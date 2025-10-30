@@ -2,7 +2,9 @@
   "name": "@money-matters/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "nx serve money-matters"
+  },
   "private": true,
   "dependencies": {
     "react": "^19.0.0",
@@ -48,6 +50,10 @@
     "webpack-cli": "^5.1.4"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "dashboardlib/*",
+    "libs/*",
+    "ui",
+    "auth"
   ]
 }

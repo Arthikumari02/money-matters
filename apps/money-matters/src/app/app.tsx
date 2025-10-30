@@ -1,3 +1,4 @@
+import { LoginForm } from '@money-matters/auth';
 import NxWelcome from './nx-welcome';
 
 import { Route, Routes, Link } from 'react-router-dom';
@@ -6,7 +7,7 @@ export function App() {
   return (
     <div>
       <NxWelcome title="@money-matters/money-matters" />
-
+      <LoginForm />
       {/* START: routes */}
       {/* These routes and navigation have been generated for you */}
       {/* Feel free to move and update them to fit your needs */}

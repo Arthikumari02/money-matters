@@ -5,6 +5,36 @@
   "references": [
     {
       "path": "./apps/money-matters"
+    },
+    {
+      "path": "./dashboardlib/mylib"
+    },
+    {
+      "path": "./libs/transactionlib"
+    },
+    {
+      "path": "./libs/authlib"
+    },
+    {
+      "path": "./libs/profilelib"
+    },
+    {
+      "path": "./libs/uilib"
+    },
+    {
+      "path": "./libs/ui"
+    },
+    {
+      "path": "./libs/auth"
+    },
+    {
+      "path": "./libs/dashboard"
+    },
+    {
+      "path": "./libs/profile"
+    },
+    {
+      "path": "./libs/transaction"
     }
   ]
 }
