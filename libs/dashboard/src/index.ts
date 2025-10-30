@@ -1,3 +1,7 @@
 // export * from './lib/dashboard';
 export { default as DashboardLayout } from './lib/components/DashboardLayout';
-export { DashboardPage } from './lib/components/DashboardPage';
+export { default as DashboardPage } from './lib/components/DashboardPage';
+export {
+  DashboardProvider,
+  useDashboardStore,
+} from './lib/contexts/DashboardContext';

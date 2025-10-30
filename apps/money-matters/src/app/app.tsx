@@ -3,7 +3,7 @@ import { LoginForm } from '@money-matters/auth';
 import { DashboardLayout } from '@money-matters/dashboard';
 import { Routes, Route } from 'react-router-dom';
 
-import { DashboardPage } from '@money-matters/dashboard';
+import { DashboardPage, DashboardProvider } from '@money-matters/dashboard';
 import { TransactionPage } from '@money-matters/transaction';
 import { ProfilePage } from '@money-matters/profile';
 
@@ -30,7 +30,9 @@ export function AppContent() {
 export const App: React.FC = () => {
   return (
     <AuthStoreProvider>
-      <AppContent />
+      <DashboardProvider>
+        <AppContent />
+      </DashboardProvider>
     </AuthStoreProvider>
   );
 };

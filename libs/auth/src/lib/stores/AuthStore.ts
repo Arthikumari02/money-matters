@@ -7,15 +7,15 @@ import {
 } from 'mobx';
 import { loginApi } from '../apis/authApi';
 
-interface UserCredentials {
-  email: string;
-  password: string;
-  id?: string;
-  isAdmin?: boolean;
+declare global {
+  interface Window {
+    localStorage: Storage;
+  }
+  const window: Window & typeof globalThis;
 }
 
-const USERS: UserCredentials[] = [
-  { email: 'admin@gmail.com', password: 'Admin@123', isAdmin: true, id: '0' },
+const USERS = [
+  { email: 'admin@gmail.com', password: 'Admin@123', isAdmin: true },
   { email: 'jane.doe@gmail.com', password: 'janedoe@123', id: '1' },
   { email: 'samsmith@gmail.com', password: 'samsmith@123', id: '2' },
   { email: 'rahul@gmail.com', password: 'rahul@123', id: '4' },
@@ -32,18 +32,20 @@ const USERS: UserCredentials[] = [
   { email: 'phani@gmail.com', password: 'phani@123', id: '17' },
 ];
 
-export interface UserInfo {
+interface UserInfo {
   id: string;
-  fullName: string;
+  fullName?: string;
+  initials?: string;
   email: string;
-  username: string;
+  username?: string;
   isAdmin: boolean;
   token: string;
-  initials?: string;
+  name?: string;
 }
 
 class AuthStore {
   token: string | null = null;
+  cliendId: string | null = null;
   userInfo: UserInfo | null = null;
   isLoading = false;
   error: string | null = null;
@@ -61,13 +63,8 @@ class AuthStore {
       setError: action,
     });
 
-    this.initializeFromStorage();
-  }
-
-  private initializeFromStorage() {
-    if (!this.isLocalStorageAvailable()) return;
-
-    const storedToken = localStorage.getItem('auth_token');
+    // Load token from localStorage on initialization
+    const storedToken = this.getLocalStorageItem('auth_token');
     if (storedToken) {
       this.token = storedToken;
       this.loadUserInfoFromStorage();
@@ -81,58 +78,34 @@ class AuthStore {
     return this.userInfo?.isAdmin || false;
   }
 
-  login = async (email: string, password: string): Promise<boolean> => {
+  login = async (email: string, password: string) => {
     this.isLoading = true;
     this.error = null;
-
-    if (!email || !password) {
-      this.error = 'Email and password are required';
-      this.isLoading = false;
-      return false;
-    }
-
     try {
-      // Find the user in our USERS array
-      const user = USERS.find(u => u.email === email && u.password === password);
-      console.log('Found user:', user); // Debug log
+      const user = USERS.find(
+        (u) => u.email === email && u.password === password
+      );
+      if (!user) throw new Error('Invalid email or password');
 
-      if (!user) {
-        throw new Error('Invalid email or password');
-      }
+      // Pass both email and password as an object to match the interface
+      const response = await loginApi({ email, password });
 
-      // For demo purposes, we'll skip the actual API call
-      // In a real app, you would make an API call here
-      // const response = await loginApi({ email, password });
-      // if (!response?.data) {
-      //   throw new Error('Invalid response from server');
-      // }
-
-      const username = user.email.split('@')[0];
       const userInfo: UserInfo = {
-        id: user.id || `user_${Date.now()}`,
-        fullName: username,
+        id: user.id || (response?.data?.id || ''),
         email: user.email,
-        username: username,
-        isAdmin: user.isAdmin === true, // Ensure boolean value
-        token: `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        initials: username.substring(0, 2).toUpperCase()
+        isAdmin: user.isAdmin || false,
+        fullName: user.email.split('@')[0],
+        initials: user.email[0].toUpperCase(),
+        username: user.email.split('@')[0],
+        token: `token_${Date.now()}`,
+        name: user.email.split('@')[0], // Keep for backward compatibility
       };
-
-      console.log('User info to be saved:', userInfo); // Debug log
 
       runInAction(() => {
         this.userInfo = userInfo;
         this.token = userInfo.token;
-
-        if (this.isLocalStorageAvailable()) {
-          try {
-            localStorage.setItem('auth_token', userInfo.token);
-            localStorage.setItem('user_info', JSON.stringify(userInfo));
-            console.log('User data saved to localStorage'); // Debug log
-          } catch (storageError) {
-            console.error('Failed to save auth data to storage:', storageError);
-          }
-        }
+        this.setLocalStorageItem('auth_token', userInfo.token);
+        this.setLocalStorageItem('user_info', JSON.stringify(userInfo));
       });
 
       return true;
@@ -146,75 +119,74 @@ class AuthStore {
     }
   };
 
-  logout = (): void => {
+  logout = () => {
     this.token = null;
     this.userInfo = null;
-    if (this.isLocalStorageAvailable()) {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_info');
-    }
+    this.removeLocalStorageItem('auth_token');
+    this.removeLocalStorageItem('user_info');
   };
 
-  setError = (message: string) => {
+  setError = (message: string | null) => {
     this.error = message;
   };
 
-  private isLocalStorageAvailable(): boolean {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
+  // Helper to safely access localStorage in both browser and Node.js
+  private getLocalStorageItem(key: string): string | null {
+    if (typeof window === 'undefined' || !window.localStorage) return null;
     try {
-      const testKey = '__test__';
-      localStorage.setItem(testKey, testKey);
-      localStorage.removeItem(testKey);
-      return true;
+      return window.localStorage.getItem(key);
     } catch (e) {
-      console.warn('localStorage is not available:', e);
-      return false;
+      console.error('Error accessing localStorage:', e);
+      return null;
     }
   }
 
-  loadUserInfoFromStorage = (): void => {
-    if (!this.isLocalStorageAvailable()) {
-      return;
-    }
-
+  // Helper to safely set localStorage in both browser and Node.js
+  private setLocalStorageItem(key: string, value: string): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
     try {
-      const userInfo = localStorage.getItem('user_info');
-      if (!userInfo) {
+      window.localStorage.setItem(key, value);
+    } catch (e) {
+      console.error('Error setting localStorage:', e);
+    }
+  }
+
+  // Helper to safely remove localStorage in both browser and Node.js
+  private removeLocalStorageItem(key: string): void {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    try {
+      window.localStorage.removeItem(key);
+    } catch (e) {
+      console.error('Error removing from localStorage:', e);
+    }
+  }
+
+  loadUserInfoFromStorage = () => {
+    const userInfo = this.getLocalStorageItem('user_info');
+    if (userInfo) {
+      try {
+        const parsedUserInfo = JSON.parse(userInfo);
+        // Only set user info if the token matches
+        if (this.token === parsedUserInfo.token) {
+          // Ensure all required fields are present
+          this.userInfo = {
+            ...parsedUserInfo,
+            fullName: parsedUserInfo.fullName || parsedUserInfo.name || parsedUserInfo.email.split('@')[0],
+            initials: parsedUserInfo.initials || (parsedUserInfo.name || parsedUserInfo.email[0]).toUpperCase(),
+            username: parsedUserInfo.username || parsedUserInfo.email.split('@')[0]
+          };
+        } else {
+          // If token doesn't match, clear everything
+          this.logout();
+        }
+      } catch {
         this.logout();
-        return;
       }
-
-      const parsedUser = JSON.parse(userInfo);
-
-      if (parsedUser &&
-        typeof parsedUser === 'object' &&
-        'id' in parsedUser &&
-        'email' in parsedUser &&
-        'token' in parsedUser) {
-
-        const safeUserInfo: UserInfo = {
-          id: String(parsedUser.id),
-          email: String(parsedUser.email),
-          username: String(parsedUser.username || parsedUser.email.split('@')[0]),
-          fullName: String(parsedUser.fullName || parsedUser.email.split('@')[0]),
-          isAdmin: Boolean(parsedUser.isAdmin),
-          token: String(parsedUser.token),
-          initials: String(parsedUser.initials || parsedUser.email.substring(0, 2).toUpperCase())
-        };
-
-        runInAction(() => {
-          this.userInfo = safeUserInfo;
-          this.token = safeUserInfo.token;
-        });
-      } else {
-        throw new Error('Invalid user data structure in storage');
+    } else {
+      // If no user info is found but we have a token, clear it
+      if (this.token) {
+        this.logout();
       }
-    } catch (error) {
-      console.error('Failed to load user info from storage:', error);
-      this.logout();
     }
   };
 }
