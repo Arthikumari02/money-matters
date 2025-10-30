@@ -27,16 +27,5 @@
     "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "include": [
-    "src/**/*.js",
-    "src/**/*.jsx",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "../transaction/src/lib/components/TransactionTabs.ts",
-    "../transaction/src/lib/components/TransactionList.ts",
-    "../transaction/src/lib/components/TransactionItem.ts",
-    "../transaction/src/lib/components/DeleteTransactionDialog.ts",
-    "../transaction/src/lib/components/AddTransactionModal.ts",
-    "../transaction/src/lib/components/EditTransactionModal.ts"
-  ]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
 }

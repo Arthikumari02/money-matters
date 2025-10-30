@@ -1,51 +1,38 @@
+import { AuthStoreProvider, RequireAuth } from '@money-matters/auth';
 import { LoginForm } from '@money-matters/auth';
-import NxWelcome from './nx-welcome';
+import { DashboardLayout } from '@money-matters/dashboard';
+import { Routes, Route } from 'react-router-dom';
 
-import { Route, Routes, Link } from 'react-router-dom';
+import { DashboardPage } from '@money-matters/dashboard';
+import { TransactionPage } from '@money-matters/transaction';
+import { ProfilePage } from '@money-matters/profile';
 
-export function App() {
+export function AppContent() {
   return (
-    <div>
-      <NxWelcome title="@money-matters/money-matters" />
-      <LoginForm />
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
-      <div role="navigation">
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
-        </ul>
-      </div>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              This is the generated root route.{' '}
-              <Link to="/page-2">Click here for page 2.</Link>
-            </div>
-          }
-        />
-        <Route
-          path="/page-2"
-          element={
-            <div>
-              <Link to="/">Click here to go back to root page.</Link>
-            </div>
-          }
-        />
-      </Routes>
-      {/* END: routes */}
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginForm />} />
+      <Route
+        element={
+          <RequireAuth>
+            <DashboardLayout />
+          </RequireAuth>
+        }
+      >
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="transactions" element={<TransactionPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+      </Route>
+    </Routes>
   );
 }
+
+export const App: React.FC = () => {
+  return (
+    <AuthStoreProvider>
+      <AppContent />
+    </AuthStoreProvider>
+  );
+};
 
 export default App;

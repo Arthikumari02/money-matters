@@ -1,9 +1,21 @@
-import { makeObservable, observable, computed, action, runInAction } from 'mobx';
-import axios from 'axios';
+import {
+  makeObservable,
+  observable,
+  computed,
+  action,
+  runInAction,
+} from 'mobx';
+import { loginApi } from '../apis/authApi';
 
-// User credentials mapping
-const USERS = [
-  { email: 'admin@gmail.com', password: 'Admin@123', isAdmin: true },
+interface UserCredentials {
+  email: string;
+  password: string;
+  id?: string;
+  isAdmin?: boolean;
+}
+
+const USERS: UserCredentials[] = [
+  { email: 'admin@gmail.com', password: 'Admin@123', isAdmin: true, id: '0' },
   { email: 'jane.doe@gmail.com', password: 'janedoe@123', id: '1' },
   { email: 'samsmith@gmail.com', password: 'samsmith@123', id: '2' },
   { email: 'rahul@gmail.com', password: 'rahul@123', id: '4' },
@@ -22,47 +34,50 @@ const USERS = [
 
 export interface UserInfo {
   id: string;
+  fullName: string;
   email: string;
+  username: string;
   isAdmin: boolean;
-  name: string;
   token: string;
+  initials?: string;
 }
 
 class AuthStore {
-  token: string | null = localStorage.getItem('auth_token') || null;
+  token: string | null = null;
   userInfo: UserInfo | null = null;
-  isLoading: boolean = false;
+  isLoading = false;
   error: string | null = null;
 
   constructor() {
     makeObservable(this, {
-      // Observable properties
       token: observable,
       userInfo: observable,
       isLoading: observable,
       error: observable,
-
-      // Computed properties
       isAuthenticated: computed,
       isAdmin: computed,
-
-      // Actions
       login: action,
       logout: action,
       setError: action,
     });
 
-    // Load user info from storage if token exists
-    if (this.token) {
+    this.initializeFromStorage();
+  }
+
+  private initializeFromStorage() {
+    if (!this.isLocalStorageAvailable()) return;
+
+    const storedToken = localStorage.getItem('auth_token');
+    if (storedToken) {
+      this.token = storedToken;
       this.loadUserInfoFromStorage();
     }
   }
 
-  get isAuthenticated(): boolean {
+  get isAuthenticated() {
     return !!this.token && !!this.userInfo;
   }
-
-  get isAdmin(): boolean {
+  get isAdmin() {
     return this.userInfo?.isAdmin || false;
   }
 
@@ -70,37 +85,58 @@ class AuthStore {
     this.isLoading = true;
     this.error = null;
 
+    if (!email || !password) {
+      this.error = 'Email and password are required';
+      this.isLoading = false;
+      return false;
+    }
+
     try {
-      // Find user in the credentials list
+      // Find the user in our USERS array
       const user = USERS.find(u => u.email === email && u.password === password);
+      console.log('Found user:', user); // Debug log
 
       if (!user) {
         throw new Error('Invalid email or password');
       }
 
-      // Mock API call to get user ID
-      const response = await axios.get('https://bursting-gelding-24.hasura.app/api/rest/get-user-id', {
-        params: { email: user.email }
-      });
+      // For demo purposes, we'll skip the actual API call
+      // In a real app, you would make an API call here
+      // const response = await loginApi({ email, password });
+      // if (!response?.data) {
+      //   throw new Error('Invalid response from server');
+      // }
 
+      const username = user.email.split('@')[0];
       const userInfo: UserInfo = {
-        id: user.id || response.data.id || '',
+        id: user.id || `user_${Date.now()}`,
+        fullName: username,
         email: user.email,
-        isAdmin: user.isAdmin || false,
-        name: user.email.split('@')[0],
-        token: `token_${Date.now()}`,
+        username: username,
+        isAdmin: user.isAdmin === true, // Ensure boolean value
+        token: `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        initials: username.substring(0, 2).toUpperCase()
       };
+
+      console.log('User info to be saved:', userInfo); // Debug log
 
       runInAction(() => {
         this.userInfo = userInfo;
         this.token = userInfo.token;
-        localStorage.setItem('auth_token', userInfo.token);
-        localStorage.setItem('user_info', JSON.stringify(userInfo));
+
+        if (this.isLocalStorageAvailable()) {
+          try {
+            localStorage.setItem('auth_token', userInfo.token);
+            localStorage.setItem('user_info', JSON.stringify(userInfo));
+            console.log('User data saved to localStorage'); // Debug log
+          } catch (storageError) {
+            console.error('Failed to save auth data to storage:', storageError);
+          }
+        }
       });
 
       return true;
     } catch (error) {
-      console.error('Login error:', error);
       this.error = error instanceof Error ? error.message : 'Login failed';
       return false;
     } finally {
@@ -113,26 +149,74 @@ class AuthStore {
   logout = (): void => {
     this.token = null;
     this.userInfo = null;
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_info');
-  };
-
-  setError = (message: string | null): void => {
-    this.error = message;
-  };
-
-  private loadUserInfoFromStorage = (): void => {
-    const userInfo = localStorage.getItem('user_info');
-    if (userInfo) {
-      try {
-        this.userInfo = JSON.parse(userInfo);
-      } catch (error) {
-        console.error('Failed to parse user info from storage', error);
-        this.logout();
-      }
+    if (this.isLocalStorageAvailable()) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
     }
   };
 
+  setError = (message: string) => {
+    this.error = message;
+  };
+
+  private isLocalStorageAvailable(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    try {
+      const testKey = '__test__';
+      localStorage.setItem(testKey, testKey);
+      localStorage.removeItem(testKey);
+      return true;
+    } catch (e) {
+      console.warn('localStorage is not available:', e);
+      return false;
+    }
+  }
+
+  loadUserInfoFromStorage = (): void => {
+    if (!this.isLocalStorageAvailable()) {
+      return;
+    }
+
+    try {
+      const userInfo = localStorage.getItem('user_info');
+      if (!userInfo) {
+        this.logout();
+        return;
+      }
+
+      const parsedUser = JSON.parse(userInfo);
+
+      if (parsedUser &&
+        typeof parsedUser === 'object' &&
+        'id' in parsedUser &&
+        'email' in parsedUser &&
+        'token' in parsedUser) {
+
+        const safeUserInfo: UserInfo = {
+          id: String(parsedUser.id),
+          email: String(parsedUser.email),
+          username: String(parsedUser.username || parsedUser.email.split('@')[0]),
+          fullName: String(parsedUser.fullName || parsedUser.email.split('@')[0]),
+          isAdmin: Boolean(parsedUser.isAdmin),
+          token: String(parsedUser.token),
+          initials: String(parsedUser.initials || parsedUser.email.substring(0, 2).toUpperCase())
+        };
+
+        runInAction(() => {
+          this.userInfo = safeUserInfo;
+          this.token = safeUserInfo.token;
+        });
+      } else {
+        throw new Error('Invalid user data structure in storage');
+      }
+    } catch (error) {
+      console.error('Failed to load user info from storage:', error);
+      this.logout();
+    }
+  };
 }
 
 const authStore = new AuthStore();

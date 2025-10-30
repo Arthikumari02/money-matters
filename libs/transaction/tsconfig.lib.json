@@ -27,5 +27,12 @@
     "eslint.config.cjs",
     "eslint.config.mjs"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../profile/src/lib/components/ProfileCard.ts",
+    "../profile/src/lib/components/ProfileDetails.ts"
+  ]
 }
