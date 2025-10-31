@@ -3,7 +3,6 @@ import { observer } from 'mobx-react-lite';
 import { useUserTransactionsApi } from '../hooks/apis/useUserTransactions';
 import { useAuthStore } from '@money-matters/auth';
 import { TransactionItemUser } from '@money-matters/ui';
-import { format } from 'date-fns';
 
 const UserTransactionsPage: React.FC = observer(() => {
   const authStore = useAuthStore();
@@ -20,7 +19,6 @@ const UserTransactionsPage: React.FC = observer(() => {
   const [activeTab, setActiveTab] = useState<'all' | 'credit' | 'debit'>('all');
   const [isDeleting, setIsDeleting] = useState<Record<string, boolean>>({});
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const ITEMS_PER_PAGE = 16;
 
   useEffect(() => {
     fetchTransactions(activeTab, true);
@@ -152,33 +150,41 @@ const UserTransactionsPage: React.FC = observer(() => {
               ))}
             </nav>
           </div>
-
-          <div
-            ref={scrollContainerRef}
-            onScroll={handleScroll}
-            className="max-h-[750px] overflow-y-auto divide-y divide-gray-200"
-          >
-            {visibleTransactions.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500">No {activeTab === 'all' ? '' : activeTab} transactions found</p>
-              </div>
-            ) : (
-              visibleTransactions.map((transaction) => (
-                <TransactionItemUser
-                  key={transaction.id}
-                  description={transaction.name}
-                  category={transaction.category}
-                  timestamp={transaction.date}
-                  amount={
-                    transaction.type === 'debit'
-                      ? `-${transaction.amount}`
-                      : `+${transaction.amount}`
-                  }
-                  onEdit={() => handleEdit(transaction.id)}
-                  onDelete={() => handleDelete(transaction.id)}
-                />
-              ))
-            )}
+          <div className="bg-white shadow-md rounded-2xl overflow-hidden">
+            <div className="grid grid-cols-5 px-6 py-3 text-sm font-semibold text-gray-600 border-b border-gray-100">
+              <span className='text-right'>User Name</span>
+              <span className='text-right'>Transaction Name</span>
+              <span className='text-right'>Category</span>
+              <span className='text-right'>Date</span>
+              <span className="text-right">Amount</span>
+            </div>
+            <div
+              ref={scrollContainerRef}
+              onScroll={handleScroll}
+              className="max-h-[750px] overflow-y-auto divide-y divide-gray-200"
+            >
+              {visibleTransactions.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No {activeTab === 'all' ? '' : activeTab} transactions found</p>
+                </div>
+              ) : (
+                visibleTransactions.map((transaction) => (
+                  <TransactionItemUser
+                    key={transaction.id}
+                    description={transaction.name}
+                    category={transaction.category}
+                    timestamp={transaction.date}
+                    amount={
+                      transaction.type === 'debit'
+                        ? `-${transaction.amount}`
+                        : `+${transaction.amount}`
+                    }
+                    onEdit={() => handleEdit(transaction.id)}
+                    onDelete={() => handleDelete(transaction.id)}
+                  />
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>

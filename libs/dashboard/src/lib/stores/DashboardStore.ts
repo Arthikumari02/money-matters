@@ -1,4 +1,4 @@
-import { makeObservable, observable, action } from 'mobx';
+import { makeObservable, observable, action, runInAction } from 'mobx';
 import {
   fetchTotalCreditsDebitsAdmin,
   fetchTotalCreditsDebitsUser,
@@ -6,19 +6,18 @@ import {
   fetchDailyTotalsAdmin,
   fetchDailyTotalsUser,
 } from '../apis/dashboardApi';
-import {
-  TransactionModel,
-  TotalsModel,
-  DailyTotalModel,
-} from '../models/Dashboard';
+import { TransactionModel } from '../models/TransactionModel';
+import { TotalsModel } from '../models/TotalsModel';
+import { DailyTotalModel } from '../models/DailyTotalModel';
 
-class DashboardStore {
-  totals: TotalsModel = { credit: 0, debit: 0 };
+export class DashboardStore {
+  totals: TotalsModel | null = null;
   recentTransactions: TransactionModel[] = [];
   dailyTotals: DailyTotalModel[] = [];
-  isLoading: boolean = false;
+  isLoading = false;
   error: string | null = null;
-  isAdmin: boolean = false;
+  isAdmin = false;
+  private userId: string | null = null;
 
   constructor() {
     makeObservable(this, {
@@ -31,6 +30,7 @@ class DashboardStore {
       setIsAdmin: action,
       setError: action,
       setLoading: action,
+      setUserId: action,
       loadTotals: action,
       loadRecentTransactions: action,
       loadDailyTotals: action,
@@ -49,8 +49,6 @@ class DashboardStore {
     this.isLoading = isLoading;
   }
 
-  private userId: string | null = null;
-
   setUserId(userId: string | null) {
     this.userId = userId;
   }
@@ -62,24 +60,21 @@ class DashboardStore {
       if (this.isAdmin) {
         data = await fetchTotalCreditsDebitsAdmin();
       } else {
-        if (!this.userId) {
-          throw new Error('User ID is required for non-admin users');
-        }
+        if (!this.userId) throw new Error('User ID is required for non-admin users');
         data = await fetchTotalCreditsDebitsUser(this.userId);
       }
 
-      // Log the response for debugging
-      console.log('Totals data:', data);
-
-      this.totals = {
-        credit: data?.total_credit || data?.totalCredit || 0,
-        debit: data?.total_debit || data?.totalDebit || 0,
-      };
+      runInAction(() => {
+        this.totals = new TotalsModel({
+          credit: data?.credit || 0,
+          debit: data?.debit || 0,
+        });
+      });
     } catch (error) {
       console.error('Error loading totals:', error);
-      this.setError(String(error));
+      runInAction(() => this.setError(String(error)));
     } finally {
-      this.setLoading(false);
+      runInAction(() => this.setLoading(false));
     }
   }
 
@@ -97,22 +92,31 @@ class DashboardStore {
         this.userId ?? undefined
       );
 
-      console.log('Recent transactions data:', data);
-
-      this.recentTransactions = (data.transactions || []).map((tx: any) => ({
-        id: tx.id,
-        direction: tx.type === 'credit' ? 'credit' : 'debit',
-        userName: tx.user_name || tx.userName || '',
-        amount: tx.amount || 0,
-        description: tx.description || tx.remarks || '',
-        category: tx.category || '',
-        timestamp: tx.timestamp || tx.date || new Date().toISOString(),
-        avatarUrl: tx.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(tx.user_name || 'U')}&background=random`,
-      }));
+      runInAction(() => {
+        this.recentTransactions = (data.transactions || []).map(
+          (tx: any) =>
+            new TransactionModel({
+              id: tx.id,
+              amount: tx.amount || 0,
+              direction: tx.type === 'credit' ? 'credit' : 'debit',
+              description: tx.description || tx.remarks || '',
+              category: tx.category || 'General',
+              timestamp: tx.timestamp || tx.date || new Date().toISOString(),
+              userId: tx.user_id || '',
+              userName: tx.user_name || tx.userName || 'Unknown User',
+              avatarUrl:
+                tx.avatarUrl ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  tx.user_name || 'U'
+                )}&background=random`,
+            })
+        );
+      });
     } catch (error) {
-      this.setError(String(error));
+      console.error('Error loading recent transactions:', error);
+      runInAction(() => this.setError(String(error)));
     } finally {
-      this.setLoading(false);
+      runInAction(() => this.setLoading(false));
     }
   }
 
@@ -122,15 +126,25 @@ class DashboardStore {
       const data = this.isAdmin
         ? await fetchDailyTotalsAdmin()
         : await fetchDailyTotalsUser(this.userId ?? '');
-      this.dailyTotals = data.daywiseTotals || [];
+
+      runInAction(() => {
+        this.dailyTotals = (data.daywiseTotals || []).map(
+          (item: any) =>
+            new DailyTotalModel({
+              date: item.date,
+              credit: item.credit || 0,
+              debit: item.debit || 0,
+            })
+        );
+      });
     } catch (error) {
-      this.setError(String(error));
+      console.error('Error loading daily totals:', error);
+      runInAction(() => this.setError(String(error)));
     } finally {
-      this.setLoading(false);
+      runInAction(() => this.setLoading(false));
     }
   }
 }
 
 const dashboardStore = new DashboardStore();
 export default dashboardStore;
-export { DashboardStore };

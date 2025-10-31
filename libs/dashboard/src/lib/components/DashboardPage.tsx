@@ -9,8 +9,8 @@ import {
   TransactionItemAdmin,
   TransactionItemUser,
 } from '@money-matters/ui';
-import totalCredit from '../../assests/totalcredit.png';
-import totalDebit from '../../assests/totaldebits.png';
+import totalCredit from '../../assets/totalcredit.png';
+import totalDebit from '../../assets/totaldebits.png';
 
 const DashboardPage: React.FC = observer(() => {
   const navigate = useNavigate();
@@ -51,6 +51,8 @@ const DashboardPage: React.FC = observer(() => {
       </div>
     );
   }
+  const credit = dashboardStore.totals?.credit || 0;
+  const debit = dashboardStore.totals?.debit || 0;
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -64,12 +66,12 @@ const DashboardPage: React.FC = observer(() => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <TotalCreditsAndDebits
-            amount={dashboardStore.totals.credit.toLocaleString()}
+            amount={`${credit.toLocaleString()}`}
             isCredit={true}
             imagePath={totalCredit}
           />
           <TotalCreditsAndDebits
-            amount={dashboardStore.totals.debit.toLocaleString()}
+            amount={`${debit.toLocaleString()}`}
             isCredit={false}
             imagePath={totalDebit}
           />
@@ -106,7 +108,6 @@ const DashboardPage: React.FC = observer(() => {
                   timestamp={txn.timestamp || new Date().toISOString()}
                   amount={
                     (txn.direction === 'debit' ? '-' : '+') +
-                    '$' +
                     (txn.amount || 0).toLocaleString()
                   }
                   onEdit={() => navigate(`/transactions/edit/${txn.id}`)}

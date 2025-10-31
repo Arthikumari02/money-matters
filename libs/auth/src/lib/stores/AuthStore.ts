@@ -69,7 +69,9 @@ class AuthStore {
       this.token = storedToken;
       this.loadUserInfoFromStorage();
     }
+
   }
+
 
   get isAuthenticated() {
     return !!this.token && !!this.userInfo;

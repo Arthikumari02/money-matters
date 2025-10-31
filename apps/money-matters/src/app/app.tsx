@@ -8,7 +8,7 @@ import {
   TransactionPage,
   TransactionProvider,
 } from '@money-matters/transaction';
-import { ProfilePage } from '@money-matters/profile';
+import { ProfilePage, ProfileProvider } from '@money-matters/profile';
 
 export function AppContent() {
   return (
@@ -49,7 +49,9 @@ export const App: React.FC = () => {
     <AuthStoreProvider>
       <DashboardProvider>
         <TransactionProvider>
-          <AppContent />
+          <ProfileProvider>
+            <AppContent />
+          </ProfileProvider>
         </TransactionProvider>
       </DashboardProvider>
     </AuthStoreProvider>
