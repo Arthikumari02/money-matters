@@ -1,173 +1,134 @@
-import { useEffect } from 'react';
-import { useLocalObservable } from 'mobx-react-lite';
-import { makeAutoObservable, runInAction } from 'mobx';
-import axios from 'axios';
+import { useState, useCallback, useEffect } from 'react';
+import axios, { AxiosError } from 'axios';
+import { TransactionModel, TransactionType } from '../../models/TransactionModel';
 
-export interface Transaction {
-  id: string;
-  transaction_name: string;
-  type: 'credit' | 'debit';
-  category: string;
-  amount: string;
-  date: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-}
+const API_BASE_URL = 'https://bursting-gelding-24.hasura.app/api/rest';
 
-interface TransactionSummary {
-  balance: number;
-  income: number;
-  expense: number;
-}
+const getAuthHeaders = (userId: string | null) => ({
+  'Content-Type': 'application/json',
+  'x-hasura-admin-secret':
+    'g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF',
+  'x-hasura-role': 'user',
+  ...(userId ? { 'x-hasura-user-id': userId } : {}),
+});
 
-class TransactionStore {
-  transactions: Transaction[] = [];
-  isLoading = false;
-  error: string | null = null;
-  activeTab: 'all' | 'credit' | 'debit' = 'all';
-  searchQuery = '';
-  hasMore = true;
-  currentPage = 1;
-  pageSize = 10;
-  userId: string | null = null;
-  summary: TransactionSummary = { balance: 0, income: 0, expense: 0 };
+export const useUserTransactionsApi = (userId: string | null) => {
+  const [transactions, setTransactions] = useState<TransactionModel[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const LIMIT = 16;
 
-  constructor(userId: string | null = null) {
-    makeAutoObservable(this);
-    this.userId = userId;
-  }
+  const fetchTransactions = useCallback(
+    async (type: 'all' | 'credit' | 'debit' = 'all', reset = false) => {
+      if (!userId || isLoading) return;
 
-  setUserId = (userId: string) => {
-    this.userId = userId;
-  };
+      setIsLoading(true);
+      setError(null);
 
-  setActiveTab = (tab: 'all' | 'credit' | 'debit') => {
-    this.activeTab = tab;
-    this.transactions = [];
-    this.currentPage = 1;
-    this.hasMore = true;
-    this.fetchTransactions(true);
-  };
+      try {
+        const headers = getAuthHeaders(userId);
+        let fetchedData: any[] = [];
 
-  setSearchQuery = (query: string) => {
-    this.searchQuery = query;
-    this.transactions = [];
-    this.currentPage = 1;
-    this.hasMore = true;
-    this.fetchTransactions(true);
-  };
+        if (type === 'all') {
+          const currentOffset = reset ? 0 : offset;
+          const params = { limit: LIMIT, offset: currentOffset };
 
-  fetchTransactions = async (reset = false) => {
-    if (!this.userId || this.isLoading) return;
+          const response = await axios.get(`${API_BASE_URL}/all-transactions`, {
+            headers,
+            params,
+          });
 
-    try {
-      this.isLoading = true;
-      this.error = null;
+          fetchedData =
+            response.data.transactions || response.data.all_transactions || [];
 
-      if (reset) {
-        this.transactions = [];
-        this.currentPage = 1;
-        this.hasMore = true;
+          const newTransactions: TransactionModel[] = fetchedData.map(
+            (tx: any) =>
+              new TransactionModel({
+                id: tx.id,
+                name: tx.transaction_name ?? 'Unnamed Transaction',
+                amount: parseFloat(tx.amount ?? 0),
+                type: (tx.type ?? 'debit').toLowerCase() as TransactionType,
+                category: tx.category ?? 'Uncategorized',
+                userId: tx.user_id,
+                userName: tx.user_name ?? 'Unknown User',
+                date: tx.date,
+                createdAt: tx.created_at,
+                updatedAt: tx.updated_at,
+                userAvatar: tx.userAvatar,
+              })
+          );
+
+          setTransactions((prev) =>
+            reset ? newTransactions : [...prev, ...newTransactions]
+          );
+          setOffset((prev) => (reset ? LIMIT : prev + LIMIT));
+          setHasMore(newTransactions.length === LIMIT);
+        }
+
+        else {
+          const response = await axios.get(`${API_BASE_URL}/all-transactions`, {
+            headers,
+            params: { limit: 1000, offset: 0 },
+          });
+
+          fetchedData =
+            response.data.transactions || response.data.all_transactions || [];
+
+          const filteredData = fetchedData.filter(
+            (tx) => (tx.type ?? '').toLowerCase() === type
+          );
+
+          const newTransactions: TransactionModel[] = filteredData.map(
+            (tx: any) =>
+              new TransactionModel({
+                id: tx.id,
+                name: tx.transaction_name ?? 'Unnamed Transaction',
+                amount: parseFloat(tx.amount ?? 0),
+                type: (tx.type ?? 'debit').toLowerCase() as TransactionType,
+                category: tx.category ?? 'Uncategorized',
+                userId: tx.user_id,
+                userName: tx.user_name ?? 'Unknown User',
+                date: tx.date,
+                createdAt: tx.created_at,
+                updatedAt: tx.updated_at,
+                userAvatar: tx.userAvatar,
+              })
+          );
+
+          setTransactions(newTransactions);
+          setHasMore(false);
+        }
+      } catch (err) {
+        const axiosError = err as AxiosError;
+        console.error('Error fetching user transactions:', axiosError);
+        setError('Failed to load transactions.');
+      } finally {
+        setIsLoading(false);
       }
-
-      const offset = (this.currentPage - 1) * this.pageSize;
-
-      const transactionsResponse = await axios.get(
-        'https://bursting-gelding-24.hasura.app/api/rest/all-transactions',
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-hasura-admin-secret':
-              process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET,
-            'x-hasura-role': 'user',
-            'x-hasura-user-id': this.userId,
-          },
-          params: {
-            limit: this.pageSize,
-            offset,
-            ...(this.activeTab !== 'all' && { type: this.activeTab }),
-            ...(this.searchQuery && { search: this.searchQuery }),
-          },
-        }
-      );
-
-      const summaryResponse = await axios.get(
-        'https://bursting-gelding-24.hasura.app/api/rest/transaction-summary',
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-hasura-admin-secret':
-              process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET,
-            'x-hasura-role': 'user',
-            'x-hasura-user-id': this.userId,
-          },
-        }
-      );
-
-      runInAction(() => {
-        this.transactions = [
-          ...this.transactions,
-          ...transactionsResponse.data.transactions,
-        ];
-        this.summary = {
-          balance: summaryResponse.data.balance || 0,
-          income: summaryResponse.data.income || 0,
-          expense: summaryResponse.data.expense || 0,
-        };
-        this.hasMore =
-          transactionsResponse.data.transactions.length === this.pageSize;
-        this.currentPage++;
-      });
-    } catch (err) {
-      console.error('Error fetching transactions:', err);
-      runInAction(() => {
-        this.error = 'Failed to load transactions. Please try again.';
-      });
-    } finally {
-      runInAction(() => {
-        this.isLoading = false;
-      });
-    }
-  };
-
-  deleteTransaction = async (id: string) => {
-    try {
-      await axios.delete(
-        `https://bursting-gelding-24.hasura.app/api/rest/transactions/${id}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-hasura-admin-secret':
-              process.env.NEXT_PUBLIC_HASURA_ADMIN_SECRET,
-            'x-hasura-role': 'user',
-            'x-hasura-user-id': this.userId,
-          },
-        }
-      );
-
-      runInAction(() => {
-        this.transactions = this.transactions.filter((tx) => tx.id !== id);
-        this.fetchTransactions(true);
-      });
-    } catch (err) {
-      console.error('Error deleting transaction:', err);
-      throw err;
-    }
-  };
-}
-
-export const useUserTransactions = (userId: string | null = null) => {
-  const store = useLocalObservable(() => new TransactionStore(userId));
+    },
+    [userId, offset, isLoading]
+  );
 
   useEffect(() => {
     if (userId) {
-      store.setUserId(userId);
-      store.fetchTransactions(true);
+      setOffset(0);
+      fetchTransactions('all', true);
     }
-  }, [userId, store]);
+  }, [userId]);
 
-  return store;
+  return {
+    transactions,
+    isLoading,
+    error,
+    hasMore,
+    fetchTransactions,
+    deleteTransaction: async (id: string) => {
+      if (!userId) return;
+      const headers = getAuthHeaders(userId);
+      await axios.delete(`${API_BASE_URL}/transactions/${id}`, { headers });
+      setTransactions((prev) => prev.filter((tx) => tx.id !== id));
+    },
+  };
 };
-
-export default useUserTransactions;

@@ -2,12 +2,9 @@ import React from 'react';
 import { useAuthStore } from '@money-matters/auth';
 import { Navigate } from 'react-router-dom';
 import AdminTransactionsPage from './AdminTransactionsPage';
+import UserTransactionsPage from './UserTransactionsPage';
 
-interface TransactionsPageProps {
-  isAdminView?: boolean;
-}
-
-const TransactionsPage: React.FC<TransactionsPageProps> = ({ isAdminView = false }) => {
+const TransactionsPage: React.FC = () => {
   const authStore = useAuthStore();
 
   if (!authStore.isAuthenticated) {
@@ -15,15 +12,11 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ isAdminView = false
   }
 
   if (authStore.isAdmin) {
-    return isAdminView ? (
-      <AdminTransactionsPage />
-    ) : (
-      <Navigate to="/admin/transactions" replace />
-    );
+    return <AdminTransactionsPage />;
   }
-
-  // For non-admin users, redirect to a different page or show a message
-  return <Navigate to="/unauthorized" replace />;
+  else {
+    return <UserTransactionsPage />;
+  }
 };
 
 export default TransactionsPage;

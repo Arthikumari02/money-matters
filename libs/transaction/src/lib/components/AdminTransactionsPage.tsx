@@ -1,35 +1,40 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
-import { useTransactions } from '../contexts/TransactionContext';
+import { useAdminTransactionsApi } from '../hooks/apis/useAdminTransactionApi';
 import { TransactionItemAdmin } from '@money-matters/ui';
 
 const AdminTransactionsPage: React.FC = observer(() => {
-  const store = useTransactions();
   const {
     transactions,
     isLoading,
     error,
-    activeTab,
     hasMore,
     fetchTransactions,
-    switchTab,
-  } = store;
+  } = useAdminTransactionsApi();
 
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'credit' | 'debit'>('all');
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Fetch initial data whenever tab changes
   useEffect(() => {
-    store.fetchTransactions(true);
-  }, [store.activeTab]);
+    fetchTransactions(activeTab, true);
+  }, [activeTab, fetchTransactions]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore && !isLoading) {
-        fetchTransactions();
-      }
-    });
-    if (loaderRef.current) observer.observe(loaderRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, isLoading]);
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    if (scrollTop + clientHeight >= scrollHeight - 20 && hasMore && !isLoading) {
+      fetchTransactions(activeTab);
+    }
+  }, [hasMore, isLoading, fetchTransactions, activeTab]);
+
+  const filteredTransactions = useMemo(() => {
+    if (activeTab === 'all') return transactions;
+    return transactions.filter((tx) => tx.type === activeTab);
+  }, [transactions, activeTab]);
 
   if (isLoading && transactions.length === 0) {
     return (
@@ -50,69 +55,77 @@ const AdminTransactionsPage: React.FC = observer(() => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] flex flex-col">
+    <div className="min-h-screen bg-[#F7F9FB] flex flex-col">
       <div className="max-w-6xl mx-auto w-full p-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Transactions</h1>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+          Transactions
+        </h1>
 
+        {/* Tabs */}
         <div className="border-b border-gray-200 mb-4">
           <nav className="flex space-x-8">
-            {['all', 'debit', 'credit'].map((tab) => {
-              const isActive = activeTab === tab;
-              const tabName = tab.charAt(0).toUpperCase() + tab.slice(1);
-              return (
-                <button
-                  key={tab}
-                  onClick={() => switchTab(tab as any)}
-                  className={`py-3 border-b-2 font-medium text-sm ${
-                    isActive
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            {[
+              { id: 'all' as const, label: 'All Transactions' },
+              { id: 'debit' as const, label: 'Debit' },
+              { id: 'credit' as const, label: 'Credit' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
-                >
-                  {tabName}
-                </button>
-              );
-            })}
+              >
+                {tab.label}
+              </button>
+            ))}
           </nav>
         </div>
 
-        <div className="bg-white shadow-md rounded-xl overflow-hidden">
+        <div className="bg-white shadow-md rounded-2xl overflow-hidden">
           <div className="grid grid-cols-5 px-6 py-3 text-sm font-semibold text-gray-600 border-b border-gray-100">
-            <span>User Name</span>
-            <span>Transaction Name</span>
-            <span>Category</span>
-            <span>Date</span>
+            <span className='text-right'>User Name</span>
+            <span className='text-right'>Transaction Name</span>
+            <span className='text-right'>Category</span>
+            <span className='text-right'>Date</span>
             <span className="text-right">Amount</span>
           </div>
 
-          {transactions.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              No transactions found
-            </div>
-          ) : (
-            transactions.map((tx) => (
-              <TransactionItemAdmin
-                key={tx.id}
-                transaction={{
-                  id: tx.id,
-                  name: tx.name,
-                  userName: tx.userName || 'Unknown',
-                  category: tx.category || 'General',
-                  type: tx.type,
-                  amount: tx.amount,
-                  date: new Date(tx.date || tx.createdAt).toLocaleString(),
-                  userAvatar: tx.userAvatar,
-                }}
-              />
-            ))
-          )}
-          {/* Loader */}
-          {isLoading && transactions.length > 0 && (
-            <div className="py-4 flex justify-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-          )}
-          <div ref={loaderRef}></div>
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="max-h-[720px] overflow-y-auto"
+          >
+            {filteredTransactions.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                No {activeTab === 'all' ? '' : activeTab} transactions found
+              </div>
+            ) : (
+              filteredTransactions.map((tx) => (
+                <TransactionItemAdmin
+                  key={tx.id}
+                  transaction={{
+                    id: tx.id,
+                    name: tx.name,
+                    userName: tx.userName || 'Unknown',
+                    category: tx.category || 'General',
+                    type: tx.type,
+                    amount: tx.amount,
+                    date: new Date(tx.date || tx.createdAt).toLocaleString(),
+                    userAvatar: tx.userAvatar,
+                  }}
+                />
+              ))
+            )}
+
+            {/* Loader at bottom */}
+            {isLoading && filteredTransactions.length > 0 && (
+              <div className="py-4 flex justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
