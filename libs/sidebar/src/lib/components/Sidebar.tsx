@@ -29,23 +29,25 @@ const Sidebar: React.FC = () => {
       </nav>
 
       <div className="border-t border-gray-200 p-4">
-        <div className="flex items-center space-x-3">
-          <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
-            {userInfo?.email?.charAt(0)?.toUpperCase() || 'U'}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold">
+              {userInfo?.email?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+
+            <div className="flex flex-col">
+              <p className="text-sm font-semibold text-gray-900 truncate">
+                {userInfo?.email || 'User'}
+              </p>
+              <p className="text-xs text-gray-500">
+                {authStore.isAdmin ? 'Admin' : 'User'}
+              </p>
+            </div>
           </div>
 
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate">
-              {userInfo?.email || 'User'}
-            </p>
-            <p className="text-xs text-gray-500">
-              {authStore.isAdmin ? 'Admin' : 'User'}
-            </p>
+          <div className="flex-shrink-0 ml-2">
+            <LogoutButton />
           </div>
-        </div>
-
-        <div className="mt-4">
-          <LogoutButton />
         </div>
       </div>
     </aside>

@@ -1,31 +1,37 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { useAuthStore } from '@money-matters/auth';
 import { useDashboardStore } from '../contexts/DashboardContext';
-import { AddTransactionButton, TotalCreditsAndDebits, TransactionItemAdmin, TransactionItemUser } from '@money-matters/ui';
-import totalCredit from '../../assests/totalcredit.png'
-import totalDebit from '../../assests/totaldebits.png'
+import {
+  AddTransactionButton,
+  TotalCreditsAndDebits,
+  TransactionItemAdmin,
+  TransactionItemUser,
+} from '@money-matters/ui';
+import totalCredit from '../../assests/totalcredit.png';
+import totalDebit from '../../assests/totaldebits.png';
 
 const DashboardPage: React.FC = observer(() => {
+  const navigate = useNavigate();
   const dashboardStore = useDashboardStore();
   const authStore = useAuthStore();
 
   const isAdmin = !!authStore.isAdmin;
-  const userId = isAdmin ? undefined : authStore.userInfo?.id;
 
   useEffect(() => {
     const initDashboard = async () => {
       try {
         dashboardStore.setIsAdmin(isAdmin);
+
         if (!isAdmin && authStore.userInfo?.id) {
           dashboardStore.setUserId(authStore.userInfo.id);
         }
 
-        // Load data in parallel
         await Promise.all([
           dashboardStore.loadTotals(),
           dashboardStore.loadRecentTransactions(),
-          dashboardStore.loadDailyTotals()
+          dashboardStore.loadDailyTotals(),
         ]);
       } catch (error) {
         console.error('Error initializing dashboard:', error);
@@ -35,7 +41,10 @@ const DashboardPage: React.FC = observer(() => {
     initDashboard();
   }, [isAdmin, authStore.userInfo?.id, dashboardStore]);
 
-  if (dashboardStore.isLoading && dashboardStore.recentTransactions.length === 0) {
+  if (
+    dashboardStore.isLoading &&
+    dashboardStore.recentTransactions.length === 0
+  ) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#e6f4d9]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
@@ -44,15 +53,16 @@ const DashboardPage: React.FC = observer(() => {
   }
 
   return (
-    <div className="min-h-screen bg-[#e6f4d9] flex">
-      <main className="flex-1 bg-[#f4f6fc] p-8">
+    <div className="min-h-screen bg-gray-50 flex">
+      <main className="flex-1 p-6 max-w-4xl mx-auto w-full">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-700">{isAdmin ? 'Admin Dashboard' : 'Dashboard'}</h2>
-          <div className='h-5 w-10'>
-            <AddTransactionButton onclick={() => {/* ... */ }} />
-          </div>
+          <h1 className="text-2xl font-bold text-gray-800">
+            {isAdmin ? 'Admin Dashboard' : 'Dashboard'}
+          </h1>
+          <AddTransactionButton onclick={() => navigate('/add-transaction')} />
         </div>
-        <div className="flex gap-4 mb-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <TotalCreditsAndDebits
             amount={dashboardStore.totals.credit.toLocaleString()}
             isCredit={true}
@@ -64,47 +74,60 @@ const DashboardPage: React.FC = observer(() => {
             imagePath={totalDebit}
           />
         </div>
-        <div className="bg-white rounded-2xl p-4 mb-6 shadow">
-          <div className="font-medium text-gray-700 mb-4">Last Transaction</div>
-          <div className="flex flex-col gap-2">
-            {dashboardStore.recentTransactions.map(txn => (
+
+        <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Last Transactions
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {dashboardStore.recentTransactions.map((txn) =>
               isAdmin ? (
                 <TransactionItemAdmin
                   key={txn.id}
-                  avatarUrl={txn.avatarUrl}
-                  direction={txn.direction}
-                  name={txn.userName}
-                  description={txn.description}
-                  category={txn.category}
-                  timestamp={txn.timestamp}
-                  amount={
-                    (txn.direction === 'debit' ? '-' : '+') +
-                    '$' +
-                    (txn.amount || 0).toLocaleString()
-                  }
+                  transaction={{
+                    id: txn.id,
+                    name: txn.description || 'No description',
+                    userName: txn.userName || 'Unknown User',
+                    category: txn.category || 'Uncategorized',
+                    type: txn.direction === 'credit' ? 'credit' : 'debit',
+                    amount: txn.amount || 0,
+                    date: txn.timestamp || new Date().toISOString(),
+                    userAvatar: txn.avatarUrl,
+                  }}
                 />
               ) : (
                 <TransactionItemUser
                   key={txn.id}
-                  description={txn.description}
-                  category={txn.category}
-                  timestamp={txn.timestamp}
+                  description={txn.description || 'No description'}
+                  category={txn.category || 'Uncategorized'}
+                  timestamp={txn.timestamp || new Date().toISOString()}
                   amount={
                     (txn.direction === 'debit' ? '-' : '+') +
                     '$' +
                     (txn.amount || 0).toLocaleString()
                   }
-                  onEdit={() => console.log('Edit:', txn.id)}
+                  onEdit={() => navigate(`/transactions/edit/${txn.id}`)}
                   onDelete={() => console.log('Delete:', txn.id)}
+                  onClick={() => navigate(`/transactions/${txn.id}`)}
                 />
               )
-            ))}
+            )}
           </div>
         </div>
-        {/* Debit & Credit Overview Section */}
-        <div className="bg-white rounded-2xl p-4">
-          <div className="font-medium text-gray-700 mb-2">Debit & Credit Overview</div>
-          {/* Bar chart to be added here */}
+
+        {/* Chart Placeholder */}
+        <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Debit & Credit Overview
+            </h2>
+          </div>
+          <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+            <p className="text-gray-400">Chart will be displayed here</p>
+          </div>
         </div>
       </main>
     </div>

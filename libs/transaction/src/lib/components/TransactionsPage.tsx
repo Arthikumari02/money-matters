@@ -1,36 +1,29 @@
 import React from 'react';
 import { useAuthStore } from '@money-matters/auth';
-import { useLocation } from 'react-router-dom';
-import UserTransactionsPage from './UserTransactionsPage';
+import { Navigate } from 'react-router-dom';
 import AdminTransactionsPage from './AdminTransactionsPage';
 
-const TransactionsPage: React.FC = () => {
+interface TransactionsPageProps {
+  isAdminView?: boolean;
+}
+
+const TransactionsPage: React.FC<TransactionsPageProps> = ({ isAdminView = false }) => {
   const authStore = useAuthStore();
-  const location = useLocation();
-  const isAdminPath = location.pathname.startsWith('/transactions');
 
   if (!authStore.isAuthenticated) {
-    return <div>Please log in to view transactions</div>;
-  }
-
-  if (
-    (authStore.isAdmin && isAdminPath) ||
-    (!authStore.isAdmin && !isAdminPath)
-  ) {
-    return authStore.isAdmin ? (
-      <AdminTransactionsPage />
-    ) : (
-      <UserTransactionsPage />
-    );
+    return <Navigate to="/login" replace />;
   }
 
   if (authStore.isAdmin) {
-    window.location.href = '/transactions';
-  } else {
-    window.location.href = '/transactions';
+    return isAdminView ? (
+      <AdminTransactionsPage />
+    ) : (
+      <Navigate to="/admin/transactions" replace />
+    );
   }
 
-  return null;
+  // For non-admin users, redirect to a different page or show a message
+  return <Navigate to="/unauthorized" replace />;
 };
 
 export default TransactionsPage;

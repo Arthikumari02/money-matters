@@ -1,155 +1,122 @@
-import React, { useState, useEffect } from 'react';
-import TransactionList, { Transaction } from './TransactionList';
+import React, { useEffect, useRef } from 'react';
+import { observer } from 'mobx-react-lite';
+import { useTransactions } from '../contexts/TransactionContext';
+import { TransactionItemAdmin } from '@money-matters/ui';
 
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    description: 'Grocery shopping',
-    amount: 125.75,
-    date: '2023-05-15T10:30:00Z',
-    userId: '1',
-    userName: 'Jane Doe',
-  },
-  {
-    id: '2',
-    description: 'Electric bill',
-    amount: 85.2,
-    date: '2023-05-10T14:45:00Z',
-    userId: '1',
-    userName: 'Jane Doe',
-  },
-  {
-    id: '3',
-    description: 'Internet bill',
-    amount: 65.99,
-    date: '2023-05-12T09:15:00Z',
-    userId: '2',
-    userName: 'John Smith',
-  },
-];
+const AdminTransactionsPage: React.FC = observer(() => {
+  const store = useTransactions();
+  const {
+    transactions,
+    isLoading,
+    error,
+    activeTab,
+    hasMore,
+    fetchTransactions,
+    switchTab,
+  } = store;
 
-const AdminTransactionsPage: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUser, setSelectedUser] = useState<string>('all');
-
-  const users = Array.from(new Set(mockTransactions.map((t) => t.userId))).map(
-    (id) => ({
-      id,
-      name:
-        mockTransactions.find((t) => t.userId === id)?.userName || `User ${id}`,
-    })
-  );
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setTransactions(mockTransactions);
-      } catch (error) {
-        console.error('Failed to fetch transactions:', error);
-      } finally {
-        setIsLoading(false);
+    store.fetchTransactions(true);
+  }, [store.activeTab]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore && !isLoading) {
+        fetchTransactions();
       }
-    };
+    });
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading]);
 
-    fetchTransactions();
-  }, []);
-
-  const filteredTransactions = transactions.filter((transaction) => {
-    const matchesSearch = transaction.description
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-
-    const matchesUser =
-      selectedUser === 'all' || transaction.userId === selectedUser;
-
-    return matchesSearch && matchesUser;
-  });
-
-  if (isLoading) {
+  if (isLoading && transactions.length === 0) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4">
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+          <p className="text-red-700">{error}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-8">
-      <div className="sm:flex sm:items-center">
-        <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            All Transactions
-          </h1>
-          <p className="mt-2 text-sm text-gray-700">
-            View and manage all user transactions.
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#f7f9fb] flex flex-col">
+      <div className="max-w-6xl mx-auto w-full p-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Transactions</h1>
 
-      <div className="mt-6 flex flex-col sm:flex-row gap-4">
-        <div className="w-full sm:max-w-xs">
-          <label htmlFor="search" className="sr-only">
-            Search
-          </label>
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <input
-              type="text"
-              name="search"
-              id="search"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Search transactions"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+        <div className="border-b border-gray-200 mb-4">
+          <nav className="flex space-x-8">
+            {['all', 'debit', 'credit'].map((tab) => {
+              const isActive = activeTab === tab;
+              const tabName = tab.charAt(0).toUpperCase() + tab.slice(1);
+              return (
+                <button
+                  key={tab}
+                  onClick={() => switchTab(tab as any)}
+                  className={`py-3 border-b-2 font-medium text-sm ${
+                    isActive
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {tabName}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div className="bg-white shadow-md rounded-xl overflow-hidden">
+          <div className="grid grid-cols-5 px-6 py-3 text-sm font-semibold text-gray-600 border-b border-gray-100">
+            <span>User Name</span>
+            <span>Transaction Name</span>
+            <span>Category</span>
+            <span>Date</span>
+            <span className="text-right">Amount</span>
           </div>
-        </div>
 
-        <div className="w-full sm:max-w-xs">
-          <label htmlFor="user-filter" className="sr-only">
-            Filter by user
-          </label>
-          <select
-            id="user-filter"
-            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            value={selectedUser}
-            onChange={(e) => setSelectedUser(e.target.value)}
-          >
-            <option value="all">All Users</option>
-            {users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.name}
-              </option>
-            ))}
-          </select>
+          {transactions.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              No transactions found
+            </div>
+          ) : (
+            transactions.map((tx) => (
+              <TransactionItemAdmin
+                key={tx.id}
+                transaction={{
+                  id: tx.id,
+                  name: tx.name,
+                  userName: tx.userName || 'Unknown',
+                  category: tx.category || 'General',
+                  type: tx.type,
+                  amount: tx.amount,
+                  date: new Date(tx.date || tx.createdAt).toLocaleString(),
+                  userAvatar: tx.userAvatar,
+                }}
+              />
+            ))
+          )}
+          {/* Loader */}
+          {isLoading && transactions.length > 0 && (
+            <div className="py-4 flex justify-center">
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          )}
+          <div ref={loaderRef}></div>
         </div>
-      </div>
-
-      <div className="mt-8">
-        <TransactionList
-          transactions={filteredTransactions}
-          isAdminView={true}
-        />
       </div>
     </div>
   );
-};
+});
 
 export default AdminTransactionsPage;

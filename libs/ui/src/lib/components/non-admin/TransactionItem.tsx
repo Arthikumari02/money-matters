@@ -1,83 +1,96 @@
+import React from 'react';
 import { FaRegEdit, FaTrashAlt } from 'react-icons/fa';
+import { FiArrowUpCircle, FiArrowDownCircle } from 'react-icons/fi';
 
-interface TransactionRowProps {
+interface TransactionItemUserProps {
   description: string;
   category: string;
   timestamp: string;
   amount: string;
   onEdit?: () => void;
   onDelete?: () => void;
+  onClick?: () => void;
 }
 
-const TransactionItem: React.FC<TransactionRowProps> = ({
+const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   description,
   category,
   timestamp,
   amount,
   onEdit,
   onDelete,
+  onClick,
 }) => {
-  // Determine if it's a debit or credit transaction
   const isDebit = amount.startsWith('-');
-
-  // Format date to show time only (e.g., "10:30 AM")
-  const formattedTime = new Date(timestamp).toLocaleTimeString('en-US', {
+  const formattedDate = new Date(timestamp).toLocaleString('en-US', {
+    month: 'short',
+    day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true
-  });
-
-  // Format date to show day and month (e.g., "20 May")
-  const formattedDate = new Date(timestamp).toLocaleDateString('en-US', {
-    day: '2-digit',
-    month: 'short'
+    hour12: true,
   });
 
   return (
-    <div className="flex items-center justify-between bg-white rounded-2xl p-4 mb-2 last:mb-0 shadow-sm hover:shadow transition-shadow">
-      <div className="flex items-center gap-4 flex-1 min-w-0">
-        <div className={`rounded-full p-2 ${isDebit ? 'bg-red-50' : 'bg-green-50'}`}>
-          <span className={`text-lg ${isDebit ? 'text-red-400' : 'text-green-400'}`}>
-            {isDebit ? '↓' : '↑'}
-          </span>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900 truncate">{description}</span>
-            <span className="text-xs text-gray-400">{formattedTime}</span>
-          </div>
-          <p className="text-sm text-gray-500 truncate">{category}</p>
-        </div>
+    <div
+      onClick={onClick}
+      className="flex items-center bg-white border px-6 py-3 gap-x-6 rounded-2xl shadow-sm hover:shadow transition-all cursor-pointer"
+    >
+      <div
+        className="flex-shrink-0 flex items-center justify-center"
+        style={{
+          borderColor: isDebit ? '#FE5C73' : '#16DBAA',
+          color: isDebit ? '#FE5C73' : '#16DBAA',
+        }}
+      >
+        {isDebit ? <FiArrowDownCircle /> : <FiArrowUpCircle />}
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="text-right">
-          <div className={`font-semibold ${isDebit ? 'text-red-500' : 'text-green-500'}`}>
-            {amount}
-          </div>
-          <div className="text-xs text-gray-400">{formattedDate}</div>
-        </div>
+      <div className="flex-1 min-w-[160px]">
+        <span className="text-[15px] text-[#505887] font-medium truncate block">
+          {description}
+        </span>
+      </div>
 
-        <div className="flex items-center gap-2 ml-2">
-          <button
-            onClick={onEdit}
-            className="text-gray-400 hover:text-blue-500 p-1 rounded-full hover:bg-gray-100"
-            aria-label="Edit transaction"
-          >
-            <FaRegEdit className="w-4 h-4" />
-          </button>
-          <button
-            onClick={onDelete}
-            className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-gray-100"
-            aria-label="Delete transaction"
-          >
-            <FaTrashAlt className="w-4 h-4" />
-          </button>
-        </div>
+      <div className="min-w-[120px] text-[#718EBF] text-[14px] text-center truncate">
+        {category}
+      </div>
+
+      <div className="min-w-[150px] text-[#718EBF] text-[14px] text-center">
+        {formattedDate}
+      </div>
+
+      <div
+        className={`min-w-[80px] text-right text-[15px] font-semibold ${
+          isDebit ? 'text-[#FE5C73]' : 'text-[#16DBAA]'
+        }`}
+      >
+        {amount}
+      </div>
+
+      <div className="flex items-center gap-x-2 min-w-fit">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit?.();
+          }}
+          className="text-[#2D60FF] hover:text-blue-400 transition-colors p-1"
+          aria-label="Edit transaction"
+        >
+          <FaRegEdit className="w-4 h-4" />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete?.();
+          }}
+          className="text-[#FE5C73] hover:text-red-400 transition-colors p-1"
+          aria-label="Delete transaction"
+        >
+          <FaTrashAlt className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
 };
 
-export default TransactionItem;
+export default TransactionItemUser;

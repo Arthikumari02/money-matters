@@ -1,63 +1,76 @@
-interface TransactionItemProps {
-  avatarUrl: string;
-  direction: 'credit' | 'debit';
-  name: string;
-  description: string;
-  category: string;
-  timestamp: string;
-  amount: string;
+import React from 'react';
+import { FiArrowUpCircle, FiArrowDownCircle } from 'react-icons/fi';
+
+interface TransactionItemAdminProps {
+  transaction: {
+    id: string;
+    name: string;
+    userName: string;
+    category: string;
+    type: 'credit' | 'debit';
+    amount: number;
+    date: string;
+    userAvatar?: string;
+  };
 }
 
-const TransactionItem: React.FC<TransactionItemProps> = ({
-  avatarUrl,
-  direction,
-  name,
-  description,
-  category,
-  timestamp,
-  amount,
+export const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({
+  transaction,
 }) => {
-  // Format date to show time only (e.g., "10:30 AM")
-  const formattedTime = new Date(timestamp).toLocaleTimeString('en-US', {
+  const { userName, name, category, type, amount, date, userAvatar } =
+    transaction;
+
+  const formattedDate = new Date(date).toLocaleString('en-US', {
+    month: 'short',
+    day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true
-  });
-
-  // Format date to show day and month (e.g., "20 May")
-  const formattedDate = new Date(timestamp).toLocaleDateString('en-US', {
-    day: '2-digit',
-    month: 'short'
+    hour12: true,
   });
 
   return (
-    <div className="flex items-center justify-between bg-white rounded-2xl p-4 mb-2 last:mb-0 shadow-sm hover:shadow transition-shadow">
-      <div className="flex items-center gap-4 flex-1 min-w-0">
-        <div className={`rounded-full p-2 ${direction === 'debit' ? 'bg-red-50' : 'bg-green-50'}`}>
-          <span className={`text-lg ${direction === 'debit' ? 'text-red-400' : 'text-green-400'}`}>
-            {direction === 'debit' ? '↓' : '↑'}
-          </span>
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900 truncate">{name}</span>
-            <span className="text-xs text-gray-400">{formattedTime}</span>
-          </div>
-          <p className="text-sm text-gray-500 truncate">{description}</p>
-        </div>
+    <div className="flex items-center justify-between bg-white px-3 py-2 rounded-2xl shadow-sm hover:shadow transition-all border border-gray-100">
+      <div className="flex items-center w-[40px] justify-center">
+        {type === 'credit' ? (
+          <FiArrowUpCircle className="text-[#16DBAA] text-xl" />
+        ) : (
+          <FiArrowDownCircle className="text-[#FE5C73] text-xl" />
+        )}
       </div>
-      
-      <div className="flex items-center gap-4 ml-4">
-        <div className="text-right">
-          <div className={`font-semibold ${direction === 'debit' ? 'text-red-500' : 'text-green-500'}`}>
-            {amount}
-          </div>
-          <div className="text-xs text-gray-400">{formattedDate}</div>
-        </div>
+
+      <div className="flex items-center gap-3 min-w-[150px]">
+        <img
+          src={
+            userAvatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              userName
+            )}&background=random`
+          }
+          alt={userName}
+          className="w-8 h-8 rounded-full object-cover"
+        />
+        <span className="text-[#343C6A] font-medium">{userName}</span>
+      </div>
+
+      <div className="min-w-[160px] text-[#505887] text-[15px]">{name}</div>
+
+      <div className="min-w-[120px] text-[#718EBF] text-[14px] text-center">
+        {category}
+      </div>
+
+      <div className="min-w-[150px] text-[#718EBF] text-[14px] text-center">
+        {formattedDate}
+      </div>
+
+      <div
+        className={`min-w-[90px] text-right font-semibold text-[15px] ${
+          type === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'
+        }`}
+      >
+        {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
       </div>
     </div>
   );
 };
 
-export default TransactionItem;
+export default TransactionItemAdmin;

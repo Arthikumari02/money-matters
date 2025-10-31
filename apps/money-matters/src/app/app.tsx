@@ -4,7 +4,10 @@ import { DashboardLayout } from '@money-matters/dashboard';
 import { Routes, Route } from 'react-router-dom';
 
 import { DashboardPage, DashboardProvider } from '@money-matters/dashboard';
-import { TransactionPage } from '@money-matters/transaction';
+import {
+  TransactionPage,
+  TransactionProvider,
+} from '@money-matters/transaction';
 import { ProfilePage } from '@money-matters/profile';
 
 export function AppContent() {
@@ -20,7 +23,21 @@ export function AppContent() {
       >
         <Route path="/" element={<DashboardPage />} />
         <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="transactions" element={<TransactionPage />} />
+
+        <Route path="transactions">
+          <Route index element={<TransactionPage />} />
+          <Route path="user" element={<TransactionPage />} />
+        </Route>
+
+        <Route
+          path="admin/transactions"
+          element={
+            <RequireAuth requireAdmin>
+              <TransactionPage />
+            </RequireAuth>
+          }
+        />
+
         <Route path="profile" element={<ProfilePage />} />
       </Route>
     </Routes>
@@ -31,7 +48,9 @@ export const App: React.FC = () => {
   return (
     <AuthStoreProvider>
       <DashboardProvider>
-        <AppContent />
+        <TransactionProvider>
+          <AppContent />
+        </TransactionProvider>
       </DashboardProvider>
     </AuthStoreProvider>
   );
