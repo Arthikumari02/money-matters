@@ -1,8 +1,15 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from 'react';
 import { observer } from 'mobx-react-lite';
 import { useUserTransactionsApi } from '../hooks/apis/useUserTransactions';
 import { useAuthStore } from '@money-matters/auth';
 import { TransactionItemUser } from '@money-matters/ui';
+import { toast } from 'react-toastify';
 
 const UserTransactionsPage: React.FC = observer(() => {
   const authStore = useAuthStore();
@@ -17,13 +24,11 @@ const UserTransactionsPage: React.FC = observer(() => {
   } = useUserTransactionsApi(userId);
 
   const [activeTab, setActiveTab] = useState<'all' | 'credit' | 'debit'>('all');
-  const [isDeleting, setIsDeleting] = useState<Record<string, boolean>>({});
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchTransactions(activeTab, true);
   }, [activeTab]);
-
 
   const handleScroll = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -37,7 +42,6 @@ const UserTransactionsPage: React.FC = observer(() => {
       }
     }
   }, [hasMore, isLoading, fetchTransactions, activeTab]);
-
 
   const { totalCredit, totalDebit, balance } = useMemo(() => {
     return transactions.reduce(
@@ -55,7 +59,7 @@ const UserTransactionsPage: React.FC = observer(() => {
   }, [transactions]);
 
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(transaction => {
+    return transactions.filter((transaction) => {
       if (activeTab === 'all') return true;
       return transaction.type === activeTab;
     });
@@ -63,31 +67,17 @@ const UserTransactionsPage: React.FC = observer(() => {
 
   console.log('Transaction counts:', {
     all: transactions.length,
-    credit: transactions.filter(t => t.type === 'credit').length,
-    debit: transactions.filter(t => t.type === 'debit').length,
+    credit: transactions.filter((t) => t.type === 'credit').length,
+    debit: transactions.filter((t) => t.type === 'debit').length,
     filtered: filteredTransactions.length,
-    summary: { totalCredit, totalDebit, balance }
+    summary: { totalCredit, totalDebit, balance },
   });
 
-  const visibleTransactions = filteredTransactions;
-
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this transaction?')) {
-      try {
-        setIsDeleting((prev) => ({ ...prev, [id]: true }));
-        await deleteTransaction(id);
-      } catch (err) {
-        console.error('Failed to delete transaction:', err);
-      } finally {
-        setIsDeleting((prev) => ({ ...prev, [id]: false }));
-      }
-    }
-  };
-
-  const handleEdit = useCallback((id: string) => {
-    console.log('Edit transaction:', id);
-  }, []);
-
+  const handleUpdateSuccess = useCallback(() => {
+    // Refresh transactions when a transaction is updated
+    fetchTransactions(activeTab, true);
+    toast.success('Transaction updated successfully!');
+  }, [activeTab, fetchTransactions]);
 
   if (isLoading && transactions.length === 0) {
     return (
@@ -111,7 +101,9 @@ const UserTransactionsPage: React.FC = observer(() => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Your Transactions</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Your Transactions
+          </h1>
         </div>
 
         <div className="bg-white rounded-lg shadow mb-6 overflow-hidden">
@@ -121,56 +113,56 @@ const UserTransactionsPage: React.FC = observer(() => {
                 {
                   id: 'all' as const,
                   label: 'All Transactions',
-                  count: transactions.length
+                  count: transactions.length,
                 },
                 {
                   id: 'credit' as const,
                   label: 'Credit',
-                  count: transactions.filter(t => t.type === 'credit').length
+                  count: transactions.filter((t) => t.type === 'credit').length,
                 },
                 {
                   id: 'debit' as const,
                   label: 'Debit',
-                  count: transactions.filter(t => t.type === 'debit').length
+                  count: transactions.filter((t) => t.type === 'debit').length,
                 },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
+                  className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
                 >
-                  <div className="flex items-center">
-                    {tab.label}
-
-                  </div>
+                  <div className="flex items-center">{tab.label}</div>
                 </button>
               ))}
             </nav>
           </div>
           <div className="bg-white shadow-md rounded-2xl overflow-hidden">
-            <div className="grid grid-cols-5 px-6 py-3 text-sm font-semibold text-gray-600 border-b border-gray-100">
-              <span className='text-right'>User Name</span>
-              <span className='text-right'>Transaction Name</span>
-              <span className='text-right'>Category</span>
-              <span className='text-right'>Date</span>
-              <span className="text-right">Amount</span>
+            <div className="grid grid-cols-4 px-7 py-3 text-sm font-semibold text-gray-600 border-b border-gray-100">
+              <span className="text-center">Transaction Name</span>
+              <span className="text-right">Category</span>
+              <span className="text-center">Date</span>
+              <span className="text-center">Amount</span>
             </div>
             <div
               ref={scrollContainerRef}
               onScroll={handleScroll}
               className="max-h-[750px] overflow-y-auto divide-y divide-gray-200"
             >
-              {visibleTransactions.length === 0 ? (
+              {filteredTransactions.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500">No {activeTab === 'all' ? '' : activeTab} transactions found</p>
+                  <p className="text-gray-500">
+                    No {activeTab === 'all' ? '' : activeTab} transactions found
+                  </p>
                 </div>
               ) : (
-                visibleTransactions.map((transaction) => (
+                filteredTransactions.map((transaction) => (
                   <TransactionItemUser
                     key={transaction.id}
+                    id={transaction.id}
                     description={transaction.name}
                     category={transaction.category}
                     timestamp={transaction.date}
@@ -179,8 +171,9 @@ const UserTransactionsPage: React.FC = observer(() => {
                         ? `-${transaction.amount}`
                         : `+${transaction.amount}`
                     }
-                    onEdit={() => handleEdit(transaction.id)}
-                    onDelete={() => handleDelete(transaction.id)}
+                    userId={userId}
+                    onUpdateSuccess={handleUpdateSuccess}
+                    onDelete={deleteTransaction}
                   />
                 ))
               )}

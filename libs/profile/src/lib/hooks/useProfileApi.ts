@@ -1,62 +1,60 @@
-import { useState } from 'react';
-import { Profile, IProfile, UpdateProfileDTO } from '../models/ProfileModel';
-
-const API_BASE_URL = '/api/profile';
+import { IProfile } from '../models/ProfileModel';
 
 export const useProfileApi = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const getProfile = async (profileId: string): Promise<IProfile | null> => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${API_BASE_URL}/${profileId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch profile');
-      }
-      return await response.json();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch profile';
-      setError(errorMessage);
-      console.error('Error fetching profile:', errorMessage);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateProfile = async (profileId: string, data: UpdateProfileDTO): Promise<IProfile | null> => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${API_BASE_URL}/${profileId}`, {
-        method: 'PUT',
+  const getProfile = async (userId: string): Promise<IProfile> => {
+    const response = await fetch(
+      'https://bursting-gelding-24.hasura.app/api/rest/profile',
+      {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'x-hasura-admin-secret':
+            'g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF',
+          'x-hasura-role': 'user',
+          'x-hasura-user-id': userId,
         },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
       }
+    );
 
-      return await response.json();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update profile';
-      setError(errorMessage);
-      console.error('Error updating profile:', errorMessage);
-      return null;
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) throw new Error('Failed to fetch profile');
+
+    const data = await response.json();
+    console.log('API Response:', data);
+
+    const users = data.users || [];
+    const profile = Array.isArray(users) ? users[0] : null;
+
+    if (!profile) {
+      console.error('No profile data found in response:', data);
+      throw new Error('Profile data is empty');
     }
+
+    console.log('Profile data:', JSON.stringify(profile, null, 2));
+
+    return {
+      id: profile.id,
+      userId: profile.user_id || profile.id,
+      name:
+        profile.name ||
+        `${profile.first_name || ''} ${profile.last_name || ''}`.trim() ||
+        'Unknown User',
+      userName:
+        profile.username ||
+        profile.userName ||
+        profile.email?.split('@')[0] ||
+        'user',
+      email: profile.email || '',
+      presentAddress: profile.present_address || profile.presentAddress,
+      permanentAddress: profile.permanent_address || profile.permanentAddress,
+      city: profile.city,
+      country: profile.country,
+      postalCode: profile.postal_code || profile.postalCode,
+      avatarUrl: profile.avatar_url || profile.avatarUrl,
+      dateOfBirth: profile.date_of_birth || profile.dateOfBirth,
+      createdAt: profile.created_at || new Date().toISOString(),
+      updatedAt: profile.updated_at || new Date().toISOString(),
+    };
   };
 
-  return {
-    getProfile,
-    updateProfile,
-    isLoading,
-    error,
-  };
+  return { getProfile };
 };

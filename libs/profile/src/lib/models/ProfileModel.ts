@@ -3,10 +3,14 @@ import { BaseModel } from './BaseModel';
 export interface IProfile {
     id: string;
     userId: string;
-    firstName: string;
-    lastName: string;
+    name: string;
+    userName: string;
     email: string;
-    phoneNumber?: string;
+    presentAddress?: string;
+    permanentAddress?: string;
+    city?: string;
+    country?: string;
+    postalCode?: string;
     avatarUrl?: string;
     dateOfBirth?: Date | null;
     createdAt: Date;
@@ -32,20 +36,36 @@ export class Profile extends BaseModel<IProfile> {
         return this.props.userId;
     }
 
-    get firstName(): string {
-        return this.props.firstName;
+    get name(): string {
+        return this.props.name as string;
     }
 
-    get lastName(): string {
-        return this.props.lastName;
+    get userName(): string {
+        return this.props.userName as string;
     }
 
     get email(): string {
         return this.props.email;
     }
 
-    get phoneNumber(): string | undefined {
-        return this.props.phoneNumber;
+    get presentAddress(): string | undefined {
+        return this.props.presentAddress;
+    }
+
+    get permanentAddress(): string | undefined {
+        return this.props.permanentAddress;
+    }
+
+    get city(): string | undefined {
+        return this.props.city;
+    }
+
+    get country(): string | undefined {
+        return this.props.country;
+    }
+
+    get postalCode(): string | undefined {
+        return this.props.postalCode;
     }
 
     get avatarUrl(): string | undefined {
@@ -57,11 +77,11 @@ export class Profile extends BaseModel<IProfile> {
     }
 
     get fullName(): string {
-        return `${this.firstName} ${this.lastName}`.trim();
+        return `${this.name} ${this.userName}`.trim();
     }
 
     get initials(): string {
-        return `${this.firstName[0]}${this.lastName[0]}`.toUpperCase();
+        return `${this.name[0]}${this.userName[0]}`.toUpperCase();
     }
 
     get formattedDateOfBirth(): string {

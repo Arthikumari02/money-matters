@@ -63,9 +63,8 @@ export const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({
       </div>
 
       <div
-        className={`min-w-[90px] text-right font-semibold text-[15px] ${
-          type === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'
-        }`}
+        className={`min-w-[90px] text-right font-semibold text-[15px] ${type === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'
+          }`}
       >
         {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
       </div>

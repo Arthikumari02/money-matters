@@ -63,15 +63,12 @@ class AuthStore {
       setError: action,
     });
 
-    // Load token from localStorage on initialization
     const storedToken = this.getLocalStorageItem('auth_token');
     if (storedToken) {
       this.token = storedToken;
       this.loadUserInfoFromStorage();
     }
-
   }
-
 
   get isAuthenticated() {
     return !!this.token && !!this.userInfo;
@@ -89,18 +86,17 @@ class AuthStore {
       );
       if (!user) throw new Error('Invalid email or password');
 
-      // Pass both email and password as an object to match the interface
       const response = await loginApi({ email, password });
 
       const userInfo: UserInfo = {
-        id: user.id || (response?.data?.id || ''),
+        id: user.id || response?.data?.id || '',
         email: user.email,
         isAdmin: user.isAdmin || false,
         fullName: user.email.split('@')[0],
         initials: user.email[0].toUpperCase(),
         username: user.email.split('@')[0],
         token: `token_${Date.now()}`,
-        name: user.email.split('@')[0], // Keep for backward compatibility
+        name: user.email.split('@')[0],
       };
 
       runInAction(() => {
@@ -132,7 +128,6 @@ class AuthStore {
     this.error = message;
   };
 
-  // Helper to safely access localStorage in both browser and Node.js
   private getLocalStorageItem(key: string): string | null {
     if (typeof window === 'undefined' || !window.localStorage) return null;
     try {
@@ -143,7 +138,6 @@ class AuthStore {
     }
   }
 
-  // Helper to safely set localStorage in both browser and Node.js
   private setLocalStorageItem(key: string, value: string): void {
     if (typeof window === 'undefined' || !window.localStorage) return;
     try {
@@ -153,7 +147,6 @@ class AuthStore {
     }
   }
 
-  // Helper to safely remove localStorage in both browser and Node.js
   private removeLocalStorageItem(key: string): void {
     if (typeof window === 'undefined' || !window.localStorage) return;
     try {
@@ -168,24 +161,26 @@ class AuthStore {
     if (userInfo) {
       try {
         const parsedUserInfo = JSON.parse(userInfo);
-        // Only set user info if the token matches
         if (this.token === parsedUserInfo.token) {
-          // Ensure all required fields are present
           this.userInfo = {
             ...parsedUserInfo,
-            fullName: parsedUserInfo.fullName || parsedUserInfo.name || parsedUserInfo.email.split('@')[0],
-            initials: parsedUserInfo.initials || (parsedUserInfo.name || parsedUserInfo.email[0]).toUpperCase(),
-            username: parsedUserInfo.username || parsedUserInfo.email.split('@')[0]
+            fullName:
+              parsedUserInfo.fullName ||
+              parsedUserInfo.name ||
+              parsedUserInfo.email.split('@')[0],
+            initials:
+              parsedUserInfo.initials ||
+              (parsedUserInfo.name || parsedUserInfo.email[0]).toUpperCase(),
+            username:
+              parsedUserInfo.username || parsedUserInfo.email.split('@')[0],
           };
         } else {
-          // If token doesn't match, clear everything
           this.logout();
         }
       } catch {
         this.logout();
       }
     } else {
-      // If no user info is found but we have a token, clear it
       if (this.token) {
         this.logout();
       }

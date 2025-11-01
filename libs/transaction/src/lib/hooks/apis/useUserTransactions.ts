@@ -1,6 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
-import { TransactionModel, TransactionType } from '../../models/TransactionModel';
+import {
+  TransactionModel,
+  TransactionType,
+} from '../../models/TransactionModel';
 
 const API_BASE_URL = 'https://bursting-gelding-24.hasura.app/api/rest';
 
@@ -65,9 +68,7 @@ export const useUserTransactionsApi = (userId: string | null) => {
           );
           setOffset((prev) => (reset ? LIMIT : prev + LIMIT));
           setHasMore(newTransactions.length === LIMIT);
-        }
-
-        else {
+        } else {
           const response = await axios.get(`${API_BASE_URL}/all-transactions`, {
             headers,
             params: { limit: 1000, offset: 0 },
@@ -118,17 +119,136 @@ export const useUserTransactionsApi = (userId: string | null) => {
     }
   }, [userId]);
 
+  const testTransactionConnection = async (transactionId: string) => {
+    try {
+      const testUrl = `${API_BASE_URL}/transaction/${transactionId}`;
+      console.log('Testing connection to:', testUrl);
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-hasura-admin-secret':
+          'g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF',
+        'x-hasura-role': 'user',
+        'x-hasura-user-id': userId || '',
+      };
+
+      const response = await axios.get(testUrl, { headers });
+      console.log('Test response:', {
+        status: response.status,
+        data: response.data,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Test connection failed:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        isAxiosError: axios.isAxiosError(error),
+        status: (error as any)?.response?.status,
+        data: (error as any)?.response?.data,
+      });
+      throw error;
+    }
+  };
+
   return {
     transactions,
     isLoading,
     error,
     hasMore,
     fetchTransactions,
-    deleteTransaction: async (id: string) => {
-      if (!userId) return;
-      const headers = getAuthHeaders(userId);
-      await axios.delete(`${API_BASE_URL}/transactions/${id}`, { headers });
-      setTransactions((prev) => prev.filter((tx) => tx.id !== id));
+    testTransactionConnection,
+    deleteTransaction: async (id: string): Promise<boolean> => {
+      console.log('Attempting to delete transaction with ID:', id);
+      console.log(
+        'Available transaction IDs:',
+        transactions.map((tx) => tx.id)
+      );
+
+      if (!userId) {
+        console.error('Delete failed: User not authenticated');
+        throw new Error('User not authenticated');
+      }
+
+      try {
+        const deleteUrl = `${API_BASE_URL}/delete-transaction/${id}`;
+        console.log('Sending DELETE request to:', deleteUrl);
+
+        const headers = {
+          'Content-Type': 'application/json',
+          'x-hasura-admin-secret':
+            'g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF',
+          'x-hasura-role': 'user',
+          'x-hasura-user-id': userId,
+        };
+
+        console.log('Request headers:', JSON.stringify(headers, null, 2));
+
+        const response = await axios.delete(deleteUrl, {
+          headers,
+          validateStatus: (status) => status < 500, // Don't throw for 4xx errors
+        });
+
+        console.log('Delete response:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: response.data,
+          headers: response.headers,
+        });
+
+        if (response.status === 200 || response.status === 204) {
+          console.log('Delete successful, updating UI');
+          setTransactions((prev) => prev.filter((tx) => tx.id !== id));
+          return true;
+        }
+
+        // Handle specific error cases
+        let errorMessage = 'Failed to delete transaction';
+        if (response.status === 404) {
+          errorMessage = 'Transaction not found or already deleted';
+        } else if (response.status === 403) {
+          errorMessage =
+            'You do not have permission to delete this transaction';
+        } else if (response.data?.error) {
+          errorMessage = response.data.error;
+        } else if (response.data?.message) {
+          errorMessage = response.data.message;
+        }
+
+        console.error(
+          'Delete failed with status',
+          response.status,
+          ':',
+          errorMessage
+        );
+        throw new Error(errorMessage);
+      } catch (error) {
+        console.error('Error in deleteTransaction:', {
+          error,
+          isAxiosError: axios.isAxiosError(error),
+          status: (error as any)?.response?.status,
+          data: (error as any)?.response?.data,
+          config: {
+            url: (error as any)?.config?.url,
+            method: (error as any)?.config?.method,
+            headers: (error as any)?.config?.headers,
+          },
+        });
+
+        if (axios.isAxiosError(error)) {
+          const errorData = error.response?.data;
+          const errorMessage =
+            errorData?.error ||
+            errorData?.message ||
+            error.message ||
+            'Failed to delete transaction. Please try again.';
+          throw new Error(errorMessage);
+        }
+
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'An unexpected error occurred';
+        throw new Error(`Failed to delete transaction: ${errorMessage}`);
+      }
     },
   };
 };

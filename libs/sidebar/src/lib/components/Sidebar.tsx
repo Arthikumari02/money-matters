@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuthStore } from '@money-matters/auth';
 import { sidebarLinks } from '../model/Sidebarmodel';
 import SidebarItem from './SidebarItem';
 import LogoutButton from './LogoutButton';
 import logo from '../../assets/money-matters-logo.png';
+import { ConfirmationModel } from '@money-matters/ui';
 
 const Sidebar: React.FC = () => {
   const authStore = useAuthStore();
   const userInfo = authStore.userInfo;
   const userRole = authStore.isAdmin ? 'admin' : 'user';
+
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const links = sidebarLinks.filter(
     (link) => !link.roles || link.roles.includes(userRole)
