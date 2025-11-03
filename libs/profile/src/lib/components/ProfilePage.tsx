@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useAuthStore } from '@money-matters/auth';
+import { AddTransactionButton } from '@money-matters/ui';
 import { useProfileStore } from '../contexts/ProfileContext';
 
 const ProfilePage: React.FC = observer(() => {
@@ -29,14 +30,12 @@ const ProfilePage: React.FC = observer(() => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] ">
-      <div className="flex justify-between items-center mb-8 bg-white p-3">
-        <h1 className="text-2xl font-semibold text-gray-800">Profile</h1>
-        <button className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm hover:bg-blue-700">
-          + Add Transaction
-        </button>
+      <div className="flex justify-between items-center mb-9 bg-white p-5">
+        <h1 className="text-2xl font-bold text-gray-800">Profile</h1>
+        <AddTransactionButton userId={authStore.userInfo?.id ?? ''} />
       </div>
 
-      <div className="bg-white shadow-sm rounded-2xl p-8 max-w-4xl">
+      <div className="bg-white shadow-sm rounded-2xl max-w-4xl mx-auto p-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2">
           <img
             src={

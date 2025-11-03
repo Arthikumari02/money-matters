@@ -8,20 +8,13 @@ import React, {
 import { observer } from 'mobx-react-lite';
 import { useUserTransactionsApi } from '../hooks/apis/useUserTransactions';
 import { useAuthStore } from '@money-matters/auth';
-import { TransactionItemUser } from '@money-matters/ui';
-import { toast } from 'react-toastify';
+import { TransactionItemUser, AddTransactionButton } from '@money-matters/ui';
 
 const UserTransactionsPage: React.FC = observer(() => {
   const authStore = useAuthStore();
   const userId = authStore.userInfo?.id || '';
-  const {
-    transactions,
-    isLoading,
-    error,
-    hasMore,
-    fetchTransactions,
-    deleteTransaction,
-  } = useUserTransactionsApi(userId);
+  const { transactions, isLoading, error, hasMore, fetchTransactions } =
+    useUserTransactionsApi(userId);
 
   const [activeTab, setActiveTab] = useState<'all' | 'credit' | 'debit'>('all');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -43,41 +36,12 @@ const UserTransactionsPage: React.FC = observer(() => {
     }
   }, [hasMore, isLoading, fetchTransactions, activeTab]);
 
-  const { totalCredit, totalDebit, balance } = useMemo(() => {
-    return transactions.reduce(
-      (acc, transaction) => {
-        if (transaction.type === 'credit') {
-          acc.totalCredit += transaction.amount;
-        } else if (transaction.type === 'debit') {
-          acc.totalDebit += transaction.amount;
-        }
-        acc.balance = acc.totalCredit - acc.totalDebit;
-        return acc;
-      },
-      { totalCredit: 0, totalDebit: 0, balance: 0 }
-    );
-  }, [transactions]);
-
   const filteredTransactions = useMemo(() => {
     return transactions.filter((transaction) => {
       if (activeTab === 'all') return true;
       return transaction.type === activeTab;
     });
   }, [transactions, activeTab]);
-
-  console.log('Transaction counts:', {
-    all: transactions.length,
-    credit: transactions.filter((t) => t.type === 'credit').length,
-    debit: transactions.filter((t) => t.type === 'debit').length,
-    filtered: filteredTransactions.length,
-    summary: { totalCredit, totalDebit, balance },
-  });
-
-  const handleUpdateSuccess = useCallback(() => {
-    // Refresh transactions when a transaction is updated
-    fetchTransactions(activeTab, true);
-    toast.success('Transaction updated successfully!');
-  }, [activeTab, fetchTransactions]);
 
   if (isLoading && transactions.length === 0) {
     return (
@@ -99,14 +63,18 @@ const UserTransactionsPage: React.FC = observer(() => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex justify-between items-center">
+      <div className="">
+        <div className="mb-6 flex justify-between items-center bg-white p-5">
           <h1 className="text-2xl font-bold text-gray-900">
             Your Transactions
           </h1>
+          <AddTransactionButton
+            userId={authStore.userInfo?.id ?? ''}
+            onSuccess={() => fetchTransactions()}
+          />
         </div>
 
-        <div className="bg-white rounded-lg shadow mb-6 overflow-hidden">
+        <div className="bg-white rounded-lg shadow mb-6 overflow-hidden max-w-4xl mx-auto p-4 sm:px-6 lg:px-8">
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
               {[
@@ -172,8 +140,8 @@ const UserTransactionsPage: React.FC = observer(() => {
                         : `+${transaction.amount}`
                     }
                     userId={userId}
-                    onUpdateSuccess={handleUpdateSuccess}
-                    onDelete={deleteTransaction}
+                    onDeleteSuccess={() => fetchTransactions()}
+                    onUpdateSuccess={() => fetchTransactions()}
                   />
                 ))
               )}
