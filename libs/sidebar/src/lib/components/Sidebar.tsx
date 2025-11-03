@@ -4,7 +4,6 @@ import { sidebarLinks } from '../model/Sidebarmodel';
 import SidebarItem from './SidebarItem';
 import LogoutButton from './LogoutButton';
 import logo from '../../assets/money-matters-logo.png';
-import { ConfirmationModel } from '@money-matters/ui';
 
 const Sidebar: React.FC = () => {
   const authStore = useAuthStore();

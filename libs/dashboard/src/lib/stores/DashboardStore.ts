@@ -1,13 +1,6 @@
-import { makeObservable, observable, action, runInAction } from 'mobx';
-import {
-  fetchTotalCreditsDebitsAdmin,
-  fetchTotalCreditsDebitsUser,
-  fetchRecentTransactions,
-  fetchDailyTotalsAdmin,
-  fetchDailyTotalsUser,
-} from '../apis/dashboardApi';
-import { TransactionModel } from '../models/TransactionModel';
+import { makeAutoObservable } from 'mobx';
 import { TotalsModel } from '../models/TotalsModel';
+import { TransactionModel } from '../models/TransactionModel';
 import { DailyTotalModel } from '../models/DailyTotalModel';
 
 export class DashboardStore {
@@ -17,134 +10,43 @@ export class DashboardStore {
   isLoading = false;
   error: string | null = null;
   isAdmin = false;
-  private userId: string | null = null;
+  userId: string | null = null;
 
   constructor() {
-    makeObservable(this, {
-      totals: observable,
-      recentTransactions: observable,
-      dailyTotals: observable,
-      isLoading: observable,
-      error: observable,
-      isAdmin: observable,
-      setIsAdmin: action,
-      setError: action,
-      setLoading: action,
-      setUserId: action,
-      loadTotals: action,
-      loadRecentTransactions: action,
-      loadDailyTotals: action,
-    });
+    makeAutoObservable(this);
   }
 
-  setIsAdmin(isAdmin: boolean) {
-    this.isAdmin = isAdmin;
+  chartData: { day: string; debit: number; credit: number }[] = [];
+
+  setChartData(data: { day: string; debit: number; credit: number }[]) {
+    this.chartData = data;
+  }
+
+  setLoading(loading: boolean) {
+    this.isLoading = loading;
   }
 
   setError(error: string | null) {
     this.error = error;
   }
 
-  setLoading(isLoading: boolean) {
-    this.isLoading = isLoading;
+  setIsAdmin(isAdmin: boolean) {
+    this.isAdmin = isAdmin;
   }
 
-  setUserId(userId: string | null) {
+  setUserId(userId: string) {
     this.userId = userId;
   }
 
-  async loadTotals() {
-    this.setLoading(true);
-    try {
-      let data;
-      if (this.isAdmin) {
-        data = await fetchTotalCreditsDebitsAdmin();
-      } else {
-        if (!this.userId) throw new Error('User ID is required for non-admin users');
-        data = await fetchTotalCreditsDebitsUser(this.userId);
-      }
-
-      runInAction(() => {
-        this.totals = new TotalsModel({
-          credit: data?.credit || 0,
-          debit: data?.debit || 0,
-        });
-      });
-    } catch (error) {
-      console.error('Error loading totals:', error);
-      runInAction(() => this.setError(String(error)));
-    } finally {
-      runInAction(() => this.setLoading(false));
-    }
+  setTotals(data: any) {
+    this.totals = new TotalsModel(data);
   }
 
-  async loadRecentTransactions() {
-    this.setLoading(true);
-    try {
-      if (!this.isAdmin && !this.userId) {
-        throw new Error('User ID is required for non-admin users');
-      }
-
-      const data = await fetchRecentTransactions(
-        3,
-        0,
-        this.isAdmin,
-        this.userId ?? undefined
-      );
-
-      runInAction(() => {
-        this.recentTransactions = (data.transactions || []).map(
-          (tx: any) =>
-            new TransactionModel({
-              id: tx.id,
-              amount: tx.amount || 0,
-              direction: tx.type === 'credit' ? 'credit' : 'debit',
-              description: tx.description || tx.remarks || '',
-              category: tx.category || 'General',
-              timestamp: tx.timestamp || tx.date || new Date().toISOString(),
-              userId: tx.user_id || '',
-              userName: tx.user_name || tx.userName || 'Unknown User',
-              avatarUrl:
-                tx.avatarUrl ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  tx.user_name || 'U'
-                )}&background=random`,
-            })
-        );
-      });
-    } catch (error) {
-      console.error('Error loading recent transactions:', error);
-      runInAction(() => this.setError(String(error)));
-    } finally {
-      runInAction(() => this.setLoading(false));
-    }
+  setRecentTransactions(data: any[]) {
+    this.recentTransactions = data.map((t) => new TransactionModel(t));
   }
 
-  async loadDailyTotals() {
-    this.setLoading(true);
-    try {
-      const data = this.isAdmin
-        ? await fetchDailyTotalsAdmin()
-        : await fetchDailyTotalsUser(this.userId ?? '');
-
-      runInAction(() => {
-        this.dailyTotals = (data.daywiseTotals || []).map(
-          (item: any) =>
-            new DailyTotalModel({
-              date: item.date,
-              credit: item.credit || 0,
-              debit: item.debit || 0,
-            })
-        );
-      });
-    } catch (error) {
-      console.error('Error loading daily totals:', error);
-      runInAction(() => this.setError(String(error)));
-    } finally {
-      runInAction(() => this.setLoading(false));
-    }
+  setDailyTotals(data: any[]) {
+    this.dailyTotals = data.map((d) => new DailyTotalModel(d));
   }
 }
-
-const dashboardStore = new DashboardStore();
-export default dashboardStore;

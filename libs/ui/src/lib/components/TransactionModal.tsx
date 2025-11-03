@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoClose } from 'react-icons/io5';
+import { updateTransaction, addTransaction } from '../services/transactionApi';
+import { toast } from 'react-toastify';
 
 export interface TransactionData {
   name: string;
@@ -17,28 +19,92 @@ interface TransactionModalProps {
   onSuccess?: () => void;
   onClose: () => void;
   isOpen: boolean;
-  isLoading: boolean;
-  errors: Record<string, string>;
-  onChange: (field: string, value: string) => void;
-  onSubmit: () => void;
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
   mode,
+  userId,
+  transactionId,
   transactionData = { name: '', type: '', category: '', amount: '', date: '' },
-  isOpen = false,
-  isLoading = false,
-  errors = {},
-  onClose = () => {},
-  onChange = () => {},
-  onSubmit = () => {},
+  onSuccess,
+  onClose,
+  isOpen,
 }) => {
-  const isEditMode = mode === 'edit';
-  const heading = isEditMode ? 'Update Transaction' : 'Add Transaction';
-  const subText = isEditMode
-    ? 'You can update your transaction here'
-    : 'Enter the details of your transaction';
-  const buttonLabel = isEditMode ? 'Update Transaction' : 'Add Transaction';
+  const [formData, setFormData] = useState<TransactionData>({
+    name: transactionData.name || '',
+    type: transactionData.type || '',
+    category: transactionData.category || '',
+    amount: transactionData.amount || '',
+    date: transactionData.date || '',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setFormData({
+      name: transactionData.name || '',
+      type: transactionData.type || '',
+      category: transactionData.category || '',
+      amount: transactionData.amount || '',
+      date: transactionData.date || '',
+    });
+  }, [transactionData, isOpen]);
+
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) newErrors.name = 'Name is required';
+    if (!formData.type) newErrors.type = 'Type is required';
+    if (!formData.category) newErrors.category = 'Category is required';
+    if (!formData.amount) newErrors.amount = 'Amount is required';
+    if (!formData.date) newErrors.date = 'Date is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+
+    setIsLoading(true);
+    try {
+      if (mode === 'edit' && transactionId) {
+        const result = await updateTransaction(userId, transactionId, {
+          name: formData.name,
+          type: formData.type.toLowerCase() as 'credit | debit',
+          category: formData.category,
+          amount: parseFloat(formData.amount),
+          date: formData.date,
+        });
+
+        if (result.success) {
+          toast.success('Transaction updated successfully!');
+          onSuccess?.();
+          onClose();
+        } else {
+          toast.error(result.message || 'Failed to update transaction');
+        }
+      } else {
+        await addTransaction(userId, {
+          name: formData.name,
+          type: formData.type.toLowerCase() as 'credit' | 'debit',
+          category: formData.category,
+          amount: parseFloat(formData.amount),
+          date: formData.date,
+        });
+        toast.success('Transaction added successfully!');
+        onSuccess?.();
+        onClose();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong!');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -53,8 +119,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           <IoClose size={22} />
         </button>
 
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">{heading}</h2>
-        <p className="text-gray-500 text-sm mb-5">{subText}</p>
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+          {mode === 'edit' ? 'Update Transaction' : 'Add Transaction'}
+        </h2>
+        <p className="text-gray-500 text-sm mb-5">
+          {mode === 'edit'
+            ? 'You can update your transaction here'
+            : 'Enter the details of your transaction'}
+        </p>
 
         <div className="space-y-4">
           <div>
@@ -63,8 +135,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             </label>
             <input
               type="text"
-              value={transactionData.name}
-              onChange={(e) => onChange('name', e.target.value)}
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
               placeholder="Enter Name"
               maxLength={30}
               disabled={isLoading}
@@ -82,8 +154,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               Transaction Type <span className="text-red-500">*</span>
             </label>
             <select
-              value={transactionData.type}
-              onChange={(e) => onChange('type', e.target.value)}
+              value={formData.type}
+              onChange={(e) => handleChange('type', e.target.value)}
               disabled={isLoading}
               className={`w-full border ${
                 errors.type ? 'border-red-500' : 'border-gray-300'
@@ -103,8 +175,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               Category <span className="text-red-500">*</span>
             </label>
             <select
-              value={transactionData.category}
-              onChange={(e) => onChange('category', e.target.value)}
+              value={formData.category}
+              onChange={(e) => handleChange('category', e.target.value)}
               disabled={isLoading}
               className={`w-full border ${
                 errors.category ? 'border-red-500' : 'border-gray-300'
@@ -134,13 +206,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               </span>
               <input
                 type="number"
-                value={transactionData.amount}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                    onChange('amount', value);
-                  }
-                }}
+                value={formData.amount}
+                onChange={(e) => handleChange('amount', e.target.value)}
                 placeholder="0.00"
                 min="0.01"
                 step="0.01"
@@ -161,8 +228,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             </label>
             <input
               type="date"
-              value={transactionData.date}
-              onChange={(e) => onChange('date', e.target.value)}
+              value={formData.date}
+              onChange={(e) => handleChange('date', e.target.value)}
               max={new Date().toISOString().split('T')[0]}
               disabled={isLoading}
               className={`w-full border ${
@@ -176,13 +243,17 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         </div>
 
         <button
-          onClick={onSubmit}
+          onClick={handleSubmit}
           disabled={isLoading}
           className={`w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition ${
             isLoading ? 'opacity-70 cursor-not-allowed' : ''
           }`}
         >
-          {isLoading ? 'Processing...' : buttonLabel}
+          {isLoading
+            ? 'Processing...'
+            : mode === 'edit'
+            ? 'Update Transaction'
+            : 'Add Transaction'}
         </button>
       </div>
     </div>

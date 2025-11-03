@@ -1,11 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { FaRegEdit, FaTrashAlt } from 'react-icons/fa';
 import { FiArrowUpCircle, FiArrowDownCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 import ConfirmationModal from '../ConfirmationModal';
 import TransactionModal from '../TransactionModal';
-import useTransactionModal from '../../hooks/useTransactionModal';
+import {
+  deleteTransaction,
+  updateTransaction,
+} from '../../services/transactionApi';
 
 interface TransactionItemUserProps {
   id: string;
@@ -14,9 +18,8 @@ interface TransactionItemUserProps {
   category: string;
   timestamp: string;
   amount: string;
+  onDeleteSuccess?: () => void;
   onUpdateSuccess?: () => void;
-  onDelete?: (id: string) => Promise<boolean>;
-  onClick?: () => void;
 }
 
 const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
@@ -26,69 +29,36 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   category,
   timestamp,
   amount,
+  onDeleteSuccess,
   onUpdateSuccess,
-  onDelete,
-  onClick,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsUpdating] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const handleEditClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Edit button clicked, opening modal');
-    setIsEditModalOpen(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    console.log('Closing modal');
-    setIsEditModalOpen(false);
-  }, []);
-
-  const handleUpdateSuccess = useCallback(() => {
-    console.log('Update successful, closing modal');
-    setIsEditModalOpen(false);
-    onUpdateSuccess?.();
-  }, [onUpdateSuccess]);
-
-  const {
-    formData,
-    errors,
-    handleInputChange,
-    handleSubmit,
-    isLoading: isUpdating,
-  } = useTransactionModal({
-    mode: 'edit',
-    userId,
-    transactionId: id,
-    onSuccess: handleUpdateSuccess,
-    initialData: {
-      name: description,
-      type: amount.startsWith('-') ? 'Debit' : 'Credit',
-      category,
-      amount: amount.replace(/[^0-9.-]+/g, ''),
-      date: new Date(timestamp).toISOString().split('T')[0],
-    },
-  });
-
-  const displayAmount = useCallback((amt: string) => {
-    console.log('displayAmount called with:', amt);
-    const num = parseFloat(amt);
-    if (isNaN(num)) return amt;
-    return num >= 0 ? `+$${num.toFixed(2)}` : `-$${Math.abs(num).toFixed(2)}`;
-  }, []);
-
   const handleDelete = async () => {
-    console.log('handleDelete called');
-    if (!onDelete) return;
+    setIsDeleting(true);
     try {
-      setIsDeleting(true);
-      await onDelete(id);
+      await deleteTransaction({
+        transactionId: id,
+        userId,
+      });
+
       toast.success('Transaction deleted successfully!');
+      onDeleteSuccess?.();
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      toast.error('Failed to delete transaction.');
     } finally {
       setIsDeleting(false);
       setShowConfirm(false);
     }
+  };
+
+  const handleUpdate = async () => {
+    setIsUpdating(true);
+    onUpdateSuccess?.();
   };
 
   const isDebit = amount.startsWith('-');
@@ -102,10 +72,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
 
   return (
     <>
-      <div
-        onClick={onClick}
-        className="flex items-center bg-white border px-6 py-3 gap-x-6 rounded-2xl shadow-sm hover:shadow transition-all cursor-pointer"
-      >
+      <div className="flex items-center bg-white border px-6 py-3 gap-x-6 rounded-2xl shadow-sm hover:shadow transition-all cursor-pointer">
         <div
           className="flex-shrink-0 flex items-center justify-center"
           style={{
@@ -131,27 +98,25 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
         </div>
 
         <div
-          className={`min-w-[80px] text-right text-[15px] font-semibold ${isDebit ? 'text-[#FE5C73]' : 'text-[#16DBAA]'
-            }`}
+          className={`min-w-[80px] text-right text-[15px] font-semibold ${
+            isDebit ? 'text-[#FE5C73]' : 'text-[#16DBAA]'
+          }`}
         >
           {amount}
         </div>
 
         <div className="flex items-center gap-x-2 min-w-fit">
           <button
-            onClick={handleEditClick}
+            onClick={() => setIsEditModalOpen(true)}
+            disabled={isEditing}
             className="text-[#2D60FF] hover:text-blue-400 transition-colors p-1"
-            disabled={isUpdating}
             aria-label="Edit transaction"
           >
             <FaRegEdit className="w-4 h-4" />
           </button>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowConfirm(true);
-            }}
+            onClick={() => setShowConfirm(true)}
             disabled={isDeleting}
             className="text-[#FE5C73] hover:text-red-400 transition-colors p-1 disabled:opacity-50"
             aria-label="Delete transaction"
@@ -163,21 +128,25 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
 
       {isEditModalOpen && (
         <TransactionModal
-          mode="edit"
           isOpen={isEditModalOpen}
-          isLoading={isUpdating}
-          transactionData={formData}
-          errors={errors}
-          onClose={handleCloseModal}
-          onChange={handleInputChange}
-          onSubmit={handleSubmit}
+          onClose={() => setIsEditModalOpen(false)}
+          transactionId={id}
           userId={userId}
+          mode="edit"
+          transactionData={{
+            name: description,
+            type: amount.startsWith('-') ? 'Debit' : 'Credit',
+            category,
+            amount: amount.replace('-', ''),
+            date: new Date(timestamp).toISOString().split('T')[0],
+          }}
+          onSuccess={handleUpdate}
         />
       )}
 
       {showConfirm && (
         <ConfirmationModal
-          title="delete this transaction"
+          title="Delete Transaction"
           message="This action cannot be undone. Are you sure you want to proceed?"
           onConfirm={handleDelete}
           onCancel={() => setShowConfirm(false)}

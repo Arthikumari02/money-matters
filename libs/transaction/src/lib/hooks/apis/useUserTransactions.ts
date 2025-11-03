@@ -119,43 +119,12 @@ export const useUserTransactionsApi = (userId: string | null) => {
     }
   }, [userId]);
 
-  const testTransactionConnection = async (transactionId: string) => {
-    try {
-      const testUrl = `${API_BASE_URL}/transaction/${transactionId}`;
-      console.log('Testing connection to:', testUrl);
-
-      const headers = {
-        'Content-Type': 'application/json',
-        'x-hasura-admin-secret':
-          'g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF',
-        'x-hasura-role': 'user',
-        'x-hasura-user-id': userId || '',
-      };
-
-      const response = await axios.get(testUrl, { headers });
-      console.log('Test response:', {
-        status: response.status,
-        data: response.data,
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Test connection failed:', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        isAxiosError: axios.isAxiosError(error),
-        status: (error as any)?.response?.status,
-        data: (error as any)?.response?.data,
-      });
-      throw error;
-    }
-  };
-
   return {
     transactions,
     isLoading,
     error,
     hasMore,
     fetchTransactions,
-    testTransactionConnection,
     deleteTransaction: async (id: string): Promise<boolean> => {
       console.log('Attempting to delete transaction with ID:', id);
       console.log(
@@ -184,7 +153,7 @@ export const useUserTransactionsApi = (userId: string | null) => {
 
         const response = await axios.delete(deleteUrl, {
           headers,
-          validateStatus: (status) => status < 500, // Don't throw for 4xx errors
+          validateStatus: (status) => status < 500,
         });
 
         console.log('Delete response:', {
@@ -200,7 +169,6 @@ export const useUserTransactionsApi = (userId: string | null) => {
           return true;
         }
 
-        // Handle specific error cases
         let errorMessage = 'Failed to delete transaction';
         if (response.status === 404) {
           errorMessage = 'Transaction not found or already deleted';

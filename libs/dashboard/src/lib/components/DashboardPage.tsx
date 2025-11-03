@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { useAuthStore } from '@money-matters/auth';
 import { useDashboardStore } from '../contexts/DashboardContext';
+import { useFetchDashboard } from '../hooks/apis/useFetchDashboard';
 import {
   AddTransactionButton,
   TotalCreditsAndDebits,
@@ -11,57 +12,61 @@ import {
 } from '@money-matters/ui';
 import totalCredit from '../../assets/totalcredit.png';
 import totalDebit from '../../assets/totaldebits.png';
+import { DebitCreditChart } from './DebitCreditOverview';
 
 const DashboardPage: React.FC = observer(() => {
   const navigate = useNavigate();
   const dashboardStore = useDashboardStore();
   const authStore = useAuthStore();
 
+  const { fetchDashboard, isFetching } = useFetchDashboard(dashboardStore);
   const isAdmin = !!authStore.isAdmin;
 
   useEffect(() => {
-    const initDashboard = async () => {
-      try {
-        dashboardStore.setIsAdmin(isAdmin);
+    dashboardStore.setIsAdmin(isAdmin);
 
-        if (!isAdmin && authStore.userInfo?.id) {
-          dashboardStore.setUserId(authStore.userInfo.id);
-        }
+    if (!isAdmin && authStore.userInfo?.id) {
+      dashboardStore.setUserId(authStore.userInfo.id);
+    }
 
-        await Promise.all([
-          dashboardStore.loadTotals(),
-          dashboardStore.loadRecentTransactions(),
-          dashboardStore.loadDailyTotals(),
-        ]);
-      } catch (error) {
-        console.error('Error initializing dashboard:', error);
-      }
-    };
+    fetchDashboard({
+      onSuccess: () => console.log('Dashboard loaded successfully'),
+      onError: (err) => console.error('Dashboard load failed:', err),
+    });
+  }, [isAdmin, authStore.userInfo?.id]);
 
-    initDashboard();
-  }, [isAdmin, authStore.userInfo?.id, dashboardStore]);
+  const loading =
+    dashboardStore.isLoading ||
+    isFetching ||
+    dashboardStore.recentTransactions.length === 0;
 
-  if (
-    dashboardStore.isLoading &&
-    dashboardStore.recentTransactions.length === 0
-  ) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#e6f4d9]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
       </div>
     );
   }
+
   const credit = dashboardStore.totals?.credit || 0;
   const debit = dashboardStore.totals?.debit || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen flex">
       <main className="flex-1 p-6 max-w-4xl mx-auto w-full">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-800">
             {isAdmin ? 'Admin Dashboard' : 'Dashboard'}
           </h1>
-          <AddTransactionButton onclick={() => navigate('/add-transaction')} />
+          <AddTransactionButton
+            userId={authStore.userInfo?.id ?? ''}
+            onSuccess={() =>
+              fetchDashboard({
+                onSuccess: () => console.log('Refetched dashboard after add'),
+                onError: (err) => console.error('Refetch failed:', err),
+              })
+            }
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -91,35 +96,47 @@ const DashboardPage: React.FC = observer(() => {
                   key={txn.id}
                   transaction={{
                     id: txn.id,
-                    name: txn.description || 'No description',
-                    userName: txn.userName || 'Unknown User',
+                    name: txn.transaction_name || 'No description',
+                    userName: txn.user_id || 'Unknown User',
                     category: txn.category || 'Uncategorized',
-                    type: txn.direction === 'credit' ? 'credit' : 'debit',
+                    type: txn.type === 'credit' ? 'credit' : 'debit',
                     amount: txn.amount || 0,
-                    date: txn.timestamp || new Date().toISOString(),
+                    date: txn.date || new Date().toISOString(),
                     userAvatar: txn.avatarUrl,
                   }}
                 />
               ) : (
                 <TransactionItemUser
                   key={txn.id}
-                  description={txn.description || 'No description'}
+                  id={txn.id}
+                  userId={authStore.userInfo?.id ?? ''}
+                  description={txn.transaction_name || 'No description'}
                   category={txn.category || 'Uncategorized'}
-                  timestamp={txn.timestamp || new Date().toISOString()}
+                  timestamp={txn.date || new Date().toISOString()}
                   amount={
-                    (txn.direction === 'debit' ? '-' : '+') +
+                    (txn.type === 'debit' ? '-' : '+') +
                     (txn.amount || 0).toLocaleString()
                   }
-                  onEdit={() => navigate(`/transactions/edit/${txn.id}`)}
-                  onDelete={() => console.log('Delete:', txn.id)}
-                  onClick={() => navigate(`/transactions/${txn.id}`)}
+                  onDeleteSuccess={() =>
+                    fetchDashboard({
+                      onSuccess: () =>
+                        console.log('Refetched dashboard after delete'),
+                      onError: (err) => console.error('Refetch failed:', err),
+                    })
+                  }
+                  onUpdateSuccess={() =>
+                    fetchDashboard({
+                      onSuccess: () =>
+                        console.log('Refetched dashboard after update'),
+                      onError: (err) => console.error('Refetch failed:', err),
+                    })
+                  }
                 />
               )
             )}
           </div>
         </div>
 
-        {/* Chart Placeholder */}
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">
@@ -127,7 +144,15 @@ const DashboardPage: React.FC = observer(() => {
             </h2>
           </div>
           <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-            <p className="text-gray-400">Chart will be displayed here</p>
+            <div className="h-64 bg-gray-50 rounded-lg p-4">
+              {dashboardStore.chartData.length > 0 ? (
+                <DebitCreditChart />
+              ) : (
+                <p className="text-gray-400 flex items-center justify-center h-full">
+                  No data available for last 7 days
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </main>
