@@ -69,7 +69,7 @@ const UserTransactionsPage: React.FC = observer(() => {
             <AddTransactionButton
               userId={authStore.userInfo?.id ?? ''}
               onSuccess={() => fetchTransactions()}
-              className="!rounded-lg !px-4 !py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 transition-all"
+              className="!rounded-lg !px-4 !py-1 text-sm font-semibold bg-blue-600 hover:bg-blue-700 transition-all"
             />
           </div>
         </div>
