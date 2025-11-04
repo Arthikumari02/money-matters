@@ -55,6 +55,8 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
     setIsLoading(true);
     try {
       await addTransaction(userId, formData);
+      onSuccess?.();
+
       setIsOpen(false);
       setFormData({
         name: '',
@@ -63,7 +65,8 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
         amount: 0,
         date: '',
       });
-      onSuccess?.();
+
+      toast.success('Transaction added successfully!');
     } catch (error: any) {
       toast.error(error.message || 'Failed to add transaction');
     } finally {

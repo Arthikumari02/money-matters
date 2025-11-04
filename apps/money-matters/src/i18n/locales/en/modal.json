@@ -1,15 +1,16 @@
 {
   "delete": {
-    "title": "Are you sure you want to Delete?",
+    "Type": "Delete",
+    "title": "Are you sure you want to",
     "description": "This transaction will be deleted immediately. You can't undo this action",
-    "yes_delete": "Yes Delete",
+    "yes_delete": "Yes",
     "no_leave_it": "No, Leave it"
   },
   "logout": {
-    "title": "Are you sure you want to Logout?",
+    "Type": "Logout",
+    "title": "Are you sure you want to?",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed ",
-    "yes_logout": "Yes Logout",
-    "no_cancel": "Cancel"
+    "yes_logout": "Yes"
   },
   "transaction": {
     "name": "Transaction Name",

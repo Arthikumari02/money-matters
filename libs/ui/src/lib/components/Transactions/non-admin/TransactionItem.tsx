@@ -3,6 +3,7 @@ import { FaRegEdit, FaTrashAlt } from 'react-icons/fa';
 import { FiArrowUpCircle, FiArrowDownCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
 
 import ConfirmationModal from '../../Modals/ConfirmationModal';
 import TransactionModal from '../../Modals/TransactionModal';
@@ -32,6 +33,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   onDeleteSuccess,
   onUpdateSuccess,
 }) => {
+  const { t } = useTranslation('modal');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsUpdating] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -145,8 +147,8 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
 
       {showConfirm && (
         <ConfirmationModal
-          title="Delete Transaction"
-          message="This action cannot be undone. Are you sure you want to proceed?"
+          title={t('delete.Type')}
+          message={t('delete.description')}
           onConfirm={handleDelete}
           onCancel={() => setShowConfirm(false)}
         />

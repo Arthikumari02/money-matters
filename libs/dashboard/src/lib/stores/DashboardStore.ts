@@ -6,17 +6,18 @@ import { DailyTotalModel } from '../models/DailyTotalModel';
 export class DashboardStore {
   totals: TotalsModel | null = null;
   recentTransactions: TransactionModel[] = [];
+  allTransactions: TransactionModel[] = [];
   dailyTotals: DailyTotalModel[] = [];
   isLoading = false;
   error: string | null = null;
   isAdmin = false;
   userId: string | null = null;
 
+  chartData: { day: string; debit: number; credit: number }[] = [];
+
   constructor() {
     makeAutoObservable(this);
   }
-
-  chartData: { day: string; debit: number; credit: number }[] = [];
 
   setChartData(data: { day: string; debit: number; credit: number }[]) {
     this.chartData = data;
@@ -44,6 +45,10 @@ export class DashboardStore {
 
   setRecentTransactions(data: any[]) {
     this.recentTransactions = data.map((t) => new TransactionModel(t));
+  }
+
+  setAllTransactions(data: any[]) {
+    this.allTransactions = data.map((t) => new TransactionModel(t));
   }
 
   setDailyTotals(data: any[]) {

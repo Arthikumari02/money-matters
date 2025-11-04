@@ -82,14 +82,14 @@ const DashboardPage: React.FC = observer(() => {
             />
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+          <div className="p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">
                 {t('last_transaction')}
               </h2>
             </div>
 
-            <div className="space-y-3">
+            <div className="bg-white rounded-xl p-6  space-y-3">
               {dashboardStore.recentTransactions.map((txn) =>
                 isAdmin ? (
                   <TransactionItemAdmin
@@ -125,11 +125,12 @@ const DashboardPage: React.FC = observer(() => {
                       })
                     }
                     onUpdateSuccess={() =>
-                      fetchDashboard({
-                        onSuccess: () =>
-                          console.log('Refetched dashboard after update'),
-                        onError: (err) => console.error('Refetch failed:', err),
-                      })
+                      setTimeout(() => {
+                        fetchDashboard({
+                          onSuccess: () => console.log('Refetched dashboard after update'),
+                          onError: (err) => console.error('Refetch failed:', err),
+                        });
+                      }, 1000)
                     }
                   />
                 )
@@ -137,24 +138,26 @@ const DashboardPage: React.FC = observer(() => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm">
+          <div className="p-6 m-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">
                 {t('debit_and_credit_overview')}
               </h2>
             </div>
-            <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-              <div className="h-64 bg-gray-50 rounded-lg p-4">
-                {dashboardStore.chartData.length > 0 ? (
+
+            <div className="bg-white rounded-lg p-4 h-72 w-full">
+              {dashboardStore.chartData.length > 0 ? (
+                <div className="w-full h-full">
                   <DebitCreditChart />
-                ) : (
-                  <p className="text-gray-400 flex items-center justify-center h-full">
-                    No data available for last 7 days
-                  </p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <p className="text-gray-400 flex items-center justify-center h-full">
+                  No data available for last 7 days
+                </p>
+              )}
             </div>
           </div>
+
         </div>
       </main>
     </div>

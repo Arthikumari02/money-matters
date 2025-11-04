@@ -34,7 +34,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-gray-900 mb-1">
-              {t('are_you_sure')} {title}?
+              {t('delete.title')}{title}
             </h2>
             <p className="text-gray-500 text-sm">{message}</p>
           </div>
@@ -45,13 +45,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onClick={onConfirm}
             className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg"
           >
-            {t('yes_delete')} {title}
+            {t('delete.yes_delete')} {title}
           </button>
           <button
             onClick={onCancel}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-lg"
           >
-            {t('no_leave_it')}
+            {t('delete.no_leave_it')}
           </button>
         </div>
       </div>
