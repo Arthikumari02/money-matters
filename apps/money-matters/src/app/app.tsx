@@ -2,7 +2,7 @@ import { AuthStoreProvider, RequireAuth } from '@money-matters/auth';
 import { LoginForm } from '@money-matters/auth';
 import { DashboardLayout } from '@money-matters/dashboard';
 import { Routes, Route } from 'react-router-dom';
-import { I18nProvider } from '@money-matters/ui';
+import { I18nProvider } from '../i18n';
 
 import { DashboardPage, DashboardProvider } from '@money-matters/dashboard';
 import {

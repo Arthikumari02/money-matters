@@ -1,6 +1,7 @@
 import React from 'react';
 import { IoClose } from 'react-icons/io5';
 import { FaExclamationTriangle } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmationModalProps {
   title: string;
@@ -15,6 +16,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { t } = useTranslation('modal');
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
       <div className="bg-white rounded-xl shadow-xl w-[520px] p-6 relative">
@@ -32,7 +34,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
           <div className="flex-1">
             <h2 className="text-lg font-semibold text-gray-900 mb-1">
-              Are you sure you want to {title}?
+              {t('are_you_sure')} {title}?
             </h2>
             <p className="text-gray-500 text-sm">{message}</p>
           </div>
@@ -43,13 +45,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             onClick={onConfirm}
             className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg"
           >
-            Yes, {title}
+            {t('yes_delete')} {title}
           </button>
           <button
             onClick={onCancel}
             className="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-lg"
           >
-            No, Leave it
+            {t('no_leave_it')}
           </button>
         </div>
       </div>

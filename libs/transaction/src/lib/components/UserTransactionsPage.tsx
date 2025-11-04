@@ -15,12 +15,15 @@ import {
   PageLoader,
   PageError,
 } from '@money-matters/ui';
+import { useTranslation } from 'react-i18next';
 
 const UserTransactionsPage: React.FC = observer(() => {
   const authStore = useAuthStore();
   const userId = authStore.userInfo?.id || '';
   const { transactions, isLoading, error, hasMore, fetchTransactions } =
     useUserTransactionsApi(userId);
+
+  const { t } = useTranslation('transaction');
 
   const [activeTab, setActiveTab] = useState<'all' | 'credit' | 'debit'>('all');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -66,7 +69,7 @@ const UserTransactionsPage: React.FC = observer(() => {
       <div className="">
         <div className="mb-6 flex justify-between items-center bg-white p-5">
           <h1 className="text-2xl font-bold text-gray-900">
-            Your Transactions
+            {t('transactions_heading')}
           </h1>
           <LanguageSelector />
           <AddTransactionButton
@@ -81,28 +84,27 @@ const UserTransactionsPage: React.FC = observer(() => {
               {[
                 {
                   id: 'all' as const,
-                  label: 'All Transactions',
+                  label: t('tab.all_transactions'),
                   count: transactions.length,
                 },
                 {
                   id: 'credit' as const,
-                  label: 'Credit',
+                  label: t('tab.credit'),
                   count: transactions.filter((t) => t.type === 'credit').length,
                 },
                 {
                   id: 'debit' as const,
-                  label: 'Debit',
+                  label: t('tab.debit'),
                   count: transactions.filter((t) => t.type === 'debit').length,
                 },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  className={`py-4 px-6 text-center border-b-2 font-medium text-sm ${activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
                 >
                   <div className="flex items-center">{tab.label}</div>
                 </button>
@@ -111,10 +113,10 @@ const UserTransactionsPage: React.FC = observer(() => {
           </div>
           <div className="bg-white shadow-md rounded-2xl overflow-hidden">
             <div className="grid grid-cols-4 px-7 py-3 text-sm font-semibold text-gray-600 border-b border-gray-100">
-              <span className="text-center">Transaction Name</span>
-              <span className="text-right">Category</span>
-              <span className="text-center">Date</span>
-              <span className="text-center">Amount</span>
+              <span className="text-center">{t('common_details.transaction_name')}</span>
+              <span className="text-right">{t('common_details.category')}</span>
+              <span className="text-center">{t('common_details.date')}</span>
+              <span className="text-center">{t('common_details.amount')}</span>
             </div>
             <div
               ref={scrollContainerRef}
@@ -124,7 +126,7 @@ const UserTransactionsPage: React.FC = observer(() => {
               {filteredTransactions.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500">
-                    No {activeTab === 'all' ? '' : activeTab} transactions found
+                    {t('no_transactions_found')}
                   </p>
                 </div>
               ) : (

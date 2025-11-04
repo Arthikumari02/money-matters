@@ -1,0 +1,19 @@
+{
+  "transactions_heading": "Transactions",
+  "add_transaction_button": "Add Transactions",
+  "tab": {
+    "all_transactions": "All Transactions",
+    "debit": "Debit",
+    "credit": "Credit"
+  },
+  "common_details": {
+    "transaction_name": "Transaction Name",
+    "category": "Category",
+    "date": "Date",
+    "amount": "Amount"
+  },
+  "admin_details": {
+    "user_name": "User Name"
+  },
+  "no_transactions_found": "No transactions found"
+}

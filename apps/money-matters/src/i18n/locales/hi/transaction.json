@@ -1,0 +1,19 @@
+{
+  "transactions_heading": "लेन-देन",
+  "add_transaction_button": "लेन-देन जोड़ें",
+  "tab": {
+    "all_transactions": "सभी लेन-देन",
+    "debit": "देटी",
+    "credit": "क्रेडिट"
+  },
+  "common_details": {
+    "transaction_name": "लेन-देन का नाम",
+    "category": "वर्ग",
+    "date": "दिनांक",
+    "amount": "राशि"
+  },
+  "admin_details": {
+    "user_name": "उपयोगकर्ता नाम"
+  },
+  "no_transactions_found": "लेन-देन नहीं मिली"
+}

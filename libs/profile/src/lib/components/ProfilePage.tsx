@@ -7,10 +7,12 @@ import {
   PageLoader,
 } from '@money-matters/ui';
 import { useProfileStore } from '../contexts/ProfileContext';
+import { useTranslation } from 'react-i18next';
 
 const ProfilePage: React.FC = observer(() => {
   const profileStore = useProfileStore();
   const authStore = useAuthStore();
+  const { t } = useTranslation('profile');
 
   useEffect(() => {
     if (authStore?.userInfo?.id) {
@@ -30,7 +32,7 @@ const ProfilePage: React.FC = observer(() => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] ">
       <div className="flex justify-between items-center mb-9 bg-white p-5">
-        <h1 className="text-2xl font-bold text-gray-800">Profile</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t('profile')}</h1>
         <div className="flex items-center space-x-2">
           <LanguageSelector />
           <AddTransactionButton userId={authStore.userInfo?.id ?? ''} />
@@ -50,7 +52,7 @@ const ProfilePage: React.FC = observer(() => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                First Name
+                {t('your_name')}
               </label>
               <input
                 type="text"
@@ -62,7 +64,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                User Name
+                {t('user_name')}
               </label>
               <input
                 type="text"
@@ -74,7 +76,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Email
+                {t('email')}
               </label>
               <input
                 type="text"
@@ -86,7 +88,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Password
+                {t('password')}
               </label>
               <input
                 type="text"
@@ -98,7 +100,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Date of Birth
+                {t('date_of_birth')}
               </label>
               <input
                 type="text"
@@ -110,7 +112,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Present Address
+                {t('present_address')}
               </label>
               <input
                 type="text"
@@ -122,7 +124,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Permanet Address
+                {t('permanent_address')}
               </label>
               <input
                 type="text"
@@ -134,7 +136,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                City
+                {t('city')}
               </label>
               <input
                 type="text"
@@ -146,7 +148,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Postal Code
+                {t('postal_code')}
               </label>
               <input
                 type="text"
@@ -158,7 +160,7 @@ const ProfilePage: React.FC = observer(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
-                Country
+                {t('country')}
               </label>
               <input
                 type="text"

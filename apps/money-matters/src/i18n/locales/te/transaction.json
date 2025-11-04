@@ -1,0 +1,19 @@
+{
+  "transactions_heading": "లావాదేవీ",
+  "add_transaction_button": "లావాదేవీని జోడించండి",
+  "tab": {
+    "all_transactions": "సభి లావాదేవీ",
+    "debit": "దేబీట్",
+    "credit": "క్రీడిట్"
+  },
+  "common_details": {
+    "transaction_name": "లావాదేవీ నామం",
+    "category": "వర్గం",
+    "date": "ప్రతిధానం",
+    "amount": "రశి"
+  },
+  "admin_details": {
+    "user_name": "ఉప్యోగకర్త నామం"
+  },
+  "no_transactions_found": "లావాదేవీలు కనుగొనబడలేదు"
+}

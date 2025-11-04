@@ -1,0 +1,13 @@
+{
+  "profile": "प्रोफाइल",
+  "your_name": "आपका नाम",
+  "user_name": "उपयोगकर्ता नाम",
+  "email": "ईमेल",
+  "password": "पासवर्ड",
+  "date_of_birth": "जन्मदिन",
+  "present_address": "सर्वेक्षण ठेकी",
+  "permanent_address": "स्थायी ठेकी",
+  "city": "शहर",
+  "postal_code": "पोस्टल कोड",
+  "country": "देश"
+}

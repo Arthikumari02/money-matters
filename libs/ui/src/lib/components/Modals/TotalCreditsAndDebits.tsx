@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { use } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TotalCreditsAndDebitsProp {
   amount: string;
@@ -11,6 +12,7 @@ const TotalCreditsAndDebits: React.FC<TotalCreditsAndDebitsProp> = ({
   isCredit,
   imagePath,
 }) => {
+  const { t } = useTranslation('dashboard');
   return (
     <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-md">
       <div>
@@ -22,7 +24,7 @@ const TotalCreditsAndDebits: React.FC<TotalCreditsAndDebitsProp> = ({
           ${amount}
         </h1>
         <p className="text-gray-400 text-lg mt-2">
-          {isCredit ? 'Credit' : 'Debit'}
+          {isCredit ? t('credit') : t('debit')}
         </p>
       </div>
       <img src={imagePath} alt="Credit illustration" className="h-24 w-auto" />

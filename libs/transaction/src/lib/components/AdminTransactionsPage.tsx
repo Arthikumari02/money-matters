@@ -12,8 +12,10 @@ import {
   PageLoader,
   LanguageSelector,
 } from '@money-matters/ui';
+import { useTranslation } from 'react-i18next';
 
 const AdminTransactionsPage: React.FC = observer(() => {
+  const { t } = useTranslation('transaction');
   const { transactions, isLoading, error, hasMore, fetchTransactions } =
     useAdminTransactionsApi();
 
@@ -62,25 +64,24 @@ const AdminTransactionsPage: React.FC = observer(() => {
       <div className="bg-white p-7">
         <div className="flex flex-row justify-between w-full">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">
-            Transactions
+            {t('transactions_heading')}
           </h1>
           <LanguageSelector />
         </div>
         <div className="">
           <nav className="flex space-x-8">
             {[
-              { id: 'all' as const, label: 'All Transactions' },
-              { id: 'debit' as const, label: 'Debit' },
-              { id: 'credit' as const, label: 'Credit' },
+              { id: 'all' as const, label: t('tab.all_transactions') },
+              { id: 'debit' as const, label: t('tab.debit') },
+              { id: 'credit' as const, label: t('tab.credit') },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 {tab.label}
               </button>
@@ -91,11 +92,11 @@ const AdminTransactionsPage: React.FC = observer(() => {
       <div className="max-w-6xl mx-auto w-full p-8">
         <div className="bg-white shadow-md rounded-2xl overflow-hidden">
           <div className="grid grid-cols-5 px-6 py-3 text-sm font-semibold text-gray-600 border-b border-gray-100">
-            <span className="text-right">User Name</span>
-            <span className="text-right">Transaction Name</span>
-            <span className="text-right">Category</span>
-            <span className="text-right">Date</span>
-            <span className="text-right">Amount</span>
+            <span className="text-right">{t('admin_details.user_name')}</span>
+            <span className="text-right">{t('common_details.transaction_name')}</span>
+            <span className="text-right">{t('common_details.category')}</span>
+            <span className="text-right">{t('common_details.date')}</span>
+            <span className="text-right">{t('common_details.amount')}</span>
           </div>
 
           <div
@@ -105,7 +106,7 @@ const AdminTransactionsPage: React.FC = observer(() => {
           >
             {filteredTransactions.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                No {activeTab === 'all' ? '' : activeTab} transactions found
+                {t('no_transactions_found')}
               </div>
             ) : (
               filteredTransactions.map((tx) => (
@@ -125,7 +126,6 @@ const AdminTransactionsPage: React.FC = observer(() => {
               ))
             )}
 
-            {/* Loader at bottom */}
             {isLoading && filteredTransactions.length > 0 && (
               <div className="py-4 flex justify-center">
                 <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>

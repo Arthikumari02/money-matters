@@ -1,0 +1,13 @@
+{
+  "profile": "Profile",
+  "your_name": "Your Name",
+  "user_name": "User Name",
+  "email": "Email",
+  "password": "Password",
+  "date_of_birth": "Date Of Birth",
+  "present_address": "Present Address",
+  "permanent_address": "Permanent Address",
+  "city": "City",
+  "postal_code": "Postal Code",
+  "country": "Country"
+}

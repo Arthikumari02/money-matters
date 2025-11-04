@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { updateTransaction, addTransaction } from '../../services/transactionApi';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 export interface TransactionData {
   name: string;
@@ -30,6 +31,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   onClose,
   isOpen,
 }) => {
+  const { t } = useTranslation('modal');
   const [formData, setFormData] = useState<TransactionData>({
     name: transactionData.name || '',
     type: transactionData.type || '',
@@ -56,11 +58,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.type) newErrors.type = 'Type is required';
-    if (!formData.category) newErrors.category = 'Category is required';
-    if (!formData.amount) newErrors.amount = 'Amount is required';
-    if (!formData.date) newErrors.date = 'Date is required';
+    if (!formData.name.trim()) newErrors.name = t('validation.name_required');
+    if (!formData.type) newErrors.type = t('validation.type_required');
+    if (!formData.category) newErrors.category = t('validation.category_required');
+    if (!formData.amount) newErrors.amount = t('validation.amount_required');
+    if (!formData.date) newErrors.date = t('validation.date_required');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -73,18 +75,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       if (mode === 'edit' && transactionId) {
         const result = await updateTransaction(userId, transactionId, {
           name: formData.name,
-          type: formData.type.toLowerCase() as 'credit | debit',
+          type: formData.type.toLowerCase() as 'credit' | 'debit',
           category: formData.category,
           amount: parseFloat(formData.amount),
           date: formData.date,
         });
 
         if (result.success) {
-          toast.success('Transaction updated successfully!');
+          toast.success(t('toast.updated_successfully'));
           onSuccess?.();
           onClose();
         } else {
-          toast.error(result.message || 'Failed to update transaction');
+          toast.error(result.message || t('toast.update_failed'));
         }
       } else {
         await addTransaction(userId, {
@@ -94,13 +96,13 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           amount: parseFloat(formData.amount),
           date: formData.date,
         });
-        toast.success('Transaction added successfully!');
+        toast.success(t('toast.added_successfully'));
         onSuccess?.();
         onClose();
       }
     } catch (err) {
       console.error(err);
-      toast.error('Something went wrong!');
+      toast.error(t('toast.error'));
     } finally {
       setIsLoading(false);
     }
@@ -120,66 +122,62 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         </button>
 
         <h2 className="text-lg font-semibold text-gray-900 mb-1">
-          {mode === 'edit' ? 'Update Transaction' : 'Add Transaction'}
+          {mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title')}
         </h2>
         <p className="text-gray-500 text-sm mb-5">
           {mode === 'edit'
-            ? 'You can update your transaction here'
-            : 'Enter the details of your transaction'}
+            ? t('update_transaction.description')
+            : t('add_transaction.description')}
         </p>
 
         <div className="space-y-4">
           <div>
             <label className="text-sm text-gray-700 mb-1 block">
-              Transaction Name <span className="text-red-500">*</span>
+              {t('transaction.transaction_name')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="Enter Name"
+              placeholder={t('add_transaction.placeholders.enter_name')}
               maxLength={30}
               disabled={isLoading}
-              className={`w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+              className={`w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'}
+                rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-            )}
+            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
 
           <div>
             <label className="text-sm text-gray-700 mb-1 block">
-              Transaction Type <span className="text-red-500">*</span>
+              {t('transaction.transaction_type')} <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.type}
               onChange={(e) => handleChange('type', e.target.value)}
               disabled={isLoading}
-              className={`w-full border ${errors.type ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+              className={`w-full border ${errors.type ? 'border-red-500' : 'border-gray-300'}
+                rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
             >
-              <option value="">Select Transaction Type</option>
-              <option value="Credit">Credit</option>
-              <option value="Debit">Debit</option>
+              <option value="">{t('add_transaction.placeholders.select_type')}</option>
+              <option value="Credit">{t('credit')}</option>
+              <option value="Debit">{t('debit')}</option>
             </select>
-            {errors.type && (
-              <p className="mt-1 text-sm text-red-600">{errors.type}</p>
-            )}
+            {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type}</p>}
           </div>
 
           <div>
             <label className="text-sm text-gray-700 mb-1 block">
-              Category <span className="text-red-500">*</span>
+              {t('transaction.category')} <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.category}
               onChange={(e) => handleChange('category', e.target.value)}
               disabled={isLoading}
-              className={`w-full border ${errors.category ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+              className={`w-full border ${errors.category ? 'border-red-500' : 'border-gray-300'}
+                rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
             >
-              <option value="">Select Category</option>
+              <option value="">{t('add_transaction.placeholders.category')}</option>
               <option value="Entertainment">Entertainment</option>
               <option value="Food">Food</option>
               <option value="Shopping">Shopping</option>
@@ -188,39 +186,33 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               <option value="Transportation">Transportation</option>
               <option value="Other">Other</option>
             </select>
-            {errors.category && (
-              <p className="mt-1 text-sm text-red-600">{errors.category}</p>
-            )}
+            {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category}</p>}
           </div>
 
           <div>
             <label className="text-sm text-gray-700 mb-1 block">
-              Amount <span className="text-red-500">*</span>
+              {t('transaction.amount')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                $
-              </span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
               <input
                 type="number"
                 value={formData.amount}
                 onChange={(e) => handleChange('amount', e.target.value)}
-                placeholder="0.00"
+                placeholder={t('add_transaction.placeholders.enter_amount')}
                 min="0.01"
                 step="0.01"
                 disabled={isLoading}
-                className={`w-full border ${errors.amount ? 'border-red-500' : 'border-gray-300'
-                  } rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+                className={`w-full border ${errors.amount ? 'border-red-500' : 'border-gray-300'}
+                  rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
               />
             </div>
-            {errors.amount && (
-              <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
-            )}
+            {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
           </div>
 
           <div>
             <label className="text-sm text-gray-700 mb-1 block">
-              Date <span className="text-red-500">*</span>
+              {t('transaction.date')} <span className="text-red-500">*</span>
             </label>
             <input
               type="date"
@@ -228,26 +220,23 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               onChange={(e) => handleChange('date', e.target.value)}
               max={new Date().toISOString().split('T')[0]}
               disabled={isLoading}
-              className={`w-full border ${errors.date ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+              className={`w-full border ${errors.date ? 'border-red-500' : 'border-gray-300'}
+                rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
             />
-            {errors.date && (
-              <p className="mt-1 text-sm text-red-600">{errors.date}</p>
-            )}
+            {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
           </div>
         </div>
 
         <button
           onClick={handleSubmit}
           disabled={isLoading}
-          className={`w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
-            }`}
+          className={`w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
         >
           {isLoading
-            ? 'Processing...'
+            ? t('processing')
             : mode === 'edit'
-              ? 'Update Transaction'
-              : 'Add Transaction'}
+              ? t('update_transaction.title')
+              : t('add_transaction.title')}
         </button>
       </div>
     </div>

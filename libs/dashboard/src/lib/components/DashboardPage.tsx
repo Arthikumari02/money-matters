@@ -14,10 +14,12 @@ import {
 import totalCredit from '../../assets/totalcredit.png';
 import totalDebit from '../../assets/totaldebits.png';
 import { DebitCreditChart } from './DebitCreditOverview';
+import { useTranslation } from 'react-i18next';
 
 const DashboardPage: React.FC = observer(() => {
   const dashboardStore = useDashboardStore();
   const authStore = useAuthStore();
+  const { t } = useTranslation('dashboard');
 
   const { fetchDashboard, isFetching } = useFetchDashboard(dashboardStore);
   const isAdmin = !!authStore.isAdmin;
@@ -51,9 +53,7 @@ const DashboardPage: React.FC = observer(() => {
     <div className="min-h-screen flex">
       <main className="flex-1">
         <div className="flex items-center justify-between mb-6 bg-white p-5">
-          <h1 className="text-2xl font-bold text-gray-800">
-            {isAdmin ? 'Admin Dashboard' : 'Dashboard'}
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-800">{t('accounts')}</h1>
           <div className="flex items-center space-x-2">
             <LanguageSelector />
             <AddTransactionButton
@@ -85,7 +85,7 @@ const DashboardPage: React.FC = observer(() => {
           <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">
-                Last Transactions
+                {t('last_transaction')}
               </h2>
             </div>
 
@@ -140,7 +140,7 @@ const DashboardPage: React.FC = observer(() => {
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">
-                Debit & Credit Overview
+                {t('debit_and_credit_overview')}
               </h2>
             </div>
             <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">

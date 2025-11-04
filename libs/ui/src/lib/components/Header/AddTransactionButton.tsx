@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import TransactionModal from '../Modals/TransactionModal';
-import { addTransaction, TransactionInput } from '../../services/transactionApi';
+import {
+  addTransaction,
+  TransactionInput,
+} from '../../services/transactionApi';
+import { useTranslation } from 'react-i18next';
+
 interface AddTransactionButtonProps {
   userId: string;
   className?: string;
@@ -23,6 +28,7 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
     date: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const { t } = useTranslation('transaction');
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -73,7 +79,7 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
         className={`flex items-center gap-3 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-base font-medium focus:outline-none ${className}`}
       >
         <span className="text-xl font-light">+</span>
-        Add Transaction
+        {t('add_transaction_button')}
       </button>
 
       <TransactionModal
