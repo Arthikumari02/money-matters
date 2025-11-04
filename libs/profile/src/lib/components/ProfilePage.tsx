@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useAuthStore } from '@money-matters/auth';
-import { AddTransactionButton } from '@money-matters/ui';
+import {
+  AddTransactionButton,
+  LanguageSelector,
+  PageLoader,
+} from '@money-matters/ui';
 import { useProfileStore } from '../contexts/ProfileContext';
 
 const ProfilePage: React.FC = observer(() => {
@@ -16,12 +20,7 @@ const ProfilePage: React.FC = observer(() => {
 
   const { profile, isLoading, error } = profileStore;
 
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin h-10 w-10 border-t-2 border-b-2 border-blue-600 rounded-full"></div>
-      </div>
-    );
+  if (isLoading) return <PageLoader />;
 
   if (error)
     return (
@@ -32,7 +31,10 @@ const ProfilePage: React.FC = observer(() => {
     <div className="min-h-screen bg-[#F8FAFC] ">
       <div className="flex justify-between items-center mb-9 bg-white p-5">
         <h1 className="text-2xl font-bold text-gray-800">Profile</h1>
-        <AddTransactionButton userId={authStore.userInfo?.id ?? ''} />
+        <div className="flex items-center space-x-2">
+          <LanguageSelector />
+          <AddTransactionButton userId={authStore.userInfo?.id ?? ''} />
+        </div>
       </div>
 
       <div className="bg-white shadow-sm rounded-2xl max-w-4xl mx-auto p-4 sm:px-6 lg:px-8">

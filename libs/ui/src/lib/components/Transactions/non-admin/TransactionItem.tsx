@@ -4,12 +4,12 @@ import { FiArrowUpCircle, FiArrowDownCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import ConfirmationModal from '../ConfirmationModal';
-import TransactionModal from '../TransactionModal';
+import ConfirmationModal from '../../Modals/ConfirmationModal';
+import TransactionModal from '../../Modals/TransactionModal';
 import {
   deleteTransaction,
   updateTransaction,
-} from '../../services/transactionApi';
+} from '../../../services/transactionApi';
 
 interface TransactionItemUserProps {
   id: string;
@@ -98,9 +98,8 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
         </div>
 
         <div
-          className={`min-w-[80px] text-right text-[15px] font-semibold ${
-            isDebit ? 'text-[#FE5C73]' : 'text-[#16DBAA]'
-          }`}
+          className={`min-w-[80px] text-right text-[15px] font-semibold ${isDebit ? 'text-[#FE5C73]' : 'text-[#16DBAA]'
+            }`}
         >
           {amount}
         </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { IoClose } from 'react-icons/io5';
-import { updateTransaction, addTransaction } from '../services/transactionApi';
+import { updateTransaction, addTransaction } from '../../services/transactionApi';
 import { toast } from 'react-toastify';
 
 export interface TransactionData {
@@ -140,9 +140,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               placeholder="Enter Name"
               maxLength={30}
               disabled={isLoading}
-              className={`w-full border ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
-              } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+              className={`w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'
+                } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
             />
             {errors.name && (
               <p className="mt-1 text-sm text-red-600">{errors.name}</p>
@@ -157,9 +156,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               value={formData.type}
               onChange={(e) => handleChange('type', e.target.value)}
               disabled={isLoading}
-              className={`w-full border ${
-                errors.type ? 'border-red-500' : 'border-gray-300'
-              } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+              className={`w-full border ${errors.type ? 'border-red-500' : 'border-gray-300'
+                } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
             >
               <option value="">Select Transaction Type</option>
               <option value="Credit">Credit</option>
@@ -178,9 +176,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               value={formData.category}
               onChange={(e) => handleChange('category', e.target.value)}
               disabled={isLoading}
-              className={`w-full border ${
-                errors.category ? 'border-red-500' : 'border-gray-300'
-              } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+              className={`w-full border ${errors.category ? 'border-red-500' : 'border-gray-300'
+                } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
             >
               <option value="">Select Category</option>
               <option value="Entertainment">Entertainment</option>
@@ -212,9 +209,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                 min="0.01"
                 step="0.01"
                 disabled={isLoading}
-                className={`w-full border ${
-                  errors.amount ? 'border-red-500' : 'border-gray-300'
-                } rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+                className={`w-full border ${errors.amount ? 'border-red-500' : 'border-gray-300'
+                  } rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
               />
             </div>
             {errors.amount && (
@@ -232,9 +228,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               onChange={(e) => handleChange('date', e.target.value)}
               max={new Date().toISOString().split('T')[0]}
               disabled={isLoading}
-              className={`w-full border ${
-                errors.date ? 'border-red-500' : 'border-gray-300'
-              } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
+              className={`w-full border ${errors.date ? 'border-red-500' : 'border-gray-300'
+                } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
             />
             {errors.date && (
               <p className="mt-1 text-sm text-red-600">{errors.date}</p>
@@ -245,15 +240,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         <button
           onClick={handleSubmit}
           disabled={isLoading}
-          className={`w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition ${
-            isLoading ? 'opacity-70 cursor-not-allowed' : ''
-          }`}
+          className={`w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
         >
           {isLoading
             ? 'Processing...'
             : mode === 'edit'
-            ? 'Update Transaction'
-            : 'Add Transaction'}
+              ? 'Update Transaction'
+              : 'Add Transaction'}
         </button>
       </div>
     </div>

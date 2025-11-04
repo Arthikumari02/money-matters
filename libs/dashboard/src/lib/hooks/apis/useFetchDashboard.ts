@@ -56,7 +56,11 @@ export const useFetchDashboard = (store: DashboardStore) => {
         const transactionsData = await transactionsRes.json();
         const dailyTotalsData = await dailyTotalsRes.json();
 
-        const totals = totalsData.totals_credit_debit_transactions || [];
+        const totals =
+          (isAdmin
+            ? totalsData.transaction_totals_admin
+            : totalsData.totals_credit_debit_transactions) || [];
+
         store.setTotals({
           credit: totals.find((t: any) => t.type === 'credit')?.sum || 0,
           debit: totals.find((t: any) => t.type === 'debit')?.sum || 0,

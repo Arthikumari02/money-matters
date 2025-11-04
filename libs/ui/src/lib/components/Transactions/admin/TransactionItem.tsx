@@ -29,8 +29,8 @@ export const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({
   });
 
   return (
-    <div className="flex items-center justify-between bg-white px-3 py-2 rounded-2xl shadow-sm hover:shadow transition-all border border-gray-100">
-      <div className="flex items-center w-[40px] justify-center">
+    <div className="flex items-center justify-between bg-white px-6 py-2 rounded-2xl shadow-sm hover:shadow transition-all border border-gray-100">
+      <div className="flex items-center w-[30px] justify-center">
         {type === 'credit' ? (
           <FiArrowUpCircle className="text-[#16DBAA] text-xl" />
         ) : (
@@ -63,8 +63,9 @@ export const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({
       </div>
 
       <div
-        className={`min-w-[90px] text-right font-semibold text-[15px] ${type === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'
-          }`}
+        className={`min-w-[90px] text-right font-semibold text-[15px] ${
+          type === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'
+        }`}
       >
         {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
       </div>

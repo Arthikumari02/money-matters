@@ -8,7 +8,13 @@ import React, {
 import { observer } from 'mobx-react-lite';
 import { useUserTransactionsApi } from '../hooks/apis/useUserTransactions';
 import { useAuthStore } from '@money-matters/auth';
-import { TransactionItemUser, AddTransactionButton } from '@money-matters/ui';
+import {
+  TransactionItemUser,
+  AddTransactionButton,
+  LanguageSelector,
+  PageLoader,
+  PageError,
+} from '@money-matters/ui';
 
 const UserTransactionsPage: React.FC = observer(() => {
   const authStore = useAuthStore();
@@ -44,19 +50,13 @@ const UserTransactionsPage: React.FC = observer(() => {
   }, [transactions, activeTab]);
 
   if (isLoading && transactions.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (error) {
     return (
       <div className="p-4">
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
-          <p className="text-red-700">{error}</p>
-        </div>
+        <PageError error={'Not Found'} />
       </div>
     );
   }
@@ -68,6 +68,7 @@ const UserTransactionsPage: React.FC = observer(() => {
           <h1 className="text-2xl font-bold text-gray-900">
             Your Transactions
           </h1>
+          <LanguageSelector />
           <AddTransactionButton
             userId={authStore.userInfo?.id ?? ''}
             onSuccess={() => fetchTransactions()}

@@ -1,6 +1,9 @@
 import { useState, useCallback } from 'react';
 import axios, { AxiosError } from 'axios';
-import { TransactionModel, TransactionType } from '../../models/TransactionModel';
+import {
+  TransactionModel,
+  TransactionType,
+} from '../../models/TransactionModel';
 
 const API_BASE_URL = 'https://bursting-gelding-24.hasura.app/api/rest';
 
@@ -39,6 +42,7 @@ export const useAdminTransactionsApi = () => {
             params,
           });
 
+          console.log(response.data);
           fetchedData =
             response.data.transactions || response.data.all_transactions || [];
 
@@ -64,8 +68,7 @@ export const useAdminTransactionsApi = () => {
           );
           setOffset((prev) => (reset ? LIMIT : prev + LIMIT));
           setHasMore(newTransactions.length === LIMIT);
-        }
-        else {
+        } else {
           const response = await axios.get(`${API_BASE_URL}/all-transactions`, {
             headers,
             params: { limit: 1000, offset: 0 },

@@ -2,6 +2,7 @@ import { AuthStoreProvider, RequireAuth } from '@money-matters/auth';
 import { LoginForm } from '@money-matters/auth';
 import { DashboardLayout } from '@money-matters/dashboard';
 import { Routes, Route } from 'react-router-dom';
+import { I18nProvider } from '@money-matters/ui';
 
 import { DashboardPage, DashboardProvider } from '@money-matters/dashboard';
 import {
@@ -46,15 +47,17 @@ export function AppContent() {
 
 export const App: React.FC = () => {
   return (
-    <AuthStoreProvider>
-      <DashboardProvider>
-        <TransactionProvider>
-          <ProfileProvider>
-            <AppContent />
-          </ProfileProvider>
-        </TransactionProvider>
-      </DashboardProvider>
-    </AuthStoreProvider>
+    <I18nProvider>
+      <AuthStoreProvider>
+        <DashboardProvider>
+          <TransactionProvider>
+            <ProfileProvider>
+              <AppContent />
+            </ProfileProvider>
+          </TransactionProvider>
+        </DashboardProvider>
+      </AuthStoreProvider>
+    </I18nProvider>
   );
 };
 

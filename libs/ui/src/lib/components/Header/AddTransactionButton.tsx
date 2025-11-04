@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import TransactionModal from './TransactionModal';
-import { addTransaction, TransactionInput } from '../services/transactionApi';
+import TransactionModal from '../Modals/TransactionModal';
+import { addTransaction, TransactionInput } from '../../services/transactionApi';
 interface AddTransactionButtonProps {
   userId: string;
   className?: string;
