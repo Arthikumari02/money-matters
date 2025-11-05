@@ -6,6 +6,7 @@ import { useProfileStore } from '../contexts/ProfileContext';
 import { useTranslation } from 'react-i18next';
 import { ProfileHeader } from './ProfileHeader';
 import { ProfileForm } from './ProfileForm';
+import * as styles from './Styles';
 
 export const ProfilePage: React.FC = observer(() => {
   const profileStore = useProfileStore();
@@ -13,39 +14,47 @@ export const ProfilePage: React.FC = observer(() => {
   const { t } = useTranslation('profile');
 
   useEffect(() => {
+    console.log('ProfilePage: useEffect triggered');
+    console.log('Auth store userInfo:', authStore?.userInfo);
+    
     if (authStore?.userInfo?.id) {
-      profileStore.fetchProfile(authStore.userInfo.id);
+      console.log('Fetching profile for user ID:', authStore.userInfo.id);
+      profileStore.fetchProfile(authStore.userInfo.id)
+        .then(() => {
+          console.log('Profile fetch completed');
+        })
+        .catch(error => {
+          console.error('Error fetching profile:', error);
+        });
+    } else {
+      console.log('No user ID available in authStore.userInfo');
     }
-  }, [authStore.userInfo?.id]);
+  }, [authStore.userInfo?.id, profileStore]);
 
   const { profile, isLoading, error } = profileStore;
 
   if (isLoading) return <PageLoader />;
   if (error)
-    return (
-      <div className="text-center mt-20 text-red-500 font-medium">{error}</div>
-    );
+    return <div className="text-center mt-20 text-red-500 font-medium">{error}</div>;
 
   return (
-    <div className="min-h-screen">
-      <div className="bg-[#F8FAFC]">
-        <ProfileHeader title={t('profile')} />
-      </div>
+    <div className={styles.PageContainer}>
+      <ProfileHeader title={t('profile')} />
 
-      <div className="bg-white rounded-2xl shadow-sm max-w-4xl mx-auto p-8">
-        <div className="flex flex-col md:flex-row items-start gap-8">
-          <div className="flex-shrink-0 self-center md:self-start">
+      <div className={styles.ProfileCard}>
+        <div className={styles.ProfileLayout}>
+          <div className={styles.ProfileImageWrapper}>
             <img
               src={
                 profile?.avatarUrl ||
                 `https://ui-avatars.com/api/?name=${profile?.name}+${profile?.userName}`
               }
               alt="Profile"
-              className="w-24 h-24 rounded-full border border-gray-200 object-cover"
+              className={styles.ProfileImage}
             />
           </div>
 
-          <div className="flex-1 w-full">
+          <div className={styles.ProfileFormWrapper}>
             <ProfileForm profile={profile} t={t} />
           </div>
         </div>
@@ -53,6 +62,5 @@ export const ProfilePage: React.FC = observer(() => {
     </div>
   );
 });
-
 
 export default ProfilePage;

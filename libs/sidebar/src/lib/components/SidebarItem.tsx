@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import * as styles from './Styles';
 
 interface SidebarItemProps {
   label: string;
@@ -9,21 +10,17 @@ interface SidebarItemProps {
 
 const SidebarItem: React.FC<SidebarItemProps> = ({ label, path, icon }) => {
   return (
-    <li>
+    <li className={styles.SidebarItemContainer}>
       <NavLink
         to={path}
         className={({ isActive }) =>
-          `flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200
-          ${
-            isActive
-              ? 'bg-blue-50 text-blue-600 shadow-sm'
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          `${styles.SidebarItemLinkBase} ${isActive
+            ? styles.SidebarItemLinkActive
+            : styles.SidebarItemLinkInactive
           }`
         }
       >
-        <span className="flex-shrink-0 h-5 w-5 text-gray-500 group-hover:text-blue-600">
-          {icon}
-        </span>
+        <span className={styles.SidebarItemIcon}>{icon}</span>
         {label}
       </NavLink>
     </li>

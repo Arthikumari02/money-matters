@@ -1,24 +1,57 @@
-import React from 'react';
+import { useState } from 'react';
 import { useAuthStore } from '@money-matters/auth';
 import { useNavigate } from 'react-router-dom';
-import { LogoutIcon } from '../components/Icons';
+import { LogoutIcon } from './Icons';
+import { ConfirmationModal } from '@money-matters/ui';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import * as styles from './Styles';
 
 const LogoutButton = () => {
   const authStore = useAuthStore();
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { t } = useTranslation('modal');
 
-  const handleLogout = () => {
-    authStore.logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      authStore.logout();
+      toast.success('Logout successful!');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      toast.error('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+      setIsModalOpen(false);
+    }
   };
 
   return (
-    <button
-      onClick={handleLogout}
-      className="w-full flex items-center justify-center py-2 bg-[transparent] text-#718EBF rounded-xl font-medium transition-colors"
-    >
-      <LogoutIcon className="h-4 w-4" />
-    </button>
+    <>
+      <button
+        onClick={() => setIsModalOpen(true)}
+        disabled={isLoggingOut}
+        className={styles.LogoutButton}
+      >
+        <LogoutIcon className={styles.LogoutIcon} />
+      </button>
+
+      {isModalOpen && (
+        <ConfirmationModal
+          title={t('logout.Type')}
+          message={t('logout.description')}
+          onConfirm={() => {
+            handleLogout();
+            setIsModalOpen(false);
+          }}
+          onCancel={() => setIsModalOpen(false)}
+        />
+      )}
+    </>
   );
 };
 

@@ -6,6 +6,7 @@ import {
   TransactionInput,
 } from '../../services/transactionApi';
 import { useTranslation } from 'react-i18next';
+import * as styles from './Styles';
 
 interface AddTransactionButtonProps {
   userId: string;
@@ -79,10 +80,11 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className={`flex items-center gap-3 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-base font-medium focus:outline-none ${className}`}
+        disabled={isLoading}
+        className={`${styles.AddTransactionButton} ${className}`}
       >
-        <span className="text-xl font-light">+</span>
-        {t('add_transaction_button')}
+        <span className={styles.AddTransactionIcon}>+</span>
+        {isLoading ? t('adding_transaction') : t('add_transaction_button')}
       </button>
 
       <TransactionModal

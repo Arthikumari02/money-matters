@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiArrowUpCircle, FiArrowDownCircle } from 'react-icons/fi';
+import * as styles from '../Styles';
 
 interface TransactionItemAdminProps {
   transaction: {
@@ -17,8 +18,7 @@ interface TransactionItemAdminProps {
 export const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({
   transaction,
 }) => {
-  const { userName, name, category, type, amount, date, userAvatar } =
-    transaction;
+  const { userName, name, category, type, amount, date, userAvatar } = transaction;
 
   const formattedDate = new Date(date).toLocaleString('en-US', {
     month: 'short',
@@ -29,16 +29,16 @@ export const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({
   });
 
   return (
-    <div className="flex items-center justify-between px-6 py-2 border-b border-gray-100">
-      <div className="flex items-center w-[30px] justify-center">
+    <div className={styles.AdminContainer}>
+      <div className={styles.IconContainer}>
         {type === 'credit' ? (
-          <FiArrowUpCircle size={29} className="text-[#16DBAA] text-xl" />
+          <FiArrowUpCircle size={29} className="text-[#16DBAA]" />
         ) : (
-          <FiArrowDownCircle size={29} className="text-[#FE5C73] text-xl" />
+          <FiArrowDownCircle size={29} className="text-[#FE5C73]" />
         )}
       </div>
 
-      <div className="flex items-center gap-3 min-w-[150px]">
+      <div className={styles.AdminUserSection}>
         <img
           src={
             userAvatar ||
@@ -47,25 +47,16 @@ export const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({
             )}&background=random`
           }
           alt={userName}
-          className="w-8 h-8 rounded-full object-cover"
+          className={styles.UserAvatar}
         />
-        <span className="text-[#343C6A] font-medium">{userName}</span>
+        <span className={styles.UserName}>{userName}</span>
       </div>
 
-      <div className="min-w-[160px] text-[#505887] text-[15px]">{name}</div>
+      <div className={styles.AdminName}>{name}</div>
+      <div className={styles.AdminCategory}>{category}</div>
+      <div className={styles.DateField}>{formattedDate}</div>
 
-      <div className="min-w-[120px] text-[#718EBF] text-[14px] text-center">
-        {category}
-      </div>
-
-      <div className="min-w-[150px] text-[#718EBF] text-[14px] text-center">
-        {formattedDate}
-      </div>
-
-      <div
-        className={`min-w-[90px] text-right font-semibold text-[15px] ${type === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'
-          }`}
-      >
+      <div className={styles.AdminAmountContainer(type)}>
         {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
       </div>
     </div>

@@ -1,5 +1,6 @@
-import React, { use } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import * as styles from './Styles';
 
 interface TotalCreditsAndDebitsProp {
   amount: string;
@@ -14,20 +15,16 @@ const TotalCreditsAndDebits: React.FC<TotalCreditsAndDebitsProp> = ({
 }) => {
   const { t } = useTranslation('dashboard');
   return (
-    <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-md">
+    <div className={styles.CreditDebitCard}>
       <div>
-        <h1
-          className={`text-3xl font-bold ${
-            isCredit ? 'text-green-400' : 'text-red-400'
-          }`}
-        >
+        <h1 className={isCredit ? styles.CreditAmount : styles.DebitAmount}>
           ${amount}
         </h1>
-        <p className="text-gray-400 text-lg mt-2">
+        <p className={styles.AmountLabel}>
           {isCredit ? t('credit') : t('debit')}
         </p>
       </div>
-      <img src={imagePath} alt="Credit illustration" className="h-24 w-auto" />
+      <img src={imagePath} alt="transaction visual" className={styles.AmountImage} />
     </div>
   );
 };

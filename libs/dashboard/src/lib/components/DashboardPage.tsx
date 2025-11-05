@@ -15,6 +15,7 @@ import totalCredit from '../../assets/totalcredit.png';
 import totalDebit from '../../assets/totaldebits.png';
 import { DebitCreditChart } from './DebitCreditOverview';
 import { useTranslation } from 'react-i18next';
+import * as styles from './Style';
 
 const DashboardPage: React.FC = observer(() => {
   const dashboardStore = useDashboardStore();
@@ -50,11 +51,11 @@ const DashboardPage: React.FC = observer(() => {
   const debit = dashboardStore.totals?.debit || 0;
 
   return (
-    <div className="min-h-screen flex">
+    <div className={styles.MainContainer}>
       <main className="flex-1">
-        <div className="flex items-center justify-between mb-6 bg-white p-5">
-          <h1 className="text-2xl font-semibold text-[#343C6A]">{t('accounts')}</h1>
-          <div className="flex items-center space-x-2">
+        <div className={styles.Header}>
+          <h1 className={styles.Title}>{t('accounts')}</h1>
+          <div className={styles.LanguageSelectorContainer}>
             <LanguageSelector />
             <AddTransactionButton
               userId={authStore.userInfo?.id ?? ''}
@@ -64,13 +65,12 @@ const DashboardPage: React.FC = observer(() => {
                   onError: (err) => console.error('Refetch failed:', err),
                 })
               }
-              className="!rounded-lg !px-4 !py-1 text-sm font-semibold bg-blue-600 hover:bg-blue-700 transition-all"
             />
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto p-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-7">
+        <div className={styles.ContentContainer}>
+          <div className={styles.GridContainer}>
             <TotalCreditsAndDebits
               amount={`${credit.toLocaleString()}`}
               isCredit={true}
@@ -83,14 +83,12 @@ const DashboardPage: React.FC = observer(() => {
             />
           </div>
 
-          <div className="p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">
-                {t('last_transaction')}
-              </h2>
-            </div>
+          <div className={styles.MainContainerOfLastTransaction}>
+            <h2 className={styles.SubHeader}>
+              {t('last_transaction')}
+            </h2>
 
-            <div className="bg-white rounded-2xl p-4  space-y-3">
+            <div className={styles.ContainerOfLastTransaction}>
               {dashboardStore.recentTransactions.map((txn) =>
                 isAdmin ? (
                   <TransactionItemAdmin
@@ -139,20 +137,19 @@ const DashboardPage: React.FC = observer(() => {
             </div>
           </div>
 
-          <div className="p-6 m-0">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">
-                {t('debit_and_credit_overview')}
-              </h2>
-            </div>
+          <div className={styles.DebitCreditOverviewContainer}>
+            <h2 className={styles.SubHeader}>
+              {t('debit_and_credit_overview')}
+            </h2>
 
-            <div className="bg-white rounded-lg p-4 h-72 w-full">
+            <div className={styles.DebitCreditOverviewChartContainer}>
               {dashboardStore.chartData.length > 0 ? (
-                <div className="w-full h-full">
+                <div className={styles.DebitCreditOverviewChart
+                }>
                   <DebitCreditChart />
                 </div>
               ) : (
-                <p className="text-gray-400 flex items-center justify-center h-full">
+                <p className={styles.DebitCreditOverviewChartContainer}>
                   No data available for last 7 days
                 </p>
               )}

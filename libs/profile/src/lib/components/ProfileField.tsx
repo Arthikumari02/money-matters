@@ -1,4 +1,5 @@
 import React from 'react';
+import * as styles from './Styles';
 
 interface ProfileFieldProps {
   label: string;
@@ -18,15 +19,13 @@ export const ProfileField: React.FC<ProfileFieldProps> = ({
   const formattedValue = value ? formatValue(value) : '';
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-[#505887] mb-1">
-        {label}
-      </label>
+    <div className={styles.FieldContainer}>
+      <label className={styles.FieldLabel}>{label}</label>
       <input
         type={type}
         value={formattedValue}
         disabled={disabled}
-        className="w-full border border-[#DFEAF2] rounded-xl px-3 py-2 bg-white text-[#718EBF]"
+        className={styles.FieldInput}
       />
     </div>
   );

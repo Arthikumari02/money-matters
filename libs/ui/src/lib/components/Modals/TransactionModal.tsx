@@ -3,6 +3,7 @@ import { IoClose } from 'react-icons/io5';
 import { updateTransaction, addTransaction } from '../../services/transactionApi';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import * as styles from './Styles';
 
 export interface TransactionData {
   name: string;
@@ -69,25 +70,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
 
   const handleSubmit = async () => {
     if (!validate()) return;
-
     setIsLoading(true);
+
     try {
       if (mode === 'edit' && transactionId) {
-        const result = await updateTransaction(userId, transactionId, {
+        await updateTransaction(userId, transactionId, {
           name: formData.name,
           type: formData.type.toLowerCase() as 'credit' | 'debit',
           category: formData.category,
           amount: parseFloat(formData.amount),
           date: formData.date,
         });
-
-        if (result.success) {
-          toast.success(t('toast.updated_successfully'));
-          onSuccess?.();
-          onClose();
-        } else {
-          toast.error(result.message || t('toast.update_failed'));
-        }
+        toast.success(t('toast.updated_successfully'));
       } else {
         await addTransaction(userId, {
           name: formData.name,
@@ -97,9 +91,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           date: formData.date,
         });
         toast.success(t('toast.added_successfully'));
-        onSuccess?.();
-        onClose();
       }
+      onSuccess?.();
+      onClose();
     } catch (err) {
       console.error(err);
       toast.error(t('toast.error'));
@@ -111,126 +105,75 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-      <div className="bg-white rounded-2xl shadow-xl w-[420px] p-6 relative">
+    <div className={styles.ModalOverlay}>
+      <div className={styles.ModalContainer}>
         <button
           onClick={onClose}
           disabled={isLoading}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition disabled:opacity-50"
+          className={styles.ModalCloseButton}
         >
           <IoClose size={22} />
         </button>
 
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">
-          {mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title')}
+        <h2 className={styles.ModalHeading}>
+          {mode === 'edit'
+            ? t('update_transaction.title')
+            : t('add_transaction.title')}
         </h2>
-        <p className="text-gray-500 text-sm mb-5">
+        <p className={styles.ModalDescription}>
           {mode === 'edit'
             ? t('update_transaction.description')
             : t('add_transaction.description')}
         </p>
 
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-700 mb-1 block">
-              {t('transaction.transaction_name')} <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              placeholder={t('add_transaction.placeholders.enter_name')}
-              maxLength={30}
-              disabled={isLoading}
-              className={`w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'}
-                rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
-            />
-            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
-          </div>
+        <div className={styles.ModalFieldWrapper}>
+          {[
+            { key: 'name', label: t('transaction.transaction_name'), type: 'text' },
+            { key: 'type', label: t('transaction.transaction_type'), type: 'select' },
+            { key: 'category', label: t('transaction.category'), type: 'select' },
+            { key: 'amount', label: t('transaction.amount'), type: 'number' },
+            { key: 'date', label: t('transaction.date'), type: 'date' },
+          ].map((field) => (
+            <div key={field.key}>
+              <label className={styles.ModalLabel}>
+                {field.label} <span className={styles.ModalRequired}>*</span>
+              </label>
 
-          <div>
-            <label className="text-sm text-gray-700 mb-1 block">
-              {t('transaction.transaction_type')} <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.type}
-              onChange={(e) => handleChange('type', e.target.value)}
-              disabled={isLoading}
-              className={`w-full border ${errors.type ? 'border-red-500' : 'border-gray-300'}
-                rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
-            >
-              <option value="">{t('add_transaction.placeholders.select_type')}</option>
-              <option value="Credit">{t('credit')}</option>
-              <option value="Debit">{t('debit')}</option>
-            </select>
-            {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type}</p>}
-          </div>
+              {field.type === 'text' && (
+                <input
+                  type="text"
+                  value={(formData as any)[field.key]}
+                  onChange={(e) => handleChange(field.key, e.target.value)}
+                  disabled={isLoading}
+                  className={`${styles.ModalInputBase} ${errors[field.key] ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                />
+              )}
 
-          <div>
-            <label className="text-sm text-gray-700 mb-1 block">
-              {t('transaction.category')} <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={formData.category}
-              onChange={(e) => handleChange('category', e.target.value)}
-              disabled={isLoading}
-              className={`w-full border ${errors.category ? 'border-red-500' : 'border-gray-300'}
-                rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
-            >
-              <option value="">{t('add_transaction.placeholders.category')}</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Food">Food</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Bills">Bills</option>
-              <option value="Salary">Salary</option>
-              <option value="Transportation">Transportation</option>
-              <option value="Other">Other</option>
-            </select>
-            {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category}</p>}
-          </div>
+              {field.type === 'date' && (
+                <input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => handleChange('date', e.target.value)}
+                  disabled={isLoading}
+                  max={new Date().toISOString().split('T')[0]}
+                  className={`${styles.ModalInputBase} ${errors.date ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                />
+              )}
 
-          <div>
-            <label className="text-sm text-gray-700 mb-1 block">
-              {t('transaction.amount')} <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-              <input
-                type="number"
-                value={formData.amount}
-                onChange={(e) => handleChange('amount', e.target.value)}
-                placeholder={t('add_transaction.placeholders.enter_amount')}
-                min="0.01"
-                step="0.01"
-                disabled={isLoading}
-                className={`w-full border ${errors.amount ? 'border-red-500' : 'border-gray-300'}
-                  rounded-lg pl-8 pr-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
-              />
+              {errors[field.key] && (
+                <p className={styles.ModalErrorText}>{errors[field.key]}</p>
+              )}
             </div>
-            {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-700 mb-1 block">
-              {t('transaction.date')} <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => handleChange('date', e.target.value)}
-              max={new Date().toISOString().split('T')[0]}
-              disabled={isLoading}
-              className={`w-full border ${errors.date ? 'border-red-500' : 'border-gray-300'}
-                rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50`}
-            />
-            {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
-          </div>
+          ))}
         </div>
 
         <button
           onClick={handleSubmit}
           disabled={isLoading}
-          className={`w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+          className={`${styles.ModalSubmitButton} ${isLoading ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
         >
           {isLoading
             ? t('processing')

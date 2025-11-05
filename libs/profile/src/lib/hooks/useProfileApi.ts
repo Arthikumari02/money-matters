@@ -1,18 +1,23 @@
 import { IProfile } from '../models/ProfileModel';
 
-export const useProfileApi = () => {
+export const useProfileApi = (isAdmin: boolean = false) => {
   const getProfile = async (userId: string): Promise<IProfile> => {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'x-hasura-admin-secret':
+        'g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF',
+      'x-hasura-role': isAdmin ? 'admin' : 'user',
+    };
+
+    if (!isAdmin) {
+      headers['x-hasura-user-id'] = userId;
+    }
+
     const response = await fetch(
       'https://bursting-gelding-24.hasura.app/api/rest/profile',
       {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-hasura-admin-secret':
-            'g08A3qQy00y8yFDq3y6N1ZQnhOPOa4msdie5EtKS1hFStar01JzPKrtKEzYY2BtF',
-          'x-hasura-role': 'user',
-          'x-hasura-user-id': userId,
-        },
+        headers,
       }
     );
 
@@ -21,13 +26,21 @@ export const useProfileApi = () => {
     const data = await response.json();
     console.log('API Response:', data);
 
-    const users = data.users || [];
-    const profile = Array.isArray(users) ? users[0] : null;
+    let profile;
 
-    if (!profile) {
+    if (isAdmin) {
+      profile = data.profile || data.user || data.users?.[0] || data;
+    } else {
+      const users = data.users || [];
+      profile = Array.isArray(users) ? users[0] : users;
+    }
+
+    if (!profile || (typeof profile === 'object' && Object.keys(profile).length === 0)) {
       console.error('No profile data found in response:', data);
       throw new Error('Profile data is empty');
     }
+
+    console.log('Processed profile data:', profile);
 
     console.log('Profile data:', JSON.stringify(profile, null, 2));
 
