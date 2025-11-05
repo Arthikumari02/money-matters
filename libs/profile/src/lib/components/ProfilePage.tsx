@@ -21,34 +21,38 @@ export const ProfilePage: React.FC = observer(() => {
   const { profile, isLoading, error } = profileStore;
 
   if (isLoading) return <PageLoader />;
-
-  if (error) {
+  if (error)
     return (
       <div className="text-center mt-20 text-red-500 font-medium">{error}</div>
     );
-  }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <ProfileHeader title={t('profile')} />
+    <div className="min-h-screen">
+      <div className="bg-[#F8FAFC]">
+        <ProfileHeader title={t('profile')} />
+      </div>
 
-      <div className="bg-white shadow-sm rounded-2xl max-w-4xl mx-auto p-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex justify-center md:justify-start">
+      <div className="bg-white rounded-2xl shadow-sm max-w-4xl mx-auto p-8">
+        <div className="flex flex-col md:flex-row items-start gap-8">
+          <div className="flex-shrink-0 self-center md:self-start">
             <img
               src={
                 profile?.avatarUrl ||
                 `https://ui-avatars.com/api/?name=${profile?.name}+${profile?.userName}`
               }
               alt="Profile"
-              className="w-24 h-24 rounded-full border"
+              className="w-24 h-24 rounded-full border border-gray-200 object-cover"
             />
           </div>
-          <ProfileForm profile={profile} t={t} />
+
+          <div className="flex-1 w-full">
+            <ProfileForm profile={profile} t={t} />
+          </div>
         </div>
       </div>
     </div>
   );
 });
+
 
 export default ProfilePage;

@@ -36,11 +36,11 @@ const Sidebar: React.FC = () => {
             </div>
 
             <div className="flex flex-col">
+              <p className="text-xs text-gray-500">
+                {userInfo?.fullName || 'User'}
+              </p>
               <p className="text-sm font-semibold text-gray-900 truncate">
                 {userInfo?.email || 'User'}
-              </p>
-              <p className="text-xs text-gray-500">
-                {authStore.isAdmin ? 'Admin' : 'User'}
               </p>
             </div>
           </div>

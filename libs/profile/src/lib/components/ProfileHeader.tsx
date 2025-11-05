@@ -14,7 +14,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = observer(({ title }) 
 
   return (
     <div className="flex justify-between items-center mb-9 bg-white p-5">
-      <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+      <h1 className="text-2xl font-semibold text-[#343C6A]">{title}</h1>
       <div className="flex items-center space-x-2">
         <LanguageSelector />
         <AddTransactionButton

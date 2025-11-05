@@ -16,17 +16,17 @@ export const ProfileField: React.FC<ProfileFieldProps> = ({
   formatValue = (val) => val,
 }) => {
   const formattedValue = value ? formatValue(value) : '';
-  
+
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-600 mb-1">
+      <label className="block text-sm font-medium text-[#505887] mb-1">
         {label}
       </label>
       <input
         type={type}
         value={formattedValue}
         disabled={disabled}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 text-gray-700"
+        className="w-full border border-[#DFEAF2] rounded-xl px-3 py-2 bg-white text-[#718EBF]"
       />
     </div>
   );

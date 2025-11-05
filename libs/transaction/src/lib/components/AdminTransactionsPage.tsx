@@ -62,8 +62,8 @@ const AdminTransactionsPage: React.FC = observer(() => {
   return (
     <div className="min-h-screen bg-[#F7F9FB] flex flex-col">
       <div className="bg-white p-7">
-        <div className="flex flex-row justify-between w-full">
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+        <div className="flex flex-row justify-between w-full py-2">
+          <h1 className="text-2xl font-semibold text-[#343C6A] mb-1">
             {t('transactions_heading')}
           </h1>
           <LanguageSelector />

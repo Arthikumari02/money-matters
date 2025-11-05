@@ -74,7 +74,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
 
   return (
     <>
-      <div className="flex items-center bg-white border px-6 py-3 gap-x-6 rounded-2xl shadow-sm hover:shadow transition-all cursor-pointer">
+      <div className="flex items-center border-b px-6 py-2 gap-x-6 cursor-pointer">
         <div
           className="flex-shrink-0 flex items-center justify-center"
           style={{
@@ -82,7 +82,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
             color: isDebit ? '#FE5C73' : '#16DBAA',
           }}
         >
-          {isDebit ? <FiArrowDownCircle /> : <FiArrowUpCircle />}
+          {isDebit ? <FiArrowDownCircle size={29} /> : <FiArrowUpCircle size={29} />}
         </div>
 
         <div className="flex-1 min-w-[160px]">

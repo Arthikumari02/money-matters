@@ -61,7 +61,7 @@ const UserTransactionsPage: React.FC = observer(() => {
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
       <div className="bg-white p-2 px-8 mb-5">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-semibold text-[#343C6A]">
             {t('transactions_heading')}
           </h1>
           <div className="flex items-center space-x-3">

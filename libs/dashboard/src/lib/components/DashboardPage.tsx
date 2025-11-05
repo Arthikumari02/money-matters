@@ -53,7 +53,7 @@ const DashboardPage: React.FC = observer(() => {
     <div className="min-h-screen flex">
       <main className="flex-1">
         <div className="flex items-center justify-between mb-6 bg-white p-5">
-          <h1 className="text-2xl font-bold text-gray-800">{t('accounts')}</h1>
+          <h1 className="text-2xl font-semibold text-[#343C6A]">{t('accounts')}</h1>
           <div className="flex items-center space-x-2">
             <LanguageSelector />
             <AddTransactionButton
@@ -64,11 +64,12 @@ const DashboardPage: React.FC = observer(() => {
                   onError: (err) => console.error('Refetch failed:', err),
                 })
               }
+              className="!rounded-lg !px-4 !py-1 text-sm font-semibold bg-blue-600 hover:bg-blue-700 transition-all"
             />
           </div>
         </div>
 
-        <div className="max-w-4xl mx-auto p-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto p-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-7">
             <TotalCreditsAndDebits
               amount={`${credit.toLocaleString()}`}
@@ -89,7 +90,7 @@ const DashboardPage: React.FC = observer(() => {
               </h2>
             </div>
 
-            <div className="bg-white rounded-xl p-6  space-y-3">
+            <div className="bg-white rounded-2xl p-4  space-y-3">
               {dashboardStore.recentTransactions.map((txn) =>
                 isAdmin ? (
                   <TransactionItemAdmin
