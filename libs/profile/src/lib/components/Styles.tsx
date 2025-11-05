@@ -37,3 +37,9 @@ export const FieldInput =
     px-3 py-2 
     bg-white text-[#718EBF]
     `;
+export const InitialAvatar = `
+  flex items-center justify-center
+  bg-blue-600 text-white
+  rounded-full text-3xl font-semibold
+  w-24 h-24
+`;

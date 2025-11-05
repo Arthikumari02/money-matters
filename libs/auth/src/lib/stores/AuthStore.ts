@@ -7,12 +7,6 @@ import {
 } from 'mobx';
 import { loginApi } from '../apis/authApi';
 
-declare global {
-  interface Window {
-    localStorage: Storage;
-  }
-  const window: Window & typeof globalThis;
-}
 
 const USERS = [
   { email: 'admin@gmail.com', password: 'Admin@123', isAdmin: true },

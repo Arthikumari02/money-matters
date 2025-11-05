@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import * as styles from './Styles';
 
 const validateEmail = (email: string) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,60 +51,56 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#168a6d]">
-      <div className="bg-white rounded-xl shadow-lg px-10 py-8 w-full max-w-md">
-        <h2 className="text-center font-mono text-3xl font-bold text-gray-800 mb-8">
-          Login
-        </h2>
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 text-red-700">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-7">
+    <div className={styles.Container}>
+      <div className={styles.Card}>
+        <h2 className={styles.Heading}>Login</h2>
+
+        {error && <div className={styles.ErrorBox}>{error}</div>}
+
+        <form onSubmit={handleSubmit} className={styles.Form}>
           <div>
-            <label className="block text-gray-700 mb-2">Email:</label>
+            <label className={styles.Label}>Email:</label>
             <input
               type="email"
-              className="border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-700"
+              className={styles.Input}
               placeholder="Enter email"
               value={email}
-              onChange={(e: any) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
+
           <div>
-            <label className="block text-gray-700 mb-2">Password:</label>
+            <label className={styles.Label}>Password:</label>
             <input
               type={showPassword ? 'text' : 'password'}
-              className="border border-gray-300 rounded-md w-full py-3 px-4 text-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-700"
+              className={styles.Input}
               placeholder="Enter password"
               value={password}
-              onChange={(e: any) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <div className="mt-3 flex items-center">
+            <div className={styles.CheckboxContainer}>
               <input
                 id="showPassword"
                 type="checkbox"
                 checked={showPassword}
                 onChange={() => setShowPassword(!showPassword)}
-                className="mr-2"
+                className={styles.Checkbox}
               />
-              <label htmlFor="showPassword" className="text-gray-700 text-sm">
+              <label htmlFor="showPassword" className={styles.CheckboxLabel}>
                 Show Password
               </label>
             </div>
           </div>
-          <button
-            type="submit"
-            className="w-full py-3 px-4 bg-[#1f876d] hover:bg-[#16ba91] text-white rounded-md text-lg font-medium transition duration-200"
-          >
-            {isLoading ? 'Signing in...' : 'SIGN IN'}{' '}
+
+          <button type="submit" className={styles.Button} disabled={isLoading}>
+            {isLoading ? 'Signing in...' : 'SIGN IN'}
           </button>
         </form>
       </div>
     </div>
+
   );
 };
 

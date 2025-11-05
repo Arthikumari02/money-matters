@@ -16,7 +16,7 @@ export const ProfilePage: React.FC = observer(() => {
   useEffect(() => {
     console.log('ProfilePage: useEffect triggered');
     console.log('Auth store userInfo:', authStore?.userInfo);
-    
+
     if (authStore?.userInfo?.id) {
       console.log('Fetching profile for user ID:', authStore.userInfo.id);
       profileStore.fetchProfile(authStore.userInfo.id)
@@ -44,14 +44,18 @@ export const ProfilePage: React.FC = observer(() => {
       <div className={styles.ProfileCard}>
         <div className={styles.ProfileLayout}>
           <div className={styles.ProfileImageWrapper}>
-            <img
-              src={
-                profile?.avatarUrl ||
-                `https://ui-avatars.com/api/?name=${profile?.name}+${profile?.userName}`
-              }
-              alt="Profile"
-              className={styles.ProfileImage}
-            />
+            {profile?.avatarUrl ? (
+              <img
+                src={profile.avatarUrl}
+                alt="Profile"
+                className={styles.ProfileImage}
+              />
+            ) : (
+              <div className={styles.InitialAvatar}>
+                {profile?.name?.[0]?.toUpperCase() || "U"}
+              </div>
+            )}
+
           </div>
 
           <div className={styles.ProfileFormWrapper}>

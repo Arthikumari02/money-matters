@@ -19,8 +19,6 @@ export const DebitCreditChart = observer(() => {
 
   const chartData = toJS(store.chartData);
 
-  console.log('Chart Data:', chartData);
-
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={chartData}>

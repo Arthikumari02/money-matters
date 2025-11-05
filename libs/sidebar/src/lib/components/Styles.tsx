@@ -32,12 +32,12 @@ export const LogoutWrapper = `flex-shrink-0 ml-2`;
 
 export const SidebarItemContainer =
     `w-full flex items-center gap-3 
-    px-4 py-2.5 
+    px-4 py-1
     text-sm font-medium rounded-xl transition-all duration-200
     `;
 export const SidebarItemLinkBase =
     `w-full flex items-center gap-3 
-    px-4 py-2.5 
+    px-1 py-3
     text-sm font-medium rounded-xl transition-all duration-200
     `;
 export const SidebarItemLinkActive = 'bg-blue-50 text-blue-600 shadow-sm';
