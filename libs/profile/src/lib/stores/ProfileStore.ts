@@ -41,16 +41,16 @@ export class ProfileStore {
     console.log('ProfileStore: fetchProfile called with userId:', userId);
     this.setLoading(true);
     this.setError(null);
-    
+
     try {
       console.log('ProfileStore: Calling profileApi.getProfile...');
       const profileData = await this.profileApi.getProfile(userId);
       console.log('ProfileStore: Profile data received:', profileData);
-      
+
       if (!profileData) {
         throw new Error('No profile data received from API');
       }
-      
+
       this.setProfile(profileData);
       console.log('ProfileStore: Profile set successfully');
       return profileData;
@@ -58,7 +58,7 @@ export class ProfileStore {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch profile';
       console.error('ProfileStore: Error fetching profile:', error);
       this.setError(errorMessage);
-      throw error; // Re-throw to allow .catch() in the component
+      throw error;
     } finally {
       this.setLoading(false);
       console.log('ProfileStore: fetchProfile completed');

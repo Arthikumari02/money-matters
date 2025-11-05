@@ -59,12 +59,14 @@ const DashboardPage: React.FC = observer(() => {
             <LanguageSelector />
             <AddTransactionButton
               userId={authStore.userInfo?.id ?? ''}
-              onSuccess={() =>
-                fetchDashboard({
-                  onSuccess: () => console.log('Refetched dashboard after add'),
-                  onError: (err) => console.error('Refetch failed:', err),
-                })
-              }
+              onSuccess={() => {
+                setTimeout(() => {
+                  fetchDashboard({
+                    onSuccess: () => console.log('Dashboard reloaded after add'),
+                    onError: (err) => console.error('Reload failed:', err),
+                  });
+                }, 1000);
+              }}
             />
           </div>
         </div>
@@ -124,12 +126,10 @@ const DashboardPage: React.FC = observer(() => {
                       })
                     }
                     onUpdateSuccess={() =>
-                      setTimeout(() => {
-                        fetchDashboard({
-                          onSuccess: () => console.log('Refetched dashboard after update'),
-                          onError: (err) => console.error('Refetch failed:', err),
-                        });
-                      }, 1000)
+                      fetchDashboard({
+                        onSuccess: () => console.log('Refetched dashboard after update'),
+                        onError: (err) => console.error('Refetch failed:', err),
+                      })
                     }
                   />
                 )

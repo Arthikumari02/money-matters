@@ -71,7 +71,8 @@ export const useFetchDashboard = (store: DashboardStore) => {
         store.setRecentTransactions(allTransactions.slice(0, 3));
 
         const allDays =
-          dailyTotalsData.last_7_days_transactions_credit_debit_totals || [];
+          dailyTotalsData.last_7_days_transactions_credit_debit_totals ||
+          dailyTotalsData.last_7_days_transactions_totals_admin || [];
 
         const grouped = allDays.reduce((acc: any, item: any) => {
           const day = new Date(item.date).toLocaleDateString('en-US', {

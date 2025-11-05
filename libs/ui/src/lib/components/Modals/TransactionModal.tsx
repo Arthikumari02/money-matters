@@ -71,7 +71,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   const handleSubmit = async () => {
     if (!validate()) return;
     setIsLoading(true);
-
+    const fullDateTime = new Date(
+      `${formData.date}T${new Date().toTimeString().split(' ')[0]}`
+    ).toISOString();
     try {
       if (mode === 'edit' && transactionId) {
         await updateTransaction(userId, transactionId, {
@@ -79,7 +81,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           type: formData.type.toLowerCase() as 'credit' | 'debit',
           category: formData.category,
           amount: parseFloat(formData.amount),
-          date: formData.date,
+          date: fullDateTime,
         });
         toast.success(t('toast.updated_successfully'));
       } else {
@@ -88,12 +90,12 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           type: formData.type.toLowerCase() as 'credit' | 'debit',
           category: formData.category,
           amount: parseFloat(formData.amount),
-          date: formData.date,
+          date: fullDateTime,
         });
         toast.success(t('toast.added_successfully'));
       }
-      onSuccess?.();
       onClose();
+      onSuccess?.();
     } catch (err) {
       console.error(err);
       toast.error(t('toast.error'));
@@ -116,9 +118,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         </button>
 
         <h2 className={styles.ModalHeading}>
-          {mode === 'edit'
-            ? t('update_transaction.title')
-            : t('add_transaction.title')}
+          {mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title')}
         </h2>
         <p className={styles.ModalDescription}>
           {mode === 'edit'
@@ -127,46 +127,94 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         </p>
 
         <div className={styles.ModalFieldWrapper}>
-          {[
-            { key: 'name', label: t('transaction.transaction_name'), type: 'text' },
-            { key: 'type', label: t('transaction.transaction_type'), type: 'select' },
-            { key: 'category', label: t('transaction.category'), type: 'select' },
-            { key: 'amount', label: t('transaction.amount'), type: 'number' },
-            { key: 'date', label: t('transaction.date'), type: 'date' },
-          ].map((field) => (
-            <div key={field.key}>
-              <label className={styles.ModalLabel}>
-                {field.label} <span className={styles.ModalRequired}>*</span>
-              </label>
+          <div>
+            <label className={styles.ModalLabel}>
+              {t('transaction.transaction_name')} <span className={styles.ModalRequired}>*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+              disabled={isLoading}
+              placeholder={t('add_transaction.placeholders.enter_name')}
+              className={`${styles.ModalInputBase} ${errors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
+            />
+            {errors.name && <p className={styles.ModalErrorText}>{errors.name}</p>}
+          </div>
 
-              {field.type === 'text' && (
-                <input
-                  type="text"
-                  value={(formData as any)[field.key]}
-                  onChange={(e) => handleChange(field.key, e.target.value)}
-                  disabled={isLoading}
-                  className={`${styles.ModalInputBase} ${errors[field.key] ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                />
-              )}
+          <div>
+            <label className={styles.ModalLabel}>
+              {t('transaction.transaction_type')} <span className={styles.ModalRequired}>*</span>
+            </label>
+            <select
+              value={formData.type}
+              onChange={(e) => handleChange('type', e.target.value)}
+              disabled={isLoading}
+              className={`${styles.ModalInputBase} ${errors.type ? 'border-red-500' : 'border-gray-300'
+                }`}
+            >
+              <option value="">{t('add_transaction.placeholders.select_type')}</option>
+              <option value="credit">{t('credit')}</option>
+              <option value="debit">{t('debit')}</option>
+            </select>
+            {errors.type && <p className={styles.ModalErrorText}>{errors.type}</p>}
+          </div>
 
-              {field.type === 'date' && (
-                <input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => handleChange('date', e.target.value)}
-                  disabled={isLoading}
-                  max={new Date().toISOString().split('T')[0]}
-                  className={`${styles.ModalInputBase} ${errors.date ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                />
-              )}
+          <div>
+            <label className={styles.ModalLabel}>
+              {t('transaction.category')} <span className={styles.ModalRequired}>*</span>
+            </label>
+            <select
+              value={formData.category}
+              onChange={(e) => handleChange('category', e.target.value)}
+              disabled={isLoading}
+              className={`${styles.ModalInputBase} ${errors.category ? 'border-red-500' : 'border-gray-300'
+                }`}
+            >
+              <option value="">{t('add_transaction.placeholders.category')}</option>
+              <option value="Food">Food</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Salary">Salary</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Other">Other</option>
+            </select>
+            {errors.category && <p className={styles.ModalErrorText}>{errors.category}</p>}
+          </div>
 
-              {errors[field.key] && (
-                <p className={styles.ModalErrorText}>{errors[field.key]}</p>
-              )}
-            </div>
-          ))}
+          <div>
+            <label className={styles.ModalLabel}>
+              {t('transaction.amount')} <span className={styles.ModalRequired}>*</span>
+            </label>
+            <input
+              type="number"
+              value={formData.amount}
+              onChange={(e) => handleChange('amount', e.target.value)}
+              disabled={isLoading}
+              placeholder={t('add_transaction.placeholders.enter_amount')}
+              className={`${styles.ModalInputBase} ${errors.amount ? 'border-red-500' : 'border-gray-300'
+                }`}
+            />
+            {errors.amount && <p className={styles.ModalErrorText}>{errors.amount}</p>}
+          </div>
+
+          <div>
+            <label className={styles.ModalLabel}>
+              {t('transaction.date')} <span className={styles.ModalRequired}>*</span>
+            </label>
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => handleChange('date', e.target.value)}
+              disabled={isLoading}
+              max={new Date().toISOString().split('T')[0]}
+              className={`${styles.ModalInputBase} ${errors.date ? 'border-red-500' : 'border-gray-300'
+                }`}
+            />
+            {errors.date && <p className={styles.ModalErrorText}>{errors.date}</p>}
+          </div>
         </div>
 
         <button
