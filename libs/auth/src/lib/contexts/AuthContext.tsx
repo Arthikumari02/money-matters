@@ -1,12 +1,18 @@
 import React, { createContext, useContext, useRef } from 'react';
-import authStore, { AuthStore } from '../stores/AuthStore';
+import defaultAuthStore, { AuthStore } from '../stores/AuthStore';
 
 const AuthContext = createContext<AuthStore | undefined>(undefined);
 
-export const AuthStoreProvider: React.FC<{ children: React.ReactNode }> = ({
+interface AuthStoreProviderProps {
+  children: React.ReactNode;
+  value?: AuthStore;
+}
+
+export const AuthStoreProvider: React.FC<AuthStoreProviderProps> = ({
   children,
+  value,
 }) => {
-  const authStoreRef = useRef(authStore);
+  const authStoreRef = useRef(value ?? defaultAuthStore);
   return (
     <AuthContext.Provider value={authStoreRef.current}>
       {children}

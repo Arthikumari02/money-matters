@@ -22,12 +22,17 @@ const DashboardPage: React.FC = observer(() => {
   const authStore = useAuthStore();
   const { t } = useTranslation('dashboard');
 
-  const { fetchDashboard, isFetching } = useFetchDashboard(dashboardStore);
+  const { fetchDashboard } = useFetchDashboard(dashboardStore);
   const isAdmin = !!authStore.isAdmin;
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).__STORYBOOK_ADDONS_CHANNEL__) {
-      console.log('Skipping dashboard fetch in Storybook');
+    const isStorybook =
+      typeof window !== 'undefined' &&
+      (window.location.href.includes('iframe.html') ||
+        (window as any).__STORYBOOK_ADDONS_CHANNEL__);
+
+    if (isStorybook) {
+      console.log('🧩 Storybook detected — skipping API calls.');
       return;
     }
 
@@ -38,11 +43,12 @@ const DashboardPage: React.FC = observer(() => {
     }
 
     fetchDashboard({
-      onSuccess: () => console.log('Dashboard loaded successfully'),
-      onError: (err) => console.error('Dashboard load failed:', err),
+      onSuccess: () => console.log('Dashboard data fetched successfully'),
+      onError: (err) => console.error('Failed to fetch dashboard:', err),
     });
   }, [isAdmin, authStore.userInfo?.id]);
 
+  const { isFetching } = useFetchDashboard(dashboardStore);
 
   const loading =
     dashboardStore.isLoading ||
@@ -143,23 +149,11 @@ const DashboardPage: React.FC = observer(() => {
             </div>
           </div>
 
-          <div className={styles.DebitCreditOverviewContainer}>
-            <h2 className={styles.SubHeader}>
+          <div className="w-full p-4 bg-white rounded-lg shadow">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
               {t('debit_and_credit_overview')}
             </h2>
-
-            <div className={styles.DebitCreditOverviewChartContainer}>
-              {dashboardStore.chartData.length > 0 ? (
-                <div className={styles.DebitCreditOverviewChart
-                }>
-                  <DebitCreditChart />
-                </div>
-              ) : (
-                <p className={styles.DebitCreditOverviewChartContainer}>
-                  No data available for last 7 days
-                </p>
-              )}
-            </div>
+            <DebitCreditChart />
           </div>
 
         </div>

@@ -72,6 +72,7 @@ export const updateTransaction = async (
     date: string;
   }
 ) => {
+
   try {
     const response = await fetch(
       'https://bursting-gelding-24.hasura.app/api/rest/update-transaction',
