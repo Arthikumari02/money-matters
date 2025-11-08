@@ -26,6 +26,10 @@ const DashboardPage: React.FC = observer(() => {
   const isAdmin = !!authStore.isAdmin;
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).__STORYBOOK_PREVIEW__) {
+      return;
+    }
+
     dashboardStore.setIsAdmin(isAdmin);
 
     if (!isAdmin && authStore.userInfo?.id) {
@@ -37,6 +41,7 @@ const DashboardPage: React.FC = observer(() => {
       onError: (err) => console.error('Dashboard load failed:', err),
     });
   }, [isAdmin, authStore.userInfo?.id]);
+
 
   const loading =
     dashboardStore.isLoading ||

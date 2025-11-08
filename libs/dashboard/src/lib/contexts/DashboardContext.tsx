@@ -3,12 +3,13 @@ import { DashboardStore } from '../stores/DashboardStore';
 
 const DashboardContext = createContext<DashboardStore | undefined>(undefined);
 
-const dashboardStore = new DashboardStore();
-export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const DashboardProvider: React.FC<{
+  value?: DashboardStore;
+  children: React.ReactNode;
+}> = ({ value, children }) => {
+  const store = value ?? new DashboardStore();
   return (
-    <DashboardContext.Provider value={dashboardStore}>
+    <DashboardContext.Provider value={store}>
       {children}
     </DashboardContext.Provider>
   );
@@ -16,10 +17,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
 
 export const useDashboardStore = (): DashboardStore => {
   const context = useContext(DashboardContext);
-  if (context === undefined) {
-    throw new Error(
-      'useDashboardStore must be used within a DashboardProvider'
-    );
+  if (!context) {
+    throw new Error('useDashboardStore must be used within DashboardProvider');
   }
   return context;
 };
