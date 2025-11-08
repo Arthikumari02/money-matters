@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import { FaPlus } from 'react-icons/fa';
 import TransactionModal from '../Modals/TransactionModal';
+import Button from '../Button/Button';
 import {
   addTransaction,
   TransactionInput,
@@ -76,24 +78,15 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
 
   return (
     <>
-      <button
-        type="button"
+      <Button
+        variant="add"
         onClick={() => setIsOpen(true)}
-        disabled={isLoading}
-        className={`
-          flex items-center gap-3 
-          bg-blue-600 hover:bg-blue-700 
-          text-white text-base font-medium 
-          rounded-lg 
-          px-4 py-1 
-          focus:outline-none transition-all 
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${className}
-        `}
+        isLoading={isLoading}
+        className="bg-[#2D60FF] hover:bg-[#2D60FF]/80 text-white"
+        icon={<FaPlus />}
       >
-        <span className="text-xl font-light">+</span>
         {isLoading ? t('adding_transaction') : t('add_transaction_button')}
-      </button>
+      </Button>
 
       <TransactionModal
         mode="add"

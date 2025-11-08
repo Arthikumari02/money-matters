@@ -3,6 +3,7 @@ import { IoClose } from 'react-icons/io5';
 import { updateTransaction, addTransaction } from '../../services/transactionApi';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import Button from '../Button/Button';
 import * as styles from './Styles';
 
 export interface TransactionData {
@@ -125,13 +126,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   return (
     <div className={styles.ModalOverlay}>
       <div className={styles.ModalContainer}>
-        <button
+        <Button
+          variant="text"
           onClick={onClose}
           disabled={isLoading}
-          className={styles.ModalCloseButton}
+          className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-100"
         >
           <IoClose size={22} />
-        </button>
+        </Button>
 
         <h2 className={styles.ModalHeading}>
           {mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title')}
