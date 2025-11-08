@@ -44,14 +44,30 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setFormData({
+    if (!isOpen) return;
+    
+    const newFormData = {
       name: transactionData.name || '',
       type: transactionData.type || '',
       category: transactionData.category || '',
       amount: transactionData.amount || '',
       date: transactionData.date || '',
-    });
-  }, [transactionData, isOpen]);
+    };
+
+    // Only update if the values have actually changed
+    setFormData(prev => 
+      JSON.stringify(prev) === JSON.stringify(newFormData) 
+        ? prev 
+        : newFormData
+    );
+  }, [
+    isOpen,
+    transactionData?.name,
+    transactionData?.type,
+    transactionData?.category,
+    transactionData?.amount,
+    transactionData?.date
+  ]);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
