@@ -29,6 +29,9 @@ const config: StorybookConfig = {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '../src'),
+          '@money-matters/auth': path.resolve(__dirname, '../../../libs/auth/src'),
+          '@money-matters/ui': path.resolve(__dirname, '../../../libs/ui/src'),
+          '@money-matters/dashboard': path.resolve(__dirname, '../src'),
         },
       },
     }),

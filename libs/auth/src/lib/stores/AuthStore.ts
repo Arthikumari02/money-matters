@@ -56,11 +56,12 @@ class AuthStore {
       logout: action,
       setError: action,
     });
-
-    const storedToken = this.getLocalStorageItem('auth_token');
-    if (storedToken) {
-      this.token = storedToken;
-      this.loadUserInfoFromStorage();
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedToken = this.getLocalStorageItem('auth_token');
+      if (storedToken) {
+        this.token = storedToken;
+        this.loadUserInfoFromStorage();
+      }
     }
   }
 

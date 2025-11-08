@@ -26,7 +26,8 @@ const DashboardPage: React.FC = observer(() => {
   const isAdmin = !!authStore.isAdmin;
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).__STORYBOOK_PREVIEW__) {
+    if (typeof window !== 'undefined' && (window as any).__STORYBOOK_ADDONS_CHANNEL__) {
+      console.log('Skipping dashboard fetch in Storybook');
       return;
     }
 
