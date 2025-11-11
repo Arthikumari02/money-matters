@@ -1,4 +1,4 @@
-import { AuthStoreProvider, RequireAuth } from '@money-matters/auth';
+import { AuthStoreProvider, AuthProvider } from '@money-matters/auth';
 import { LoginForm } from '@money-matters/auth';
 import { DashboardLayout } from '@money-matters/dashboard';
 import { Routes, Route } from 'react-router-dom';
@@ -17,9 +17,9 @@ export function AppContent() {
       <Route path="/login" element={<LoginForm />} />
       <Route
         element={
-          <RequireAuth>
+          <AuthProvider>
             <DashboardLayout />
-          </RequireAuth>
+          </AuthProvider>
         }
       >
         <Route path="/" element={<DashboardPage />} />
@@ -33,9 +33,9 @@ export function AppContent() {
         <Route
           path="admin/transactions"
           element={
-            <RequireAuth requireAdmin>
+            <AuthProvider requireAdmin>
               <TransactionPage />
-            </RequireAuth>
+            </AuthProvider>
           }
         />
 

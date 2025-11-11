@@ -26,10 +26,6 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs",
-    "**/*.stories.ts",
-    "**/*.stories.js",
-    "**/*.stories.jsx",
-    "**/*.stories.tsx"
   ],
   "include": [
     "src/**/*.js",

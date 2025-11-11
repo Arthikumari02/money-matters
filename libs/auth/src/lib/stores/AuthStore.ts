@@ -5,7 +5,7 @@ import {
   action,
   runInAction,
 } from 'mobx';
-import { loginApi } from '../apis/authApi';
+import { loginApi } from '../hooks/api/useAuthApi';
 
 
 const USERS = [
