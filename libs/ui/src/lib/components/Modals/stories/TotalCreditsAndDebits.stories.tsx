@@ -33,7 +33,6 @@ export const DebitCard: Story = {
   },
 };
 
-// For the purpose of the story, we'll use placeholder images
 CreditCard.parameters = {
   backgrounds: { default: 'light' },
   docs: {

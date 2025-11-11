@@ -2,7 +2,7 @@
 export const AddTransactionButton =
     `flex items-center gap-3 
     bg-blue-600 hover:bg-blue-700 
-    text-white text-base font-medium 
+    text-white text-base font-medium font-sans
     rounded-lg 
     px-4 py-1 
     focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed`;
@@ -14,7 +14,7 @@ export const LanguageSelectorContainer = 'relative';
 export const LanguageButton =
     `flex items-center 
     space-x-2 px-3 py-2 
-    text-sm font-medium text-gray-700 
+    text-sm font-medium text-gray-700 font-sans
     hover:bg-gray-100 rounded-md transition-colors`;
 
 export const ChevronIcon = (isOpen: boolean) =>
@@ -29,7 +29,7 @@ export const LanguageMenu =
 export const LanguageMenuList = 'py-1';
 
 export const LanguageOption = (isActive: boolean) =>
-    `block w-full text-left px-4 py-2 text-sm ${isActive
+    `block w-full text-left px-4 py-2 text-sm font-sans ${isActive
         ? 'bg-gray-100 text-gray-900'
         : 'text-gray-700 hover:bg-gray-50'
     }`;

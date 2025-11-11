@@ -3,11 +3,11 @@ import { observer } from "mobx-react-lite";
 import { useUserTransactionsApi } from "../hooks/apis/useUserTransactions";
 import { useAuthStore } from "@money-matters/auth";
 import {
-  TransactionItemUser,
   AddTransactionButton,
   LanguageSelector,
   PageLoader,
   PageError,
+  TransactionTable,
 } from "@money-matters/ui";
 import { useTranslation } from "react-i18next";
 import * as styles from "./Styles";
@@ -59,45 +59,21 @@ const UserTransactionsPage: React.FC = observer(() => {
       </div>
 
       <div className={styles.UserCardContainer}>
-        <div className={styles.UserTableHeader}>
-          <span className={styles.UserTableHeaderItemLeft}>
-            {t("common_details.transaction_name")}
-          </span>
-          <span className={styles.UserTableHeaderItemRight}>
-            {t("common_details.category")}
-          </span>
-          <span className={styles.UserTableHeaderItemCenter}>
-            {t("common_details.date")}
-          </span>
-          <span className={styles.UserTableHeaderItemCenter}>
-            {t("common_details.amount")}
-          </span>
-        </div>
-
         <div className={styles.UserScrollContainer}>
-          {store.filteredTransactions.length === 0 ? (
-            <div className={styles.NoTransactionsText}>
-              {t("no_transactions_found")}
-            </div>
-          ) : (
-            store.filteredTransactions.map((tx) => (
-              <TransactionItemUser
-                key={tx.id}
-                id={tx.id}
-                description={tx.name}
-                category={tx.category}
-                timestamp={tx.date}
-                amount={
-                  tx.type === "debit"
-                    ? `-${tx.amount}`
-                    : `+${tx.amount}`
-                }
-                userId={userId}
-                onDeleteSuccess={() => fetchAllTransactions()}
-                onUpdateSuccess={() => fetchAllTransactions()}
-              />
-            ))
-          )}
+          <TransactionTable
+            transactions={store.filteredTransactions.map((tx) => ({
+              id: tx.id,
+              userId: userId,
+              description: tx.name,
+              category: tx.category || 'General',
+              timestamp: tx.date,
+              amount: tx.amount,
+            }))}
+            onDeleteSuccess={() => fetchAllTransactions()}
+            onUpdateSuccess={() => fetchAllTransactions()}
+            showHeader={false}
+            className="w-full"
+          />
         </div>
       </div>
     </div>

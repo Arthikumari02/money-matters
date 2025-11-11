@@ -9,7 +9,7 @@
   "logout": {
     "Type": "Logout",
     "title": "Are you sure you want to?",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed ",
+    "description": "The account will be logged out immediately. You can't undo this action",
     "yes_logout": "Yes"
   },
   "transaction": {
@@ -22,7 +22,7 @@
   },
   "add_transaction": {
     "title": "Add Transaction",
-    "description": "Lorem ipsum dolor sit amet, consectetur",
+    "description": "You can add your transaction here",
     "placeholders": {
       "enter_name": "Enter Name",
       "select_type": "Select Transaction Type",

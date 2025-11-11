@@ -1,6 +1,6 @@
 // Common Page Layout
 export const PageContainer = 'min-h-screen flex flex-col bg-[#F8FAFC]';
-export const HeaderContainer = 'bg-white px-7 py-2 mb-5';
+export const HeaderContainer = 'bg-white py-6 px-10 mb-5';
 export const HeaderTitle = 'text-2xl font-semibold text-[#343C6A]';
 export const HeaderFlex = 'flex items-center justify-between';
 export const HeaderActions = 'flex items-center space-x-3';

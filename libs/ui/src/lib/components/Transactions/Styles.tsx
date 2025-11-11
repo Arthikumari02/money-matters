@@ -2,20 +2,20 @@ export const Container =
     'flex items-center justify-between px-6 py-2 border-b border-gray-100';
 export const IconContainer = 'flex items-center justify-center w-[30px]';
 export const UserAvatar = 'w-8 h-8 rounded-full object-cover';
-export const UserName = 'text-[#343C6A] font-medium truncate';
-export const FieldBase = 'text-[14px] text-[#718EBF] text-center truncate';
-export const DateField = 'min-w-[150px] text-[14px] text-[#718EBF] text-center';
-export const AmountBase = 'min-w-[90px] text-right font-semibold text-[15px]';
-export const CreditAmount = 'text-[#16DBAA]';
-export const DebitAmount = 'text-[#FE5C73]';
+export const UserName = 'text-[#505887] font-sans';
+export const FieldBase = 'text-[14px] text-[#505887] text-center';
+export const DateField = 'min-w-[150px] text-[14px] text-[#505887]';
+export const AmountBase = 'min-w-[90px] text-right text-[15px]';
+export const CreditAmount = 'text-[#16DBAA] font-sans';
+export const DebitAmount = 'text-[#FE5C73] font-sans';
 
 export const AdminContainer =
     'flex items-center justify-between px-6 py-2 border-b border-gray-100';
 export const AdminUserSection = 'flex items-center gap-3 min-w-[150px]';
 export const AdminName = 'min-w-[160px] text-[#505887] text-[15px]';
-export const AdminCategory = 'min-w-[120px] text-[#718EBF] text-[14px] text-center';
+export const AdminCategory = 'min-w-[120px] text-[#505887] text-[14px]';
 export const AdminAmountContainer = (type: 'credit' | 'debit') =>
-    `min-w-[90px] text-right font-semibold text-[15px] ${type === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'
+    `min-w-[90px] text-right font-semibold text-[15px] ${type === 'credit' ? 'text-[#16DBAA] font-sans' : 'text-[#FE5C73] font-sans'
     }`;
 
 export const UserContainer =
@@ -25,7 +25,7 @@ export const UserDescription =
 export const UserCategory =
     'min-w-[120px] text-[#718EBF] text-[14px] text-center truncate';
 export const UserAmountContainer = (isDebit: boolean) =>
-    `min-w-[80px] text-right text-[15px] font-semibold ${isDebit ? 'text-[#FE5C73]' : 'text-[#16DBAA]'
+    `min-w-[80px] text-right text-[15px] font-semibold ${isDebit ? 'text-[#FE5C73] font-sans' : 'text-[#16DBAA] font-sans'
     }`;
 export const ActionButton =
     'transition-colors p-1 disabled:opacity-50';

@@ -42,6 +42,7 @@ const LogoutButton = () => {
 
       {isModalOpen && (
         <ConfirmationModal
+          isOpen={isModalOpen}
           title={t('logout.Type')}
           message={t('logout.description')}
           onConfirm={() => {

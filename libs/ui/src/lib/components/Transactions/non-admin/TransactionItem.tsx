@@ -14,7 +14,7 @@ interface TransactionItemUserProps {
   description: string;
   category: string;
   timestamp: string;
-  amount: string;
+  amount: number;
   onDeleteSuccess?: () => void;
   onUpdateSuccess?: () => void;
 }
@@ -35,7 +35,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   const [showConfirm, setShowConfirm] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const isDebit = amount.startsWith('-');
+  const isDebit = amount < 0;
   const formattedDate = new Date(timestamp).toLocaleString('en-US', {
     month: 'short',
     day: '2-digit',
@@ -115,7 +115,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
             name: description,
             type: isDebit ? 'Debit' : 'Credit',
             category,
-            amount: amount.replace('-', ''),
+            amount: Math.abs(amount).toString(),
             date: new Date(timestamp).toISOString().split('T')[0],
           }}
           onSuccess={handleUpdate}
@@ -124,6 +124,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
 
       {showConfirm && (
         <ConfirmationModal
+          isOpen={showConfirm}
           title={t('delete.Type')}
           message={t('delete.description')}
           onConfirm={handleDelete}

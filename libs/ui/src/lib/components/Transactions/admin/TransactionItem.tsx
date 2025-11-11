@@ -29,37 +29,50 @@ export const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({
   });
 
   return (
-    <div className={styles.AdminContainer}>
-      <div className={styles.IconContainer}>
-        {type === 'credit' ? (
-          <FiArrowUpCircle size={29} className="text-[#16DBAA]" />
-        ) : (
-          <FiArrowDownCircle size={29} className="text-[#FE5C73]" />
-        )}
-      </div>
+    <>
+      <td className="py-4 px-6">
+        <div className="flex items-center gap-4">
+          <div className={styles.IconContainer}>
+            {type === 'credit' ? (
+              <FiArrowUpCircle size={29} className="text-[#16DBAA]" />
+            ) : (
+              <FiArrowDownCircle size={29} className="text-[#FE5C73]" />
+            )}
+          </div>
+          <div className={styles.AdminUserSection}>
+            <img
+              src={
+                userAvatar ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  userName
+                )}&background=random`
+              }
+              alt={userName}
+              className={styles.UserAvatar}
+            />
+            <span className={styles.UserName}>{userName}</span>
+          </div>
+        </div>
+      </td>
 
-      <div className={styles.AdminUserSection}>
-        <img
-          src={
-            userAvatar ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              userName
-            )}&background=random`
-          }
-          alt={userName}
-          className={styles.UserAvatar}
-        />
-        <span className={styles.UserName}>{userName}</span>
-      </div>
+      <td className="py-4 px-6">
+        <div className={styles.AdminName}>{name}</div>
+      </td>
 
-      <div className={styles.AdminName}>{name}</div>
-      <div className={styles.AdminCategory}>{category}</div>
-      <div className={styles.DateField}>{formattedDate}</div>
+      <td className="py-4 px-6">
+        <div className={styles.AdminCategory}>{category}</div>
+      </td>
 
-      <div className={styles.AdminAmountContainer(type)}>
-        {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
-      </div>
-    </div>
+      <td className="py-4 px-6">
+        <div className={styles.DateField}>{formattedDate}</div>
+      </td>
+
+      <td className="py-4 px-6">
+        <div className={styles.AdminAmountContainer(type)}>
+          {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
+        </div>
+      </td>
+    </>
   );
 };
 

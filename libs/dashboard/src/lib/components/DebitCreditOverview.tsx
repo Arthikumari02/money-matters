@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { useDashboardStore } from '../contexts/DashboardContext';
 import { toJS } from 'mobx';
+import * as styles from './Style';
 
 export const DebitCreditChart = observer(() => {
   const store = useDashboardStore();
@@ -23,7 +24,7 @@ export const DebitCreditChart = observer(() => {
   const chartData = toJS(store.chartData);
 
   return (
-    <div className="w-full h-80 min-h-[20rem]">
+    <div className={styles.DebitCreditOverviewChartContainer}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
           <XAxis dataKey="day" />

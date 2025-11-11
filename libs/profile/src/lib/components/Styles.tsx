@@ -2,7 +2,7 @@
 export const PageContainer = 'min-h-screen bg-[#F8FAFC]';
 
 export const HeaderContainer = `flex justify-between items-center 
-    mb-9 p-5 
+    mb-9 py-6 px-10
     bg-white 
 `;
 export const HeaderTitle = 'text-2xl font-semibold text-[#343C6A]';

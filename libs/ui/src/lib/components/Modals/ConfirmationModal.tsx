@@ -1,11 +1,12 @@
 import React from 'react';
+import Modal from 'react-modal';
 import { IoClose } from 'react-icons/io5';
-import { FaExclamationTriangle } from 'react-icons/fa';
+import { FiLogOut } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
-import Button from '../Button/Button';
 import * as styles from './Styles';
 
 interface ConfirmationModalProps {
+  isOpen: boolean;
   title: string;
   message: string;
   onConfirm: () => void;
@@ -13,6 +14,7 @@ interface ConfirmationModalProps {
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+  isOpen,
   title,
   message,
   onConfirm,
@@ -21,41 +23,38 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const { t } = useTranslation('modal');
 
   return (
-    <div className={styles.ModalOverlay}>
-      <div className={styles.ConfirmModalBox}>
-        <button onClick={onCancel} className={styles.ModalCloseButton}>
-          <IoClose size={20} />
-        </button>
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onCancel}
+      overlayClassName={styles.ModalOverlay}
+      className={styles.ConfirmModalBox}
+      contentLabel={title}
+      shouldCloseOnOverlayClick={true}
+    >
+      <button onClick={onCancel} className={styles.ModalCloseButton}>
+        <IoClose size={22} />
+      </button>
 
-        <div className="flex items-start gap-4">
-          <div className={styles.ConfirmIconWrapper}>
-            <FaExclamationTriangle size={20} />
-          </div>
-
-          <div className="flex-1">
-            <h2 className={styles.ConfirmTitle}> {title} ?</h2>
-            <p className={styles.ConfirmMessage}>{message}</p>
-          </div>
+      <div className={styles.ModalContentWrapper}>
+        <div className={styles.ConfirmIconWrapper}>
+          <FiLogOut size={26} />
         </div>
 
-        <div className="flex gap-4 mt-6">
-          <Button
-            variant="delete"
-            onClick={onConfirm}
-            className="flex-1 justify-center"
-          >
-            {t('delete.yes_delete')}
-          </Button>
-          <Button
-            variant="leave"
-            onClick={onCancel}
-            className="flex-1 justify-center"
-          >
-            {t('delete.no_leave_it')}
-          </Button>
+        <div className="flex-1">
+          <h2 className={styles.ConfirmTitle}>{title}</h2>
+          <p className={styles.ConfirmMessage}>{message}</p>
         </div>
       </div>
-    </div>
+
+      <div className={styles.ConfirmButtonWrapper}>
+        <button onClick={onConfirm} className={styles.ConfirmYesButton}>
+          {t('delete.yes_delete') || 'Yes, Logout'}
+        </button>
+        <button onClick={onCancel} className={styles.ConfirmCancelButton}>
+          {t('delete.no_leave_it') || 'Cancel'}
+        </button>
+      </div>
+    </Modal>
   );
 };
 

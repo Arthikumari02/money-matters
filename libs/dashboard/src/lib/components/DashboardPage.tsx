@@ -6,8 +6,7 @@ import { useFetchDashboard } from '../hooks/apis/useFetchDashboard';
 import {
   AddTransactionButton,
   TotalCreditsAndDebits,
-  TransactionItemAdmin,
-  TransactionItemUser,
+  TransactionTable,
   LanguageSelector,
   PageLoader,
 } from '@money-matters/ui';
@@ -17,12 +16,13 @@ import { DebitCreditChart } from './DebitCreditOverview';
 import { useTranslation } from 'react-i18next';
 import * as styles from './Style';
 
+
 const DashboardPage: React.FC = observer(() => {
   const dashboardStore = useDashboardStore();
   const authStore = useAuthStore();
   const { t } = useTranslation('dashboard');
 
-  const { fetchDashboard } = useFetchDashboard(dashboardStore);
+  const { fetchDashboard, isFetching } = useFetchDashboard(dashboardStore);
   const isAdmin = !!authStore.isAdmin;
 
   useEffect(() => {
@@ -48,14 +48,7 @@ const DashboardPage: React.FC = observer(() => {
     });
   }, [isAdmin, authStore.userInfo?.id]);
 
-  const { isFetching } = useFetchDashboard(dashboardStore);
-
-  const loading =
-    dashboardStore.isLoading ||
-    isFetching ||
-    dashboardStore.recentTransactions.length === 0;
-
-  if (loading) {
+  if (isFetching && !dashboardStore.recentTransactions?.length) {
     return <PageLoader />;
   }
 
@@ -69,17 +62,19 @@ const DashboardPage: React.FC = observer(() => {
           <h1 className={styles.Title}>{t('accounts')}</h1>
           <div className={styles.LanguageSelectorContainer}>
             <LanguageSelector />
-            <AddTransactionButton
-              userId={authStore.userInfo?.id ?? ''}
-              onSuccess={() => {
-                setTimeout(() => {
-                  fetchDashboard({
-                    onSuccess: () => console.log('Dashboard reloaded after add'),
-                    onError: (err) => console.error('Reload failed:', err),
-                  });
-                }, 1000);
-              }}
-            />
+            {!isAdmin && (
+              <AddTransactionButton
+                userId={authStore.userInfo?.id ?? ''}
+                onSuccess={() => {
+                  setTimeout(() => {
+                    fetchDashboard({
+                      onSuccess: () => console.log('Dashboard reloaded after add'),
+                      onError: (err) => console.error('Reload failed:', err),
+                    });
+                  }, 1000);
+                }}
+              />
+            )}
           </div>
         </div>
 
@@ -97,65 +92,50 @@ const DashboardPage: React.FC = observer(() => {
             />
           </div>
 
-          <div className={styles.MainContainerOfLastTransaction}>
-            <h2 className={styles.SubHeader}>
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold mb-4">
               {t('last_transaction')}
             </h2>
-
-            <div className={styles.ContainerOfLastTransaction}>
-              {dashboardStore.recentTransactions.map((txn) =>
-                isAdmin ? (
-                  <TransactionItemAdmin
-                    key={txn.id}
-                    transaction={{
-                      id: txn.id,
-                      name: txn.transaction_name || 'No description',
-                      userName: txn.user_id || 'Unknown User',
-                      category: txn.category || 'Uncategorized',
-                      type: txn.type === 'credit' ? 'credit' : 'debit',
-                      amount: txn.amount || 0,
-                      date: txn.date || new Date().toISOString(),
-                      userAvatar: txn.avatarUrl,
-                    }}
-                  />
-                ) : (
-                  <TransactionItemUser
-                    key={txn.id}
-                    id={txn.id}
-                    userId={authStore.userInfo?.id ?? ''}
-                    description={txn.transaction_name || 'No description'}
-                    category={txn.category || 'Uncategorized'}
-                    timestamp={txn.date || new Date().toISOString()}
-                    amount={
-                      (txn.type === 'debit' ? '-' : '+') +
-                      (txn.amount || 0).toLocaleString()
-                    }
-                    onDeleteSuccess={() =>
-                      fetchDashboard({
-                        onSuccess: () =>
-                          console.log('Refetched dashboard after delete'),
-                        onError: (err) => console.error('Refetch failed:', err),
-                      })
-                    }
-                    onUpdateSuccess={() =>
-                      fetchDashboard({
-                        onSuccess: () => console.log('Refetched dashboard after update'),
-                        onError: (err) => console.error('Refetch failed:', err),
-                      })
-                    }
-                  />
-                )
-              )}
-            </div>
+            <TransactionTable className={styles.ContainerOfLastTransaction}
+              transactions={
+                (dashboardStore.recentTransactions || []).slice(0, 5).map((tx: any) => ({
+                  id: tx.id,
+                  userId: tx.user_id,
+                  description: tx.transaction_name || tx.name || 'No description',
+                  category: tx.category || 'Uncategorized',
+                  timestamp: tx.date || tx.timestamp || new Date().toISOString(),
+                  amount: tx.amount ? Number(tx.amount) : 0,
+                  userName: tx.user_name || tx.userName || 'Unknown User',
+                  userAvatar: tx.user_avatar,
+                }))
+              }
+              showPagination={false}
+              showHeader={false}
+              onDeleteSuccess={() =>
+                fetchDashboard({
+                  onSuccess: () =>
+                    console.log('Dashboard data refreshed after delete'),
+                  onError: (err) =>
+                    console.error('Failed to refresh dashboard:', err),
+                })
+              }
+              onUpdateSuccess={() =>
+                fetchDashboard({
+                  onSuccess: () =>
+                    console.log('Dashboard data refreshed after update'),
+                  onError: (err) =>
+                    console.error('Failed to refresh dashboard:', err),
+                })
+              }
+            />
           </div>
 
-          <div className="w-full p-4 bg-white rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className={styles.DebitCreditOverviewContainer}>
+            <h2 className={styles.SubHeader}>
               {t('debit_and_credit_overview')}
             </h2>
             <DebitCreditChart />
           </div>
-
         </div>
       </main>
     </div>

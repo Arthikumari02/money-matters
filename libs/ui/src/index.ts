@@ -5,6 +5,7 @@ export { default as TransactionItemUser } from './lib/components/Transactions/no
 export { default as ConfirmationModal } from './lib/components/Modals/ConfirmationModal';
 export { default as TransactionModal } from './lib/components/Modals/TransactionModal';
 export { LanguageSelector } from './lib/components/Header/LanguageSelector';
+export { default as TransactionTable } from './lib/components/Tables/TransactionTable';
 
 export { LoadingSpinner, PageLoader, InlineLoader } from './lib/components/LoadingSpinner';
 

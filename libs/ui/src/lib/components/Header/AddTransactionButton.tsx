@@ -82,7 +82,7 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
         variant="add"
         onClick={() => setIsOpen(true)}
         isLoading={isLoading}
-        className="bg-[#2D60FF] hover:bg-[#2D60FF]/80 text-white"
+        className="bg-[#2D60FF] hover:bg-[#2D60FF]/80 rounded-xl text-white"
         icon={<FaPlus />}
       >
         {isLoading ? t('adding_transaction') : t('add_transaction_button')}
