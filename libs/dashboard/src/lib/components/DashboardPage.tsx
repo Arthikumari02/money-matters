@@ -9,6 +9,7 @@ import {
   TransactionTable,
   LanguageSelector,
   PageLoader,
+  PageError,
 } from '@money-matters/ui';
 import totalCredit from '../../assets/totalcredit.png';
 import totalDebit from '../../assets/totaldebits.png';
@@ -32,7 +33,6 @@ const DashboardPage: React.FC = observer(() => {
         (window as any).__STORYBOOK_ADDONS_CHANNEL__);
 
     if (isStorybook) {
-      console.log('🧩 Storybook detected — skipping API calls.');
       return;
     }
 
@@ -52,12 +52,24 @@ const DashboardPage: React.FC = observer(() => {
     return <PageLoader />;
   }
 
+  if (dashboardStore.error) {
+    return <PageError error={dashboardStore.error} />;
+  }
+
   const credit = dashboardStore.totals?.credit || 0;
   const debit = dashboardStore.totals?.debit || 0;
+  const handleOnSuccess = () => {
+    setTimeout(() => {
+      fetchDashboard({
+        onSuccess: () => console.log('Dashboard reloaded after add'),
+        onError: (err) => console.error('Reload failed:', err),
+      });
+    }, 1000);
 
+  }
   return (
     <div className={styles.MainContainer}>
-      <main className="flex-1">
+      <div className="flex-1">
         <div className={styles.Header}>
           <h1 className={styles.Title}>{t('accounts')}</h1>
           <div className={styles.LanguageSelectorContainer}>
@@ -65,14 +77,7 @@ const DashboardPage: React.FC = observer(() => {
             {!isAdmin && (
               <AddTransactionButton
                 userId={authStore.userInfo?.id ?? ''}
-                onSuccess={() => {
-                  setTimeout(() => {
-                    fetchDashboard({
-                      onSuccess: () => console.log('Dashboard reloaded after add'),
-                      onError: (err) => console.error('Reload failed:', err),
-                    });
-                  }, 1000);
-                }}
+                onSuccess={handleOnSuccess}
               />
             )}
           </div>
@@ -137,7 +142,7 @@ const DashboardPage: React.FC = observer(() => {
             <DebitCreditChart />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 });

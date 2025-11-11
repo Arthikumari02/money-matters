@@ -45,12 +45,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 ref={ref}
                 type="button"
                 disabled={isDisabled}
-                className={twMerge(
-                    ...baseStyles,
-                    variantStyle,
-                    isLoading && 'cursor-wait',
-                    className
-                )}
+                className={`
+                    ${baseStyles.join(' ')}
+                    ${variantStyle}
+                    ${isLoading && 'cursor-wait'}
+                    ${className}
+                `}
                 {...props}
             >
                 {isLoading ? (

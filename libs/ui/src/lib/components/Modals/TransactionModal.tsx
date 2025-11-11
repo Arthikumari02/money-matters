@@ -190,6 +190,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             className={`${styles.ModalInputBase} ${errors.category ? 'border-red-500' : 'border-gray-300'}`}
           >
             <option value="">{t('add_transaction.placeholders.category')}</option>
+            {[].map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
             <option value="Food">Food</option>
             <option value="Shopping">Shopping</option>
             <option value="Bills">Bills</option>

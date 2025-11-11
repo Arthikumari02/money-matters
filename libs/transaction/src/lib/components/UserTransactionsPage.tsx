@@ -27,7 +27,7 @@ const UserTransactionsPage: React.FC = observer(() => {
     );
 
   return (
-    <div className={styles.PageContainer}>
+    <div className={styles.UserOuterContainer}>
       <div className={styles.HeaderContainer}>
         <div className={styles.HeaderFlex}>
           <h1 className={styles.HeaderTitle}>{t("transactions_heading")}</h1>
@@ -49,7 +49,9 @@ const UserTransactionsPage: React.FC = observer(() => {
             <button
               key={tab.id}
               onClick={() => store.setActiveTab(tab.id)}
-              className={`${styles.TabButtonBase} ${store.activeTab === tab.id ? styles.TabActive : styles.TabInactive
+              className={`${styles.TabButtonBase} ${store.activeTab === tab.id
+                ? styles.TabActive
+                : styles.TabInactive
                 }`}
             >
               {tab.label}
@@ -58,22 +60,24 @@ const UserTransactionsPage: React.FC = observer(() => {
         </nav>
       </div>
 
-      <div className={styles.UserCardContainer}>
-        <div className={styles.UserScrollContainer}>
-          <TransactionTable
-            transactions={store.filteredTransactions.map((tx) => ({
-              id: tx.id,
-              userId: userId,
-              description: tx.name,
-              category: tx.category || 'General',
-              timestamp: tx.date,
-              amount: tx.amount,
-            }))}
-            onDeleteSuccess={() => fetchAllTransactions()}
-            onUpdateSuccess={() => fetchAllTransactions()}
-            showHeader={false}
-            className="w-full"
-          />
+      <div className={styles.UserInnerContainer}>
+        <div className={styles.UserCard}>
+          <div className={styles.UserScrollContainer}>
+            <TransactionTable
+              transactions={store.filteredTransactions.map((tx) => ({
+                id: tx.id,
+                userId: userId,
+                description: tx.name,
+                category: tx.category || "General",
+                timestamp: tx.date,
+                amount: tx.amount,
+              }))}
+              onDeleteSuccess={() => fetchAllTransactions()}
+              onUpdateSuccess={() => fetchAllTransactions()}
+              showHeader={true}
+              className="w-full"
+            />
+          </div>
         </div>
       </div>
     </div>

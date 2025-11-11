@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useRef } from 'react';
+
 import defaultAuthStore, { AuthStore } from '../stores/AuthStore';
 
-const AuthContext = createContext<AuthStore | undefined>(undefined);
+const AuthStoreContext = createContext<AuthStore | undefined>(undefined);
 
 interface AuthStoreProviderProps {
   children: React.ReactNode;
@@ -14,14 +15,14 @@ export const AuthStoreProvider: React.FC<AuthStoreProviderProps> = ({
 }) => {
   const authStoreRef = useRef(value ?? defaultAuthStore);
   return (
-    <AuthContext.Provider value={authStoreRef.current}>
+    <AuthStoreContext.Provider value={authStoreRef.current}>
       {children}
-    </AuthContext.Provider>
+    </AuthStoreContext.Provider>
   );
 };
 
 export const useAuthStore = (): AuthStore => {
-  const context = useContext(AuthContext);
+  const context = useContext(AuthStoreContext);
   if (context === undefined) {
     throw new Error('useAuthStore must be used within an AuthStoreProvider');
   }

@@ -47,40 +47,40 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
 
     if (transactions.length === 0) {
         return (
-            <div className={`${styles.emptyState} ${className}`}>
+            <div className={`${styles.transactionTableEmptyState} ${className}`}>
                 {t('noTransactions') || 'No transactions found'}
             </div>
         );
     }
 
     return (
-        <div className={`${styles.tableContainer} ${className}`}>
-            <table className={styles.table}>
+        <div className={`${styles.transactionTableContainer} ${className}`}>
+            <table className={styles.transactionTable}>
                 {showHeader && (
-                    <thead className={styles.thead}>
+                    <thead className={styles.transactionTableThead}>
                         <tr>
                             {isAdmin && (
-                                <th className={styles.th}>
+                                <th className={styles.transactionTableTh}>
                                     {t('admin_details.user_name') || 'User Name'}
                                 </th>
                             )}
-                            <th className={styles.th}>
+                            <th className={styles.transactionTableTh}>
                                 {t('common_details.transaction_name') || 'Transaction Name'}
                             </th>
-                            <th className={styles.th}>
+                            <th className={styles.transactionTableTh}>
                                 {t('common_details.category') || 'Category'}
                             </th>
-                            <th className={styles.th}>
+                            <th className={styles.transactionTableTh}>
                                 {t('common_details.date') || 'Date'}
                             </th>
-                            <th className={styles.th}>
+                            <th className={styles.transactionTableTh}>
                                 {t('common_details.amount') || 'Amount'}
                             </th>
                         </tr>
                     </thead>
                 )}
 
-                <tbody className={styles.tbody}>
+                <tbody className={styles.transactionTableTbody}>
                     {paginatedTransactions.map((transaction) =>
                         isAdmin ? (
                             <tr key={transaction.id}>

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useAuthStore } from '@money-matters/auth';
-import { PageLoader } from '@money-matters/ui';
+import { PageError, PageLoader } from '@money-matters/ui';
 import { useProfileStore } from '../contexts/ProfileContext';
 import { useTranslation } from 'react-i18next';
 import { ProfileHeader } from './ProfileHeader';
@@ -35,7 +35,7 @@ export const ProfilePage: React.FC = observer(() => {
 
   if (isLoading) return <PageLoader />;
   if (error)
-    return <div className="text-center mt-20 text-red-500 font-medium">{error}</div>;
+    return <PageError error={error} />;
 
   return (
     <div className={styles.PageContainer}>

@@ -9,3 +9,8 @@ export interface Transaction {
   createdAt?: string;
   updatedAt?: string;
 }
+
+
+const abcd = () => {
+  format(new Date(transaction.date), 'MMM, dd, hh:mm a..aa');
+}

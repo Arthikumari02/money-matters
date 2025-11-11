@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { observer } from 'mobx-react-lite';
 import { useAdminTransactionsApi } from '../hooks/apis/useAdminTransactionApi';
 import {
+  PageError,
   PageLoader,
   LanguageSelector,
   TransactionTable,
@@ -40,7 +41,7 @@ const AdminTransactionsPage: React.FC = observer(() => {
   if (error)
     return (
       <div className="p-4">
-        <div className={styles.AdminErrorContainer}>{error}</div>
+        <PageError error={error} />
       </div>
     );
 

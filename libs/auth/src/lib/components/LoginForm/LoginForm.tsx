@@ -50,57 +50,60 @@ const LoginForm: React.FC = () => {
     setIsLoading(false);
   };
 
-  return (
-    <div className={styles.Container}>
-      <div className={styles.Card}>
-        <h2 className={styles.Heading}>Login</h2>
+  const renderHeader = () => <h2 className={styles.Heading}>Login</h2>
+  const renderForm = () => <form onSubmit={handleSubmit} className={styles.Form}>
+    <div>
+      <label className={styles.Label}>Email:</label>
+      <input
+        type="email"
+        className={styles.Input}
+        placeholder="Enter email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+    </div>
 
-        {error && <div className={styles.ErrorBox}>{error}</div>}
-
-        <form onSubmit={handleSubmit} className={styles.Form}>
-          <div>
-            <label className={styles.Label}>Email:</label>
-            <input
-              type="email"
-              className={styles.Input}
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label className={styles.Label}>Password:</label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              className={styles.Input}
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <div className={styles.CheckboxContainer}>
-              <input
-                id="showPassword"
-                type="checkbox"
-                checked={showPassword}
-                onChange={() => setShowPassword(!showPassword)}
-                className={styles.Checkbox}
-              />
-              <label htmlFor="showPassword" className={styles.CheckboxLabel}>
-                Show Password
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" className={styles.Button} disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'SIGN IN'}
-          </button>
-        </form>
+    <div>
+      <label className={styles.Label} htmlFor="password">Password:</label>
+      <input
+        type={showPassword ? 'text' : 'password'}
+        className={styles.Input}
+        placeholder="Enter password"
+        value={password}
+        id="password"
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
+      <div className={styles.CheckboxContainer}>
+        <input
+          id="showPassword"
+          type="checkbox"
+          checked={showPassword}
+          onChange={() => setShowPassword(!showPassword)}
+          className={styles.Checkbox}
+        />
+        <label htmlFor="showPassword" className={styles.CheckboxLabel}>
+          Show Password
+        </label>
       </div>
     </div>
 
+    <button type="submit" className={styles.Button} disabled={isLoading}>
+      {isLoading ? 'Signing in...' : 'SIGN IN'}
+    </button>
+  </form>
+
+  return (
+    <div className={styles.Container}>
+      <div className={styles.Card}>
+        {renderHeader()}
+
+        {error && <div className={styles.ErrorBox}>{error}</div>}
+
+        {renderForm()}
+      </div>
+    </div>
   );
 };
 
