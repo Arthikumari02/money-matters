@@ -1,4 +1,3 @@
-// src/stores/AdminTransactionsStore.ts
 import { makeAutoObservable, runInAction } from 'mobx';
 import axios from 'axios';
 import { TransactionModel, TransactionType } from '../models/TransactionModel';

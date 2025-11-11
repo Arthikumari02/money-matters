@@ -10,17 +10,19 @@ import {
 import { useTranslation } from 'react-i18next';
 import * as styles from './Styles';
 
+type TabType = 'all' | 'credit' | 'debit';
+
 const AdminTransactionsPage: React.FC = observer(() => {
   const { t } = useTranslation('transaction');
   const { transactions, isLoading, error, hasMore, fetchTransactions } =
     useAdminTransactionsApi();
 
-  const [activeTab, setActiveTab] = useState<'all' | 'credit' | 'debit'>('all');
+  const [activeTab, setActiveTab] = useState<TabType>('all');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchTransactions(activeTab, true);
-  }, [activeTab]);
+  }, [activeTab, fetchTransactions]);
 
   const handleScroll = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -30,66 +32,95 @@ const AdminTransactionsPage: React.FC = observer(() => {
     if (scrollTop + clientHeight >= scrollHeight - 20 && hasMore && !isLoading) {
       fetchTransactions(activeTab);
     }
-  }, [hasMore, isLoading, activeTab]);
+  }, [hasMore, isLoading, activeTab, fetchTransactions]);
 
   const filteredTransactions = useMemo(() => {
     if (activeTab === 'all') return transactions;
     return transactions.filter((tx) => tx.type === activeTab);
   }, [transactions, activeTab]);
 
-  if (isLoading && transactions.length === 0) return <PageLoader />;
-  if (error)
+
+  const renderLoading = () => (
+    <PageLoader />
+  );
+
+  const renderError = () => (
+    <PageError error={error} />
+  );
+
+  const renderTabs = () => {
+    const tabs: { id: TabType; label: string }[] = [
+      { id: 'all', label: t('tab.all_transactions') },
+      { id: 'debit', label: t('tab.debit') },
+      { id: 'credit', label: t('tab.credit') },
+    ];
+
     return (
-      <div className="p-4">
-        <PageError error={error} />
-      </div>
+      <nav className={styles.TabsContainer}>
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`${styles.TabButtonBase} ${activeTab === tab.id ? styles.TabActive : styles.TabInactive
+              }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
     );
+  };
+
+  const renderHeader = () => (
+    <div className={styles.HeaderContainer}>
+      <div className={styles.HeaderFlex}>
+        <h1 className={styles.HeaderTitle}>{t('transactions_heading')}</h1>
+        <LanguageSelector />
+      </div>
+      {renderTabs()}
+    </div>
+  );
+
+  const renderTransactionTable = () => (
+    <div className={styles.AdminCard}>
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className={styles.AdminScrollContainer}
+      >
+        <TransactionTable
+          transactions={filteredTransactions.map((tx) => ({
+            id: tx.id,
+            userId: tx.userId || '',
+            description: tx.name,
+            category: tx.category || 'General',
+            timestamp: new Date(tx.date || tx.createdAt).toISOString(),
+            amount: tx.type === 'debit' ? -Math.abs(tx.amount) : Math.abs(tx.amount),
+            userName: tx.userName || 'Unknown',
+            userAvatar: tx.userAvatar,
+          }))}
+          showHeader={true}
+          className="w-full"
+          onDeleteSuccess={() => fetchTransactions(activeTab, true)}
+          onUpdateSuccess={() => fetchTransactions(activeTab, true)}
+        />
+      </div>
+    </div>
+  );
+
+  const renderContent = () => (
+    <div className={styles.AdminInnerContainer}>
+      {renderTransactionTable()}
+    </div>
+  );
+
+  if (isLoading && transactions.length === 0) return renderLoading();
+  if (error) return renderError();
 
   return (
     <div className={styles.AdminOuterContainer}>
-      <div className={styles.HeaderContainer}>
-        <div className={styles.HeaderFlex}>
-          <h1 className={styles.HeaderTitle}>{t('transactions_heading')}</h1>
-          <LanguageSelector />
-        </div>
-        <nav className={styles.TabsContainer}>
-          {[
-            { id: 'all' as const, label: t('tab.all_transactions') },
-            { id: 'debit' as const, label: t('tab.debit') },
-            { id: 'credit' as const, label: t('tab.credit') },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`${styles.TabButtonBase} ${activeTab === tab.id ? styles.TabActive : styles.TabInactive
-                }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      <div className={styles.AdminInnerContainer}>
-        <div className={styles.AdminCard}>
-          <div ref={scrollContainerRef} onScroll={handleScroll} className={styles.AdminScrollContainer}>
-            <TransactionTable
-              transactions={filteredTransactions.map((tx) => ({
-                id: tx.id,
-                userId: tx.userId || '',
-                description: tx.name,
-                category: tx.category || 'General',
-                timestamp: new Date(tx.date || tx.createdAt).toISOString(),
-                amount: tx.type === 'debit' ? -Math.abs(tx.amount) : Math.abs(tx.amount),
-                userName: tx.userName || 'Unknown',
-                userAvatar: tx.userAvatar,
-              }))}
-              showHeader={true}
-              className="w-full"
-            />
-          </div>
-        </div>
-      </div>
+      {renderHeader()}
+      {renderContent()}
     </div>
   );
 });

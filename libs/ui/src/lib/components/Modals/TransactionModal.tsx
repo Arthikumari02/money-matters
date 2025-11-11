@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Modal from 'react-modal';
 import { IoClose } from 'react-icons/io5';
 import { updateTransaction, addTransaction } from '../../services/transactionApi';
@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import * as styles from './Styles';
 import Button from '../Button/Button';
+import FormField from '../Form/FormField';
 
 export interface TransactionData {
   name: string;
@@ -119,6 +120,21 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     }
   };
 
+  const categoryOptions = useMemo(() => [
+    { value: 'Food', label: 'Food' },
+    { value: 'Shopping', label: 'Shopping' },
+    { value: 'Bills', label: 'Bills' },
+    { value: 'Salary', label: 'Salary' },
+    { value: 'Entertainment', label: 'Entertainment' },
+    { value: 'Transportation', label: 'Transportation' },
+    { value: 'Other', label: 'Other' },
+  ], []);
+
+  const transactionTypeOptions = useMemo(() => [
+    { value: 'credit', label: t('credit') },
+    { value: 'debit', label: t('debit') },
+  ], [t]);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -129,10 +145,10 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       shouldCloseOnOverlayClick={true}
     >
       <Button
-        variant="text"
+        variant="primary"
         onClick={onClose}
         disabled={isLoading}
-        className="absolute right-4 top-4 p-1 rounded-full hover:bg-gray-100"
+        className="absolute right-4 top-4 p-1 rounded-ful"
       >
         <IoClose size={22} />
       </Button>
@@ -147,94 +163,74 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       </p>
 
       <div className={styles.ModalFieldWrapper}>
-        <div>
-          <label className={styles.ModalLabel}>
-            {t('transaction.transaction_name')} <span className={styles.ModalRequired}>*</span>
-          </label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => handleChange('name', e.target.value)}
-            disabled={isLoading}
-            placeholder={t('add_transaction.placeholders.enter_name')}
-            className={`${styles.ModalInputBase} ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
-          />
-          {errors.name && <p className={styles.ModalErrorText}>{errors.name}</p>}
-        </div>
+        <FormField
+          label={t('transaction.transaction_name')}
+          name="name"
+          type="text"
+          value={formData.name}
+          onChange={handleChange}
+          error={errors.name}
+          required
+          disabled={isLoading}
+          placeholder={t('add_transaction.placeholders.enter_name')}
+        />
 
-        <div>
-          <label className={styles.ModalLabel}>
-            {t('transaction.transaction_type')} <span className={styles.ModalRequired}>*</span>
-          </label>
-          <select
-            value={formData.type}
-            onChange={(e) => handleChange('type', e.target.value)}
-            disabled={isLoading}
-            className={`${styles.ModalInputBase} ${errors.type ? 'border-red-500' : 'border-gray-300'}`}
-          >
-            <option value="">{t('add_transaction.placeholders.select_type')}</option>
-            <option value="credit">{t('credit')}</option>
-            <option value="debit">{t('debit')}</option>
-          </select>
-          {errors.type && <p className={styles.ModalErrorText}>{errors.type}</p>}
-        </div>
+        <FormField
+          label={t('transaction.transaction_type')}
+          name="type"
+          type="select"
+          value={formData.type}
+          onChange={handleChange}
+          error={errors.type}
+          required
+          disabled={isLoading}
+          options={[
+            { value: '', label: t('add_transaction.placeholders.select_type') },
+            { value: 'credit', label: t('credit') },
+            { value: 'debit', label: t('debit') }
+          ]}
+        />
 
-        <div>
-          <label className={styles.ModalLabel}>
-            {t('transaction.category')} <span className={styles.ModalRequired}>*</span>
-          </label>
-          <select
-            value={formData.category}
-            onChange={(e) => handleChange('category', e.target.value)}
-            disabled={isLoading}
-            className={`${styles.ModalInputBase} ${errors.category ? 'border-red-500' : 'border-gray-300'}`}
-          >
-            <option value="">{t('add_transaction.placeholders.category')}</option>
-            {[].map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-            <option value="Food">Food</option>
-            <option value="Shopping">Shopping</option>
-            <option value="Bills">Bills</option>
-            <option value="Salary">Salary</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Transportation">Transportation</option>
-            <option value="Other">Other</option>
-          </select>
-          {errors.category && <p className={styles.ModalErrorText}>{errors.category}</p>}
-        </div>
+        <FormField
+          label={t('transaction.category')}
+          name="category"
+          type="select"
+          value={formData.category}
+          onChange={handleChange}
+          error={errors.category}
+          required
+          disabled={isLoading}
+          options={[
+            { value: '', label: t('add_transaction.placeholders.category') },
+            ...categoryOptions
+          ]}
+        />
 
-        <div>
-          <label className={styles.ModalLabel}>
-            {t('transaction.amount')} <span className={styles.ModalRequired}>*</span>
-          </label>
-          <input
-            type="number"
-            value={formData.amount}
-            onChange={(e) => handleChange('amount', e.target.value)}
-            disabled={isLoading}
-            placeholder={t('add_transaction.placeholders.enter_amount')}
-            className={`${styles.ModalInputBase} ${errors.amount ? 'border-red-500' : 'border-gray-300'}`}
-          />
-          {errors.amount && <p className={styles.ModalErrorText}>{errors.amount}</p>}
-        </div>
+        <FormField
+          label={t('transaction.amount')}
+          name="amount"
+          type="number"
+          value={formData.amount}
+          onChange={handleChange}
+          error={errors.amount}
+          required
+          disabled={isLoading}
+          placeholder={t('add_transaction.placeholders.enter_amount')}
+          min="0"
+          step="0.01"
+        />
 
-        <div>
-          <label className={styles.ModalLabel}>
-            {t('transaction.date')} <span className={styles.ModalRequired}>*</span>
-          </label>
-          <input
-            type="date"
-            value={formData.date}
-            onChange={(e) => handleChange('date', e.target.value)}
-            disabled={isLoading}
-            max={new Date().toISOString().split('T')[0]}
-            className={`${styles.ModalInputBase} ${errors.date ? 'border-red-500' : 'border-gray-300'}`}
-          />
-          {errors.date && <p className={styles.ModalErrorText}>{errors.date}</p>}
-        </div>
+        <FormField
+          label={t('transaction.date')}
+          name="date"
+          type="date"
+          value={formData.date}
+          onChange={handleChange}
+          error={errors.date}
+          required
+          disabled={isLoading}
+          max={new Date().toISOString().split('T')[0]}
+        />
       </div>
 
       <button

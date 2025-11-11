@@ -5,6 +5,7 @@ import * as styles from './Styles';
 import { validateEmail } from '../../utils/LoginForm/LoginForm';
 import { dashboardPath } from '../../Constants/LoginFormConstants';
 import { useTranslation } from 'react-i18next';
+import useLogin from '../../hooks/api/Login/useLogin';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +17,7 @@ const LoginForm: React.FC = () => {
   const { t } = useTranslation('auth');
   const authStore = useAuthStore();
   const navigate = useNavigate();
+  const { login } = useLogin()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ const LoginForm: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const success = await authStore.login(email, password);
+      const success = await login(email, password);
       if (success) {
         navigate(dashboardPath);
       } else {
@@ -109,9 +111,9 @@ const LoginForm: React.FC = () => {
   );
 
   const renderSubmitButton = () => (
-    <button 
-      type="submit" 
-      className={styles.Button} 
+    <button
+      type="submit"
+      className={styles.Button}
       disabled={isLoading}
     >
       {isLoading ? t('login_form.signing_in') : t('login_form.sign_in')}

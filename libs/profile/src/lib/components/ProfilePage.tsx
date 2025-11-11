@@ -37,26 +37,31 @@ export const ProfilePage: React.FC = observer(() => {
   if (error)
     return <PageError error={error} />;
 
+
+  const renderProfileImage = () => (
+    <div className={styles.ProfileImageWrapper}>
+      {profile?.avatarUrl ? (
+        <img
+          src={profile.avatarUrl}
+          alt="Profile"
+          className={styles.ProfileImage}
+        />
+      ) : (
+        <div className={styles.InitialAvatar}>
+          {profile?.name?.[0]?.toUpperCase() || "U"}
+        </div>
+      )}
+
+    </div>
+  )
+
   return (
     <div className={styles.PageContainer}>
       <ProfileHeader title={t('profile')} />
 
       <div className={styles.ProfileCard}>
         <div className={styles.ProfileLayout}>
-          <div className={styles.ProfileImageWrapper}>
-            {profile?.avatarUrl ? (
-              <img
-                src={profile.avatarUrl}
-                alt="Profile"
-                className={styles.ProfileImage}
-              />
-            ) : (
-              <div className={styles.InitialAvatar}>
-                {profile?.name?.[0]?.toUpperCase() || "U"}
-              </div>
-            )}
-
-          </div>
+          {renderProfileImage()}
 
           <div className={styles.ProfileFormWrapper}>
             <ProfileForm profile={profile} t={t} />
