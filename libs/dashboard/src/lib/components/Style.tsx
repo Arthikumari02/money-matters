@@ -1,27 +1,41 @@
 
-export const MainContainer = 'min-h-screen flex';
+export const MainPageContainer = 'min-h-screen flex';
+
+export const MainContainer = 'flex-1';
+
 export const Header = `
   flex items-center justify-between 
   mb-6 py-6 px-10
   bg-white 
 `;
+
 export const Title = 'text-2xl font-sans font-semibold text-[#343C6A]';
-export const LanguageSelectorContainer = 'flex items-center space-x-2';
-export const ContentContainer = `max-w-5xl mx-auto 
-    p-4 sm:px-6 lg:px-8
+
+export const LanguageSelectorContainer = 'flex items-center space-x-4';
+
+export const ContentContainer = `
+  max-w-5xl mx-auto 
+  p-4 sm:px-6 lg:px-8
 `;
+
 export const GridContainer = 'grid grid-cols-1 md:grid-cols-2 gap-4 mb-7';
-export const MainContainerOfLastTransaction = 'p-6 mb-6';
-export const SubHeader = `flex items-center justify-between 
-    mb-4 
-    text-lg font-semibold text-gray-800  font-sans
+
+export const SubHeader = `
+  flex items-center justify-between 
+  mb-4 
+  text-lg font-semibold text-gray-800 font-sans
 `;
-export const ContainerOfLastTransaction = `bg-white rounded-xl 
-    p-3 space-y-3
-`;
+
 export const DebitCreditOverviewContainer = 'p-6 m-0';
-export const DebitCreditOverviewChartContainer = `bg-white rounded-lg 
-    p-4 h-72 
-    w-full 
+
+export const DebitCreditOverviewChartContainer = `
+  bg-white rounded-lg 
+  p-4 h-72 
+  w-full 
 `;
-export const DebitCreditOverviewChart = `w-full h-full`;
+
+export const LastTransactionsContainer = 'mt-8';
+
+export const LastTransactionsTitle = 'text-xl font-semibold mb-4';
+
+export const LastTransactionsContent = 'bg-white rounded-xl p-6';

@@ -1,13 +1,34 @@
 import { makeAutoObservable } from 'mobx';
-import { TotalsModel } from '../models/TotalsModel';
 import { TransactionModel } from '../models/TransactionModel';
-import { DailyTotalModel } from '../models/DailyTotalModel';
+
+export interface Transaction {
+  id: string;
+  amount: number;
+  type: string;
+  category: string;
+  date: string;
+  transaction_name: string;
+  user_id?: string;
+  avatarUrl?: string;
+}
+
+export interface Totals {
+  credit: number;
+  debit: number;
+  [key: string]: any;
+}
+
+export interface DailyTotal {
+  date: string;
+  credit: number;
+  debit: number;
+}
 
 export class DashboardStore {
-  totals: TotalsModel | null = null;
-  recentTransactions: TransactionModel[] = [];
-  allTransactions: TransactionModel[] = [];
-  dailyTotals: DailyTotalModel[] = [];
+  totals: Totals | null = null;
+  recentTransactions: Transaction[] = [];
+  allTransactions: Transaction[] = [];
+  dailyTotals: DailyTotal[] = [];
   isLoading = false;
   error: string | null = null;
   isAdmin = false;
@@ -40,18 +61,30 @@ export class DashboardStore {
   }
 
   setTotals(data: any) {
-    this.totals = new TotalsModel(data);
+    this.totals = {
+      credit: data.credit || 0,
+      debit: data.debit || 0,
+      ...data
+    };
   }
 
   setRecentTransactions(data: any[]) {
-    this.recentTransactions = data.map((t) => new TransactionModel(t));
+    this.recentTransactions = Array.isArray(data)
+      ? data.map(t => t instanceof TransactionModel ? t : new TransactionModel(t))
+      : [];
   }
 
   setAllTransactions(data: any[]) {
-    this.allTransactions = data.map((t) => new TransactionModel(t));
+    this.allTransactions = Array.isArray(data)
+      ? data.map(t => t instanceof TransactionModel ? t : new TransactionModel(t))
+      : [];
   }
 
   setDailyTotals(data: any[]) {
-    this.dailyTotals = data.map((d) => new DailyTotalModel(d));
+    this.dailyTotals = data.map(d => ({
+      date: d.date,
+      credit: d.credit || 0,
+      debit: d.debit || 0
+    }));
   }
 }

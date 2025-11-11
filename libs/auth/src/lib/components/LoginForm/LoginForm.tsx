@@ -14,7 +14,6 @@ const LoginForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { t } = useTranslation('auth');
-
   const authStore = useAuthStore();
   const navigate = useNavigate();
 
@@ -36,24 +35,32 @@ const LoginForm: React.FC = () => {
     try {
       const success = await authStore.login(email, password);
       if (success) {
-        if (authStore.isAdmin) {
-          navigate(dashboardPath);
-        } else {
-          navigate(dashboardPath);
-        }
+        navigate(dashboardPath);
       } else {
         setError(authStore.error || t('login_form.invalid_password_or_email_error'));
       }
     } catch (err) {
       setError(t('login_form.invalid_password_or_email_error'));
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
-  const renderHeader = () => <h2 className={styles.Heading}>Login</h2>
-  const renderForm = () => <form onSubmit={handleSubmit} className={styles.Form}>
+  const renderHeader = () => (
+    <h2 className={styles.Heading}>
+      {t('login_form.title', 'Login')}
+    </h2>
+  );
+
+  const renderError = () => (
+    error && <div className={styles.ErrorBox}>{error}</div>
+  );
+
+  const renderEmailField = () => (
     <div>
-      <label className={styles.Label} htmlFor="email">Email:</label>
+      <label className={styles.Label} htmlFor="email">
+        {t('login_form.email_label', 'Email:')}
+      </label>
       <input
         type="email"
         className={styles.Input}
@@ -61,12 +68,17 @@ const LoginForm: React.FC = () => {
         value={email}
         id="email"
         onChange={(e) => setEmail(e.target.value)}
+        disabled={isLoading}
         required
       />
     </div>
+  );
 
+  const renderPasswordField = () => (
     <div>
-      <label className={styles.Label} htmlFor="password">Password:</label>
+      <label className={styles.Label} htmlFor="password">
+        {t('login_form.password_label', 'Password:')}
+      </label>
       <input
         type={showPassword ? 'text' : 'password'}
         className={styles.Input}
@@ -74,34 +86,52 @@ const LoginForm: React.FC = () => {
         value={password}
         id="password"
         onChange={(e) => setPassword(e.target.value)}
+        disabled={isLoading}
         required
       />
-      <div className={styles.CheckboxContainer}>
-        <input
-          id="showPassword"
-          type="checkbox"
-          checked={showPassword}
-          onChange={() => setShowPassword(!showPassword)}
-          className={styles.Checkbox}
-        />
-        <label htmlFor="showPassword" className={styles.CheckboxLabel}>
-          {t('login_form.show_password')}
-        </label>
-      </div>
     </div>
+  );
 
-    <button type="submit" className={styles.Button} disabled={isLoading}>
+  const renderPasswordToggle = () => (
+    <div className={styles.CheckboxContainer}>
+      <input
+        id="showPassword"
+        type="checkbox"
+        checked={showPassword}
+        onChange={() => setShowPassword(!showPassword)}
+        className={styles.Checkbox}
+        disabled={isLoading}
+      />
+      <label htmlFor="showPassword" className={styles.CheckboxLabel}>
+        {t('login_form.show_password')}
+      </label>
+    </div>
+  );
+
+  const renderSubmitButton = () => (
+    <button 
+      type="submit" 
+      className={styles.Button} 
+      disabled={isLoading}
+    >
       {isLoading ? t('login_form.signing_in') : t('login_form.sign_in')}
     </button>
-  </form>
+  );
+
+  const renderForm = () => (
+    <form onSubmit={handleSubmit} className={styles.Form}>
+      {renderEmailField()}
+      {renderPasswordField()}
+      {renderPasswordToggle()}
+      {renderSubmitButton()}
+    </form>
+  );
 
   return (
     <div className={styles.Container}>
       <div className={styles.Card}>
         {renderHeader()}
-
-        {error && <div className={styles.ErrorBox}>{error}</div>}
-
+        {renderError()}
         {renderForm()}
       </div>
     </div>
