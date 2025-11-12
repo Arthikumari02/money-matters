@@ -21,17 +21,27 @@ export function LanguageSelector() {
   const currentLang =
     languages.find((lang) => lang.code === i18n.language) || languages[0];
 
+  const toggleLanguageMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
   const changeLanguage = (language: string) => {
     i18n.changeLanguage(language);
     setIsOpen(false);
+  };
+
+  const handleLanguageSelect = (language: string) => () => {
+    changeLanguage(language);
   };
 
   return (
     <div className={styles.LanguageSelectorContainer}>
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleLanguageMenu}
         className={styles.LanguageButton}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         <span>{currentLang?.name || 'English'}</span>
         <ChevronDown className={styles.ChevronIcon(isOpen)} />
@@ -43,9 +53,10 @@ export function LanguageSelector() {
             {languages.map((lang) => (
               <button
                 key={lang.code}
-                onClick={() => changeLanguage(lang.code)}
+                onClick={handleLanguageSelect(lang.code)}
                 className={styles.LanguageOption(currentLang.code === lang.code)}
                 role="menuitem"
+                aria-current={currentLang.code === lang.code}
               >
                 {lang.name}
               </button>

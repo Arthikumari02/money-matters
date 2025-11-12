@@ -29,6 +29,9 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
     amount: 0,
     date: '',
   });
+
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { t } = useTranslation('transaction');
 
@@ -80,7 +83,7 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
     <>
       <Button
         variant="primary"
-        onClick={() => setIsOpen(true)}
+        onClick={openModal}
         isLoading={isLoading}
         className="rounded-xl"
         icon={<FaPlus />}
@@ -96,8 +99,8 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
           ...formData,
           amount: formData.amount.toString(),
         }}
-        onClose={() => setIsOpen(false)}
-        onChange={handleInputChange}
+        onClose={closeModal}
+        onInputChange={handleInputChange}
         onSubmit={handleSubmit}
         isLoading={isLoading}
         errors={errors}

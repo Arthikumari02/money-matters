@@ -12,6 +12,10 @@ import * as styles from './Styles';
 
 type TabType = 'all' | 'credit' | 'debit';
 
+// Convert transaction type to match our tab type format
+const normalizeTransactionType = (type: string): 'credit' | 'debit' =>
+  type.toLowerCase() as 'credit' | 'debit';
+
 const AdminTransactionsPage: React.FC = observer(() => {
   const { t } = useTranslation('transaction');
   const { transactions, isLoading, error, hasMore, fetchTransactions } =
@@ -36,7 +40,9 @@ const AdminTransactionsPage: React.FC = observer(() => {
 
   const filteredTransactions = useMemo(() => {
     if (activeTab === 'all') return transactions;
-    return transactions.filter((tx) => tx.type === activeTab);
+    return transactions.filter((tx) =>
+      normalizeTransactionType(tx.type) === activeTab
+    );
   }, [transactions, activeTab]);
 
 
@@ -47,6 +53,10 @@ const AdminTransactionsPage: React.FC = observer(() => {
   const renderError = () => (
     <PageError error={error} />
   );
+
+  const handleTabChange = (tabId: TabType) => {
+    setActiveTab(tabId);
+  };
 
   const renderTabs = () => {
     const tabs: { id: TabType; label: string }[] = [
@@ -60,9 +70,10 @@ const AdminTransactionsPage: React.FC = observer(() => {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => handleTabChange(tab.id)}
             className={`${styles.TabButtonBase} ${activeTab === tab.id ? styles.TabActive : styles.TabInactive
               }`}
+            aria-pressed={activeTab === tab.id}
           >
             {tab.label}
           </button>
@@ -95,7 +106,7 @@ const AdminTransactionsPage: React.FC = observer(() => {
             description: tx.name,
             category: tx.category || 'General',
             timestamp: new Date(tx.date || tx.createdAt).toISOString(),
-            amount: tx.type === 'debit' ? -Math.abs(tx.amount) : Math.abs(tx.amount),
+            amount: tx.type === 'Debit' ? -Math.abs(tx.amount) : Math.abs(tx.amount),
             userName: tx.userName || 'Unknown',
             userAvatar: tx.userAvatar,
           }))}

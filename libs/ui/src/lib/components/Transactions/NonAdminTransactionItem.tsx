@@ -34,6 +34,14 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = () => {
+    setShowConfirm(true);
+  };
+
   const isDebit = amount < 0;
   const formattedDate = new Date(timestamp).toLocaleString('en-US', {
     month: 'short',
@@ -100,16 +108,18 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
       <td className={styles.ActionCell}>
         <div className={styles.ActionsWrapper}>
           <button
-            onClick={() => setIsEditModalOpen(true)}
+            onClick={handleEditClick}
             className={`${styles.ActionButton} ${styles.EditButton}`}
             disabled={isLoading}
+            aria-label="Edit transaction"
           >
             <FaRegEdit className="w-4 h-4" />
           </button>
           <button
-            onClick={() => setShowConfirm(true)}
+            onClick={handleDeleteClick}
             className={`${styles.ActionButton} ${styles.DeleteButton}`}
             disabled={isLoading}
+            aria-label="Delete transaction"
           >
             <FaTrashAlt className="w-4 h-4" />
           </button>

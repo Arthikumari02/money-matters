@@ -25,6 +25,10 @@ const UserTransactionsPage: React.FC = observer(() => {
 
   const renderError = () => <PageError error={store.error} />;
 
+  const handleTabChange = (tabId: TabType) => {
+    store.setActiveTab(tabId);
+  };
+
   const renderTabs = () => {
     const tabs: { id: TabType; label: string }[] = [
       { id: 'all', label: t('tab.all_transactions') },
@@ -37,9 +41,11 @@ const UserTransactionsPage: React.FC = observer(() => {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => store.setActiveTab(tab.id)}
-            className={`${styles.TabButtonBase} ${store.activeTab === tab.id ? styles.TabActive : styles.TabInactive
-              }`}
+            onClick={() => handleTabChange(tab.id)}
+            className={`${styles.TabButtonBase} ${
+              store.activeTab === tab.id ? styles.TabActive : styles.TabInactive
+            }`}
+            aria-pressed={store.activeTab === tab.id}
           >
             {tab.label}
           </button>

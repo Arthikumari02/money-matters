@@ -1,8 +1,9 @@
 import React from 'react';
-import Modal from 'react-modal';
 import { IoClose } from 'react-icons/io5';
 import { FiLogOut } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
+import Modal from 'react-modal';
+import Button from '../Button/Button';
 import * as styles from './Styles';
 
 interface ConfirmationModalProps {
@@ -41,18 +42,26 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         </div>
 
         <div className="flex-1">
-          <h2 className={styles.ConfirmTitle}>{title}</h2>
+          <h2 className={styles.ConfirmTitle}> {t(title === 'delete' ? 'delete.title' : 'logout.title')}{title}</h2>
           <p className={styles.ConfirmMessage}>{message}</p>
         </div>
       </div>
 
       <div className={styles.ConfirmButtonWrapper}>
-        <button onClick={onConfirm} className={styles.ConfirmYesButton}>
-          {t('delete.yes_delete') || 'Yes, Logout'}
-        </button>
-        <button onClick={onCancel} className={styles.ConfirmCancelButton}>
-          {t('delete.no_leave_it') || 'Cancel'}
-        </button>
+        <Button
+          onClick={onConfirm}
+          variant="danger"
+          className="w-full sm:w-auto"
+        >
+          {t(title === 'delete' ? 'delete.yes_delete' : 'logout.yes_logout')}
+        </Button>
+        <Button
+          onClick={onCancel}
+          variant="secondary"
+          className="w-full sm:w-auto"
+        >
+          {t('delete.no_leave_it')}
+        </Button>
       </div>
     </Modal>
   );

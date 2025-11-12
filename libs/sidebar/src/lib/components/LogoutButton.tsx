@@ -30,28 +30,31 @@ const LogoutButton = () => {
     }
   };
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+  const handleConfirmLogout = () => {
+    handleLogout();
+    closeModal();
+  };
+
   return (
     <>
       <button
-        onClick={() => setIsModalOpen(true)}
+        onClick={openModal}
         disabled={isLoggingOut}
         className={styles.LogoutButton}
+        aria-label="Logout"
       >
         <LogoutIcon className={styles.LogoutIcon} />
       </button>
 
-      {isModalOpen && (
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          title={t('logout.Type')}
-          message={t('logout.description')}
-          onConfirm={() => {
-            handleLogout();
-            setIsModalOpen(false);
-          }}
-          onCancel={() => setIsModalOpen(false)}
-        />
-      )}
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        title={t('logout.Type')}
+        message={t('logout.description')}
+        onConfirm={handleConfirmLogout}
+        onCancel={closeModal}
+      />
     </>
   );
 };
