@@ -50,7 +50,7 @@ const LoginForm: React.FC = () => {
 
   const renderHeader = () => (
     <h2 className={styles.Heading}>
-      {t('login_form.title', 'Login')}
+      {t('login_form.title')}
     </h2>
   );
 
@@ -61,7 +61,7 @@ const LoginForm: React.FC = () => {
   const renderEmailField = () => (
     <div>
       <label className={styles.Label} htmlFor="email">
-        {t('login_form.email_label', 'Email:')}
+        {t('login_form.email_label')}
       </label>
       <input
         type="email"
@@ -79,7 +79,7 @@ const LoginForm: React.FC = () => {
   const renderPasswordField = () => (
     <div>
       <label className={styles.Label} htmlFor="password">
-        {t('login_form.password_label', 'Password:')}
+        {t('login_form.password_label')}
       </label>
       <input
         type={showPassword ? 'text' : 'password'}

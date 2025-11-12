@@ -3,5 +3,7 @@
   "credit": "श्रेय",
   "debit": "खर्चे में लिखना",
   "last_transaction": "अंतिम लेनदेन",
-  "debit_and_credit_overview": "डेबिट और क्रेडिट अवलोकन"
+  "debit_and_credit_overview": "डेबिट और क्रेडिट अवलोकन",
+  "loading_chart": "चार्ट लोड हो रहा है",
+  "no_data_available": "कोई डेटा मौजूद नहीं"
 }
