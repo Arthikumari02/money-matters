@@ -1,32 +1,6 @@
-import {
-  makeObservable,
-  observable,
-  computed,
-  action,
-  runInAction,
-} from 'mobx';
-import { loginApi } from '../hooks/api/useAuthApi';
+import { makeObservable, observable, computed, action, runInAction } from 'mobx';
 
-
-const USERS = [
-  { email: 'admin@gmail.com', password: 'Admin@123', isAdmin: true },
-  { email: 'jane.doe@gmail.com', password: 'janedoe@123', id: '1' },
-  { email: 'samsmith@gmail.com', password: 'samsmith@123', id: '2' },
-  { email: 'rahul@gmail.com', password: 'rahul@123', id: '4' },
-  { email: 'teja@gmail.com', password: 'teja@123', id: '5' },
-  { email: 'loki@gmail.com', password: 'loki@123', id: '6' },
-  { email: 'ramesh@gmail.com', password: 'ramesh@123', id: '7' },
-  { email: 'suresh@gmail.com', password: 'suresh@123', id: '8' },
-  { email: 'prem@gmail.com', password: 'prem@123', id: '9' },
-  { email: 'piyush@gmail.com', password: 'piyush@123', id: '10' },
-  { email: 'isha@gmail.com', password: 'isha@123', id: '12' },
-  { email: 'seema@gmail.com', password: 'seema@123', id: '14' },
-  { email: 'seema@123', password: 'arjun@123', id: '15' },
-  { email: 'radha@gmail.com', password: 'radha@123', id: '16' },
-  { email: 'phani@gmail.com', password: 'phani@123', id: '17' },
-];
-
-interface UserInfo {
+export interface UserInfo {
   id: string;
   fullName?: string;
   initials?: string;
@@ -39,7 +13,6 @@ interface UserInfo {
 
 class AuthStore {
   token: string | null = null;
-  cliendId: string | null = null;
   userInfo: UserInfo | null = null;
   isLoading = false;
   error: string | null = null;
@@ -52,75 +25,71 @@ class AuthStore {
       error: observable,
       isAuthenticated: computed,
       isAdmin: computed,
-      login: action,
       logout: action,
       setError: action,
+      setUserInfo: action,
+      setToken: action,
+      setLoading: action,
     });
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const storedToken = this.getLocalStorageItem('auth_token');
-      if (storedToken) {
-        this.token = storedToken;
-        this.loadUserInfoFromStorage();
+
+    this.loadUserInfoFromStorage();
+  }
+
+  private loadUserInfoFromStorage() {
+    if (typeof window === 'undefined') return;
+
+    const token = this.getLocalStorageItem('auth_token');
+    const userInfo = this.getLocalStorageItem('user_info');
+
+    if (token && userInfo) {
+      try {
+        runInAction(() => {
+          this.token = token;
+          this.userInfo = JSON.parse(userInfo);
+        });
+      } catch (e) {
+        console.error('Failed to parse user info from localStorage', e);
+        this.clearAuthData();
       }
     }
   }
 
-  get isAuthenticated() {
+  get isAuthenticated(): boolean {
     return !!this.token && !!this.userInfo;
   }
-  get isAdmin() {
+
+  get isAdmin(): boolean {
     return this.userInfo?.isAdmin || false;
   }
 
-  login = async (email: string, password: string) => {
-    this.isLoading = true;
-    this.error = null;
-    try {
-      const user = USERS.find(
-        (u) => u.email === email && u.password === password
-      );
-      if (!user) throw new Error('Invalid email or password');
-
-      const response = await loginApi({ email, password });
-
-      const userInfo: UserInfo = {
-        id: user.id || response?.data?.id || '',
-        email: user.email,
-        isAdmin: user.isAdmin || false,
-        fullName: user.email.split('@')[0],
-        initials: user.email[0].toUpperCase(),
-        username: user.email.split('@')[0],
-        token: `token_${Date.now()}`,
-        name: user.email.split('@')[0],
-      };
-
-      runInAction(() => {
-        this.userInfo = userInfo;
-        this.token = userInfo.token;
-        this.setLocalStorageItem('auth_token', userInfo.token);
-        this.setLocalStorageItem('user_info', JSON.stringify(userInfo));
-      });
-
-      return true;
-    } catch (error) {
-      this.error = error instanceof Error ? error.message : 'Login failed';
-      return false;
-    } finally {
-      runInAction(() => {
-        this.isLoading = false;
-      });
-    }
+  setLoading = (loading: boolean): void => {
+    this.isLoading = loading;
   };
 
-  logout = () => {
+  setError = (message: string | null): void => {
+    this.error = message;
+  };
+
+  setUserInfo = (userInfo: UserInfo): void => {
+    this.userInfo = userInfo;
+    this.setLocalStorageItem('user_info', JSON.stringify(userInfo));
+  };
+
+  setToken = (token: string): void => {
+    this.token = token;
+    this.setLocalStorageItem('auth_token', token);
+  };
+
+  logout = (): void => {
+    this.clearAuthData();
+  };
+
+  private clearAuthData = (): void => {
     this.token = null;
     this.userInfo = null;
+    this.error = null;
     this.removeLocalStorageItem('auth_token');
     this.removeLocalStorageItem('user_info');
-  };
-
-  setError = (message: string | null) => {
-    this.error = message;
   };
 
   private getLocalStorageItem(key: string): string | null {
@@ -150,39 +119,9 @@ class AuthStore {
       console.error('Error removing from localStorage:', e);
     }
   }
-
-  loadUserInfoFromStorage = () => {
-    const userInfo = this.getLocalStorageItem('user_info');
-    if (userInfo) {
-      try {
-        const parsedUserInfo = JSON.parse(userInfo);
-        if (this.token === parsedUserInfo.token) {
-          this.userInfo = {
-            ...parsedUserInfo,
-            fullName:
-              parsedUserInfo.fullName ||
-              parsedUserInfo.name ||
-              parsedUserInfo.email.split('@')[0],
-            initials:
-              parsedUserInfo.initials ||
-              (parsedUserInfo.name || parsedUserInfo.email[0]).toUpperCase(),
-            username:
-              parsedUserInfo.username || parsedUserInfo.email.split('@')[0],
-          };
-        } else {
-          this.logout();
-        }
-      } catch {
-        this.logout();
-      }
-    } else {
-      if (this.token) {
-        this.logout();
-      }
-    }
-  };
 }
 
 const authStore = new AuthStore();
 export default authStore;
 export { AuthStore };
+

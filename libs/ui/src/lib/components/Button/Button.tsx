@@ -1,5 +1,6 @@
 import React, { ButtonHTMLAttributes, useMemo } from 'react';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 import {
     BASE_BUTTON_STYLES,
     PRIMARY_BUTTON,
@@ -23,20 +24,21 @@ const VARIANT_STYLES = {
     outline: OUTLINE_BUTTON,
 };
 
-const DEFAULT_TEXTS = {
-    primary: 'Submit',
-    secondary: 'Cancel',
-    danger: 'Delete',
-    success: 'Save',
-    outline: 'View',
-};
-
-const LOADING_TEXTS = {
-    primary: 'Processing...',
-    secondary: 'Processing...',
-    danger: 'Deleting...',
-    success: 'Saving...',
-    outline: 'Loading...',
+const BUTTON_TRANSLATION_KEYS = {
+    default: {
+        primary: 'submit',
+        secondary: 'cancel',
+        danger: 'delete',
+        success: 'save',
+        outline: 'click_me',
+    },
+    loading: {
+        primary: 'submitting',
+        secondary: 'cancelling',
+        danger: 'deleting',
+        success: 'saving',
+        outline: 'loading',
+    }
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -55,8 +57,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     icon,
     ...props
 }, ref) => {
-    const loadingText = LOADING_TEXTS[variant] || '';
-    const defaultText = DEFAULT_TEXTS[variant] || '';
+    const { t } = useTranslation('button');
+
+    const loadingText = t(BUTTON_TRANSLATION_KEYS.loading[variant] || 'loading');
+    const defaultText = t(BUTTON_TRANSLATION_KEYS.default[variant] || 'submit');
     const variantStyle = VARIANT_STYLES[variant];
 
     const buttonClasses = useMemo(() =>
