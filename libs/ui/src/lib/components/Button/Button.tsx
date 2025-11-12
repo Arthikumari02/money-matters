@@ -1,14 +1,41 @@
 import React, { ButtonHTMLAttributes, useMemo } from 'react';
 import classNames from 'classnames';
 import {
-    LOADING_TEXTS,
-    DEFAULT_TEXTS,
-    VARIANT_STYLES,
-    BASE_STYLES,
-    type ButtonVariant
-} from '../Constants/ButtonConstants';
+    BASE_BUTTON_STYLES,
+    PRIMARY_BUTTON,
+    SECONDARY_BUTTON,
+    DANGER_BUTTON,
+    SUCCESS_BUTTON,
+    OUTLINE_BUTTON,
+    BUTTON_ICON_LEFT,
+    BUTTON_LOADING
+} from './Button.styles';
 
-export type { ButtonVariant };
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'success' | 'outline';
+
+const VARIANT_STYLES = {
+    primary: PRIMARY_BUTTON,
+    secondary: SECONDARY_BUTTON,
+    danger: DANGER_BUTTON,
+    success: SUCCESS_BUTTON,
+    outline: OUTLINE_BUTTON,
+};
+
+const DEFAULT_TEXTS = {
+    primary: 'Submit',
+    secondary: 'Cancel',
+    danger: 'Delete',
+    success: 'Save',
+    outline: 'View',
+};
+
+const LOADING_TEXTS = {
+    primary: 'Processing...',
+    secondary: 'Processing...',
+    danger: 'Deleting...',
+    success: 'Saving...',
+    outline: 'Loading...',
+};
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ButtonVariant;
@@ -32,12 +59,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
 
     const buttonClasses = useMemo(() =>
         classNames(
-            BASE_STYLES,
+            BASE_BUTTON_STYLES,
             variantStyle,
             (disabled || isLoading) && 'opacity-50 cursor-not-allowed',
             className
         ),
-        [variant, disabled, isLoading, className]
+        [variantStyle, disabled, isLoading, className]
     );
 
     const renderLoadingState = () => (
@@ -52,7 +79,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
 
         return (
             <>
-                {icon && <span className="mr-2">{icon}</span>}
+                {icon && <span className={BUTTON_ICON_LEFT}>{icon}</span>}
                 {children || defaultText}
             </>
         );
@@ -75,7 +102,7 @@ Button.displayName = 'Button';
 
 const LoadingSpinner = () => (
     <svg
-        className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
+        className={classNames("animate-spin h-4 w-4 text-current", BUTTON_ICON_LEFT.replace('mr-2', 'mr-0'))}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

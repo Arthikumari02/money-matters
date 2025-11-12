@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { TransactionItemAdmin } from './TransactionItem';
+import TransactionItemAdmin from '../AdminTransactionItem';
 
 type Transaction = {
   id: string;
   name: string;
   userName: string;
   category: string;
-  type: 'credit' | 'debit';
+  type: 'Credit' | 'Debit';
   amount: number;
   date: string;
   userAvatar?: string;
@@ -35,7 +35,7 @@ const sampleTransaction: Transaction = {
   name: 'Grocery Shopping',
   userName: 'John Doe',
   amount: 125.5,
-  type: 'debit',
+  type: 'Debit',
   category: 'groceries',
   date: '2023-10-15T10:30:00Z',
   userAvatar: 'https://i.pravatar.cc/150?img=1',
@@ -53,7 +53,7 @@ export const CreditTransaction: Story = {
       ...sampleTransaction,
       name: 'Freelance Work',
       amount: 500,
-      type: 'credit',
+      type: 'Credit',
       category: 'income',
       userAvatar: 'https://i.pravatar.cc/150?img=2',
     },

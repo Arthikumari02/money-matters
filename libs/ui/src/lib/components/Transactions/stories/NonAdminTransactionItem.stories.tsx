@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TransactionItemUser from './TransactionItem';
+import TransactionItemUser from '../NonAdminTransactionItem';
 
 const meta = {
     title: 'Components/Transactions/NonAdmin/TransactionItem',
@@ -31,7 +31,7 @@ const meta = {
             description: 'Transaction timestamp',
         },
         amount: {
-            control: 'text',
+            control: 'number',
             description: 'Transaction amount',
         },
         onDeleteSuccess: {
@@ -55,7 +55,7 @@ export const FoodTransaction: Story = {
         description: 'Grocery Shopping',
         category: 'food',
         timestamp: new Date('2023-10-15T10:30:00Z').toISOString(),
-        amount: '125.50',
+        amount: 125.50,
     },
 };
 
@@ -66,7 +66,7 @@ export const ShoppingTransaction: Story = {
         description: 'New Laptop',
         category: 'shopping',
         timestamp: new Date('2023-10-10T14:15:00Z').toISOString(),
-        amount: '999.99',
+        amount: 999.99,
     },
 };
 
@@ -77,7 +77,7 @@ export const BillPayment: Story = {
         description: 'Electricity Bill',
         category: 'bills',
         timestamp: new Date('2023-10-01T09:00:00Z').toISOString(),
-        amount: '85.30',
+        amount: 85.30,
     },
 };
 
@@ -88,7 +88,7 @@ export const WithLongDescription: Story = {
         description: 'Monthly rent payment for the apartment in downtown',
         category: 'bills',
         timestamp: new Date('2023-10-01T00:00:00Z').toISOString(),
-        amount: '1200.00',
+        amount: 1200.00,
     },
     parameters: {
         docs: {

@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import Modal from 'react-modal';
 import { IoClose } from 'react-icons/io5';
-import { updateTransaction, addTransaction } from '../../services/transactionApi';
+import updateTransaction from '../../services/updateTransactionApi';
+import addTransactionApi from '../../services/addTransactionApi';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import * as styles from './Styles';
 import Button from '../Button/Button';
 import FormField from '../Form/FormField';
+import { validateTransactionForm } from '../../utils/validation';
 
 export interface TransactionData {
   name: string;
@@ -73,47 +75,42 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = t('validation.name_required');
-    if (!formData.type) newErrors.type = t('validation.type_required');
-    if (!formData.category) newErrors.category = t('validation.category_required');
-    if (!formData.amount) newErrors.amount = t('validation.amount_required');
-    if (!formData.date) newErrors.date = t('validation.date_required');
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const validate = () => validateTransactionForm(formData, t, setErrors);
 
   const handleSubmit = async () => {
     if (!validate()) return;
     setIsLoading(true);
-    const fullDateTime = new Date(
-      `${formData.date}T${new Date().toTimeString().split(' ')[0]}`
-    ).toISOString();
+
     try {
+      const fullDateTime = new Date(
+        `${formData.date}T${new Date().toTimeString().split(' ')[0]}`
+      ).toISOString();
+
       if (mode === 'edit' && transactionId) {
         await updateTransaction(userId, transactionId, {
           name: formData.name,
-          type: formData.type.toLowerCase() as 'credit' | 'debit',
+          type: formData.type as 'Credit' | 'Debit',
           category: formData.category,
           amount: parseFloat(formData.amount),
           date: fullDateTime,
         });
         toast.success(t('toast.updated_successfully'));
       } else {
-        await addTransaction(userId, {
+        await addTransactionApi(userId, {
           name: formData.name,
-          type: formData.type.toLowerCase() as 'credit' | 'debit',
+          type: formData.type as 'Credit' | 'Debit',
           category: formData.category,
           amount: parseFloat(formData.amount),
           date: fullDateTime,
         });
         toast.success(t('toast.added_successfully'));
       }
-      onClose();
+
+      // Call onSuccess before closing the modal
       onSuccess?.();
+      onClose();
     } catch (err) {
-      console.error(err);
+      console.error('Transaction operation failed:', err);
       toast.error(t('toast.error'));
     } finally {
       setIsLoading(false);
@@ -130,10 +127,78 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     { value: 'Other', label: 'Other' },
   ], []);
 
-  const transactionTypeOptions = useMemo(() => [
-    { value: 'credit', label: t('credit') },
-    { value: 'debit', label: t('debit') },
-  ], [t]);
+  const renderFields = () => (
+    <div className={styles.ModalFieldWrapper}>
+      <FormField
+        label={t('transaction.name')}
+        name="name"
+        type="text"
+        value={formData.name}
+        onChange={handleChange}
+        error={errors.name}
+        required
+        disabled={isLoading}
+        placeholder={t('add_transaction.placeholders.enter_name')}
+      />
+
+      <FormField
+        label={t('transaction.type')}
+        name="type"
+        type="select"
+        value={formData.type}
+        onChange={handleChange}
+        error={errors.type}
+        required
+        disabled={isLoading}
+        options={[
+          { value: '', label: t('add_transaction.placeholders.select_type') },
+          { value: 'Credit', label: t('credit') },
+          { value: 'Debit', label: t('debit') }
+        ]}
+      />
+
+      <FormField
+        label={t('transaction.category')}
+        name="category"
+        type="select"
+        value={formData.category}
+        onChange={handleChange}
+        error={errors.category}
+        required
+        disabled={isLoading}
+        options={[
+          { value: '', label: t('add_transaction.placeholders.category') },
+          ...categoryOptions
+        ]}
+      />
+
+      <FormField
+        label={t('transaction.amount')}
+        name="amount"
+        type="number"
+        value={formData.amount}
+        onChange={handleChange}
+        error={errors.amount}
+        required
+        disabled={isLoading}
+        placeholder={t('add_transaction.placeholders.enter_amount')}
+        min="0"
+        step="0.01"
+      />
+
+      <FormField
+        label={t('transaction.date')}
+        name="date"
+        type="date"
+        value={formData.date}
+        onChange={handleChange}
+        error={errors.date}
+        required
+        disabled={isLoading}
+        max={new Date().toISOString().split('T')[0]}
+      />
+    </div>
+  )
 
   return (
     <Modal
@@ -144,14 +209,13 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       contentLabel={mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}
       shouldCloseOnOverlayClick={true}
     >
-      <Button
-        variant="primary"
+      <button
         onClick={onClose}
         disabled={isLoading}
-        className="absolute right-4 top-4 p-1 rounded-ful"
+        className="absolute right-4 top-4 p-1 rounded-ful bg-transparent text-[#718EBF]"
       >
         <IoClose size={22} />
-      </Button>
+      </button>
 
       <h2 className={styles.ModalHeading}>
         {mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title')}
@@ -162,88 +226,16 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           : t('add_transaction.description')}
       </p>
 
-      <div className={styles.ModalFieldWrapper}>
-        <FormField
-          label={t('transaction.transaction_name')}
-          name="name"
-          type="text"
-          value={formData.name}
-          onChange={handleChange}
-          error={errors.name}
-          required
-          disabled={isLoading}
-          placeholder={t('add_transaction.placeholders.enter_name')}
-        />
+      {renderFields()}
 
-        <FormField
-          label={t('transaction.transaction_type')}
-          name="type"
-          type="select"
-          value={formData.type}
-          onChange={handleChange}
-          error={errors.type}
-          required
-          disabled={isLoading}
-          options={[
-            { value: '', label: t('add_transaction.placeholders.select_type') },
-            { value: 'credit', label: t('credit') },
-            { value: 'debit', label: t('debit') }
-          ]}
-        />
-
-        <FormField
-          label={t('transaction.category')}
-          name="category"
-          type="select"
-          value={formData.category}
-          onChange={handleChange}
-          error={errors.category}
-          required
-          disabled={isLoading}
-          options={[
-            { value: '', label: t('add_transaction.placeholders.category') },
-            ...categoryOptions
-          ]}
-        />
-
-        <FormField
-          label={t('transaction.amount')}
-          name="amount"
-          type="number"
-          value={formData.amount}
-          onChange={handleChange}
-          error={errors.amount}
-          required
-          disabled={isLoading}
-          placeholder={t('add_transaction.placeholders.enter_amount')}
-          min="0"
-          step="0.01"
-        />
-
-        <FormField
-          label={t('transaction.date')}
-          name="date"
-          type="date"
-          value={formData.date}
-          onChange={handleChange}
-          error={errors.date}
-          required
-          disabled={isLoading}
-          max={new Date().toISOString().split('T')[0]}
-        />
-      </div>
-
-      <button
+      <Button
         onClick={handleSubmit}
-        disabled={isLoading}
-        className={`${styles.ModalSubmitButton} ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+        isLoading={isLoading}
+        variant="primary"
+        className={`${styles.ModalSubmitButton} w-full`}
       >
-        {isLoading
-          ? t('processing')
-          : mode === 'edit'
-            ? t('update_transaction.title')
-            : t('add_transaction.title')}
-      </button>
+        {mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title')}
+      </Button>
     </Modal>
   );
 };

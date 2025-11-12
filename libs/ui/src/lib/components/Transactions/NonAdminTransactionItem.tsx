@@ -3,10 +3,10 @@ import { FaRegEdit, FaTrashAlt } from 'react-icons/fa';
 import { FiArrowUpCircle, FiArrowDownCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import ConfirmationModal from '../../Modals/ConfirmationModal';
-import TransactionModal from '../../Modals/TransactionModal';
-import { deleteTransaction } from '../../../services/transactionApi';
-import * as styles from '../Styles';
+import ConfirmationModal from '../Modals/ConfirmationModal';
+import TransactionModal from '../Modals/TransactionModal';
+import deleteTransaction from '../../services/deleteTransactionApi';
+import * as styles from './Styles';
 
 interface TransactionItemUserProps {
   id: string;
@@ -30,10 +30,9 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   onUpdateSuccess,
 }) => {
   const { t } = useTranslation('modal');
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isDebit = amount < 0;
   const formattedDate = new Date(timestamp).toLocaleString('en-US', {
@@ -45,64 +44,77 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   });
 
   const handleDelete = async () => {
-    setIsDeleting(true);
+    setIsLoading(true);
     try {
       await deleteTransaction({ transactionId: id, userId });
-      toast.success('Transaction deleted successfully!');
+      toast.success(t('toast.deleted_successfully'));
       onDeleteSuccess?.();
     } catch (error) {
-      console.error('Error deleting transaction:', error);
-      toast.error('Failed to delete transaction.');
+      console.error(error);
+      toast.error(t('toast.delete_failed'));
     } finally {
-      setIsDeleting(false);
+      setIsLoading(false);
       setShowConfirm(false);
     }
   };
 
-  const handleUpdate = () => {
-    setIsEditing(true);
+  const handleUpdateSuccess = () => {
     onUpdateSuccess?.();
-    setIsEditing(false);
+    setIsEditModalOpen(false);
   };
 
   return (
     <>
-      <div className={styles.UserContainer}>
-        <div
-          className="flex-shrink-0 flex items-center justify-center"
-          style={{
-            color: isDebit ? '#FE5C73' : '#16DBAA',
-          }}
-        >
-          {isDebit ? <FiArrowDownCircle size={29} /> : <FiArrowUpCircle size={29} />}
+      {/* Transaction Name + Icon */}
+      <td className={styles.CellBase}>
+        <div className={styles.IconCell}>
+          <div className={styles.IconContainer}>
+            {isDebit ? (
+              <FiArrowDownCircle size={24} className={styles.DebitIcon} />
+            ) : (
+              <FiArrowUpCircle size={24} className={styles.CreditIcon} />
+            )}
+          </div>
+          <span className={styles.TransactionName}>{description}</span>
         </div>
+      </td>
 
-        <div className="flex-1 min-w-[160px]">
-          <span className={styles.UserDescription}>{description}</span>
-        </div>
+      {/* Category */}
+      <td className={`${styles.CellBase} text-center`}>
+        <span className={styles.CategoryText}>{category}</span>
+      </td>
 
-        <div className={styles.UserCategory}>{category}</div>
-        <div className={styles.DateField}>{formattedDate}</div>
-        <div className={styles.UserAmountContainer(isDebit)}>{amount}</div>
+      {/* Date */}
+      <td className={`${styles.CellBase} text-center`}>
+        <span className={styles.DateText}>{formattedDate}</span>
+      </td>
 
-        <div className={styles.ActionWrapper}>
+      {/* Amount */}
+      <td className={`${styles.CellBase} text-right`}>
+        <span className={styles.AmountText(isDebit ? 'debit' : 'credit')}>
+          {isDebit ? '-' : '+'}${Math.abs(amount).toLocaleString()}
+        </span>
+      </td>
+
+      {/* Action Buttons */}
+      <td className={styles.ActionCell}>
+        <div className={styles.ActionsWrapper}>
           <button
             onClick={() => setIsEditModalOpen(true)}
-            disabled={isEditing}
             className={`${styles.ActionButton} ${styles.EditButton}`}
+            disabled={isLoading}
           >
             <FaRegEdit className="w-4 h-4" />
           </button>
-
           <button
             onClick={() => setShowConfirm(true)}
-            disabled={isDeleting}
             className={`${styles.ActionButton} ${styles.DeleteButton}`}
+            disabled={isLoading}
           >
             <FaTrashAlt className="w-4 h-4" />
           </button>
         </div>
-      </div>
+      </td>
 
       {isEditModalOpen && (
         <TransactionModal
@@ -118,7 +130,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
             amount: Math.abs(amount).toString(),
             date: new Date(timestamp).toISOString().split('T')[0],
           }}
-          onSuccess={handleUpdate}
+          onSuccess={handleUpdateSuccess}
         />
       )}
 

@@ -20,7 +20,6 @@ const UserTransactionsPage: React.FC = observer(() => {
   const { store, fetchAllTransactions } = useUserTransactionsApi(userId);
   const { t } = useTranslation("transaction");
 
-  // ===== Render Functions ===== //
 
   const renderLoading = () => <PageLoader />;
 
@@ -39,9 +38,8 @@ const UserTransactionsPage: React.FC = observer(() => {
           <button
             key={tab.id}
             onClick={() => store.setActiveTab(tab.id)}
-            className={`${styles.TabButtonBase} ${
-              store.activeTab === tab.id ? styles.TabActive : styles.TabInactive
-            }`}
+            className={`${styles.TabButtonBase} ${store.activeTab === tab.id ? styles.TabActive : styles.TabInactive
+              }`}
           >
             {tab.label}
           </button>
@@ -76,7 +74,7 @@ const UserTransactionsPage: React.FC = observer(() => {
             description: tx.name,
             category: tx.category || "General",
             timestamp: tx.date,
-            amount: tx.amount * (tx.type === 'debit' ? -1 : 1),
+            amount: tx.amount * (tx.type === 'Debit' ? -1 : 1),
           }))}
           onDeleteSuccess={fetchAllTransactions}
           onUpdateSuccess={fetchAllTransactions}
@@ -93,8 +91,7 @@ const UserTransactionsPage: React.FC = observer(() => {
     </div>
   );
 
-  // ===== Main Render ===== //
-  
+
   if (store.isLoading && store.transactions.length === 0) return renderLoading();
   if (store.error) return renderError();
 

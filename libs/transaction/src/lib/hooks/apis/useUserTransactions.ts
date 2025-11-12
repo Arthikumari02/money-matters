@@ -37,7 +37,7 @@ export const useUserTransactionsApi = (userId: string | null) => {
             id: tx.id,
             name: tx.transaction_name ?? "Unnamed Transaction",
             amount: parseFloat(tx.amount ?? 0),
-            type: (tx.type ?? "debit").toLowerCase() as TransactionType,
+            type: (tx.type ?? "Debit") as TransactionType,
             category: tx.category ?? "Uncategorized",
             userId: tx.user_id,
             userName: tx.user_name ?? "Unknown",

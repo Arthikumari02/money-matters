@@ -1,6 +1,6 @@
 import React from 'react';
-import TransactionItemAdmin from '../Transactions/admin/TransactionItem';
-import TransactionItemUser from '../Transactions/non-admin/TransactionItem';
+import TransactionItemAdmin from '../Transactions/AdminTransactionItem';
+import TransactionItemUser from '../Transactions/NonAdminTransactionItem';
 import { useAuthStore } from '@money-matters/auth';
 import { useTranslation } from 'react-i18next';
 import * as styles from './Styles';
@@ -90,8 +90,8 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                                         name: transaction.description,
                                         userName: transaction.userName || '',
                                         category: transaction.category,
-                                        type: transaction.amount < 0 ? 'debit' : 'credit',
-                                        amount: Math.abs(transaction.amount),
+                                        type: transaction.amount < 0 ? 'Debit' : 'Credit',
+                                        amount: transaction.amount * (transaction.amount < 0 ? -1 : 1),
                                         date: transaction.timestamp,
                                         userAvatar: transaction.userAvatar,
                                     }}
@@ -99,18 +99,16 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                             </tr>
                         ) : (
                             <tr key={transaction.id}>
-                                <td colSpan={5}>
-                                    <TransactionItemUser
-                                        id={transaction.id}
-                                        userId={transaction.userId}
-                                        description={transaction.description}
-                                        category={transaction.category}
-                                        timestamp={transaction.timestamp}
-                                        amount={transaction.amount}
-                                        onDeleteSuccess={onDeleteSuccess}
-                                        onUpdateSuccess={onUpdateSuccess}
-                                    />
-                                </td>
+                                <TransactionItemUser
+                                    id={transaction.id}
+                                    userId={transaction.userId}
+                                    description={transaction.description}
+                                    category={transaction.category}
+                                    timestamp={transaction.timestamp}
+                                    amount={transaction.amount}
+                                    onDeleteSuccess={onDeleteSuccess}
+                                    onUpdateSuccess={onUpdateSuccess}
+                                />
                             </tr>
                         )
                     )}

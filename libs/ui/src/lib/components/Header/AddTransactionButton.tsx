@@ -4,9 +4,9 @@ import { FaPlus } from 'react-icons/fa';
 import TransactionModal from '../Modals/TransactionModal';
 import Button from '../Button/Button';
 import {
-  addTransaction,
   TransactionInput,
-} from '../../services/transactionApi';
+} from '../../types/transaction';
+import addTransactionApi from '../../services/addTransactionApi';
 import { useTranslation } from 'react-i18next';
 
 interface AddTransactionButtonProps {
@@ -24,7 +24,7 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<TransactionInput>({
     name: '',
-    type: 'credit',
+    type: 'Credit',
     category: '',
     amount: 0,
     date: '',
@@ -56,13 +56,13 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
 
     setIsLoading(true);
     try {
-      await addTransaction(userId, formData);
+      await addTransactionApi(userId, formData);
       onSuccess?.();
 
       setIsOpen(false);
       setFormData({
         name: '',
-        type: 'credit',
+        type: 'Credit',
         category: '',
         amount: 0,
         date: '',
