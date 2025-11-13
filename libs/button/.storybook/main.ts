@@ -1,15 +1,31 @@
-import type { StorybookConfig } from '@storybook/react-vite';
 import { mergeConfig } from 'vite';
+import type { StorybookConfig } from '@storybook/react-vite';
 import react from '@vitejs/plugin-react';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
-import path from 'path';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+
+// Create a basic Tailwind config that extends the root config
+const tailwindConfig = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "../../libs/**/*.{js,jsx,ts,tsx}"
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
   addons: [
-    '@storybook/addon-essentials',
+    {
+      name: '@storybook/addon-essentials',
+      options: {
+        backgrounds: false,
+      },
+    },
     '@storybook/addon-links',
     '@storybook/addon-interactions',
   ],
@@ -17,20 +33,19 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
-  viteFinal: async (config) =>
-    mergeConfig(config, {
+  viteFinal: async (config) => {
+    return mergeConfig(config, {
       plugins: [react(), nxViteTsPaths()],
       css: {
         postcss: {
           plugins: [
-            tailwindcss({
-              config: path.resolve(__dirname, '../tailwind.config.js'),
-            }),
+            tailwindcss(tailwindConfig),
             autoprefixer(),
           ],
         },
       },
-    }),
+    });
+  },
 };
 
 export default config;
