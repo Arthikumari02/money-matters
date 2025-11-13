@@ -1,7 +1,7 @@
 import { makeObservable, observable, action } from 'mobx';
 import { BaseModel } from './BaseModel';
 
-export type TransactionType = 'Credit' | 'Debit';
+export type TransactionType = 'credit' | 'debit';
 
 export class TransactionModel extends BaseModel {
   amount: number;
@@ -100,7 +100,7 @@ export class TransactionModel extends BaseModel {
       this.id.length > 0 &&
       this.name.length > 0 &&
       this.amount > 0 &&
-      ['Credit', 'Debit'].includes(this.type) &&
+      ['credit', 'debit'].includes(this.type) &&
       this.category.length > 0 &&
       this.userId.length > 0 &&
       this.userName.length > 0 &&
@@ -109,11 +109,11 @@ export class TransactionModel extends BaseModel {
   }
 
   get isCredit() {
-    return this.type === 'Credit';
+    return this.type === 'credit';
   }
 
   get isDebit() {
-    return this.type === 'Debit';
+    return this.type === 'debit';
   }
 
   belongsToUser(userId: string): boolean {

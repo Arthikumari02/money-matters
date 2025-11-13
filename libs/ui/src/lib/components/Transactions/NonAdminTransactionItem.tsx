@@ -13,6 +13,7 @@ interface TransactionItemUserProps {
   userId: string;
   description: string;
   category: string;
+  type: 'credit' | 'debit';
   timestamp: string;
   amount: number;
   onDeleteSuccess?: () => void;
@@ -24,6 +25,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   userId,
   description,
   category,
+  type,
   timestamp,
   amount,
   onDeleteSuccess,
@@ -33,6 +35,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   const [showConfirm, setShowConfirm] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const isDebit = amount < 0;
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
@@ -42,7 +45,6 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
     setShowConfirm(true);
   };
 
-  const isDebit = amount < 0;
   const formattedDate = new Date(timestamp).toLocaleString('en-US', {
     month: 'short',
     day: '2-digit',
@@ -77,10 +79,10 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
       <td className={styles.CellBase}>
         <div className={styles.IconCell}>
           <div className={styles.IconContainer}>
-            {isDebit ? (
-              <FiArrowDownCircle size={24} className={styles.DebitIcon} />
-            ) : (
+            {type === 'credit' ? (
               <FiArrowUpCircle size={24} className={styles.CreditIcon} />
+            ) : (
+              <FiArrowDownCircle size={24} className={styles.DebitIcon} />
             )}
           </div>
           <span className={styles.TransactionName}>{description}</span>
@@ -99,11 +101,10 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
 
       {/* Amount */}
       <td className={`${styles.CellBase} text-right`}>
-        <span className={styles.AmountText(isDebit ? 'debit' : 'credit')}>
-          {isDebit ? '-' : '+'}${Math.abs(amount).toLocaleString()}
+        <span className={styles.AmountText(type.toLowerCase() as 'credit' | 'debit')}>
+          {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
         </span>
       </td>
-
       {/* Action Buttons */}
       <td className={styles.ActionCell}>
         <div className={styles.ActionsWrapper}>
@@ -135,7 +136,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
           mode="edit"
           transactionData={{
             name: description,
-            type: isDebit ? 'Debit' : 'Credit',
+            type: type,
             category,
             amount: Math.abs(amount).toString(),
             date: new Date(timestamp).toISOString().split('T')[0],

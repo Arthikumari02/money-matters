@@ -24,7 +24,7 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<TransactionInput>({
     name: '',
-    type: 'Credit',
+    type: 'credit',
     category: '',
     amount: 0,
     date: '',

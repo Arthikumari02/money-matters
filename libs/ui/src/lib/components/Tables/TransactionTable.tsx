@@ -10,9 +10,9 @@ export interface Transaction {
     userId: string;
     description: string;
     category: string;
+    type: 'credit' | 'debit';
     timestamp: string;
     amount: number;
-    type: 'Credit' | 'Debit';
     onDeleteSuccess?: () => void;
     onUpdateSuccess?: () => void;
     userName?: string;
@@ -91,8 +91,8 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                                         name: transaction.description,
                                         userName: transaction.userName || '',
                                         category: transaction.category,
-                                        type: transaction.type || 'Credit',
-                                        amount: transaction.amount * (transaction.amount < 0 ? -1 : 1),
+                                        type: transaction.type,
+                                        amount: Math.abs(transaction.amount),
                                         date: transaction.timestamp,
                                         userAvatar: transaction.userAvatar,
                                     }}
@@ -105,6 +105,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                                     userId={transaction.userId}
                                     description={transaction.description}
                                     category={transaction.category}
+                                    type={transaction.type}
                                     timestamp={transaction.timestamp}
                                     amount={transaction.amount}
                                     onDeleteSuccess={onDeleteSuccess}

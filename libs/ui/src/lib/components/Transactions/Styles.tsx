@@ -47,7 +47,7 @@ export const DateText = `
 
 export const AmountText = (type: 'credit' | 'debit') => `
   text-right font-semibold text-[15px] min-w-[100px]
-  ${type === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'}
+  ${type.toLowerCase() === 'credit' ? 'text-[#16DBAA]' : 'text-[#FE5C73]'}
 `;
 
 export const ActionCell = `

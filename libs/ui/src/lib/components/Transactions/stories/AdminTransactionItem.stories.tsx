@@ -6,7 +6,7 @@ type Transaction = {
   name: string;
   userName: string;
   category: string;
-  type: 'Credit' | 'Debit';
+  type: 'credit' | 'debit';
   amount: number;
   date: string;
   userAvatar?: string;
@@ -35,7 +35,7 @@ const sampleTransaction: Transaction = {
   name: 'Grocery Shopping',
   userName: 'John Doe',
   amount: 125.5,
-  type: 'Debit',
+  type: 'debit',
   category: 'groceries',
   date: '2023-10-15T10:30:00Z',
   userAvatar: 'https://i.pravatar.cc/150?img=1',
@@ -53,7 +53,7 @@ export const CreditTransaction: Story = {
       ...sampleTransaction,
       name: 'Freelance Work',
       amount: 500,
-      type: 'Credit',
+      type: 'credit',
       category: 'income',
       userAvatar: 'https://i.pravatar.cc/150?img=2',
     },

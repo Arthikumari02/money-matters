@@ -1,6 +1,6 @@
 export interface TransactionInput {
   name: string;
-  type: 'Credit' | 'Debit';
+  type: 'credit' | 'debit';
   category: string;
   amount: number;
   date: string;

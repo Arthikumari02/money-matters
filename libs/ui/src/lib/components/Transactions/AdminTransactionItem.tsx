@@ -8,7 +8,7 @@ interface TransactionItemAdminProps {
     name: string;
     userName: string;
     category: string;
-    type: 'Credit' | 'Debit';
+    type: 'credit' | 'debit';
     amount: number;
     date: string;
     userAvatar?: string;
@@ -31,7 +31,7 @@ const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({ transaction
       <td className={styles.CellBase}>
         <div className={styles.IconCell}>
           <div className={styles.IconContainer}>
-            {type === 'Credit' ? (
+            {type === 'credit' ? (
               <FiArrowUpCircle size={24} className={styles.CreditIcon} />
             ) : (
               <FiArrowDownCircle size={24} className={styles.DebitIcon} />
@@ -66,7 +66,7 @@ const TransactionItemAdmin: React.FC<TransactionItemAdminProps> = ({ transaction
 
       <td className={`${styles.CellBase} text-right`}>
         <span className={styles.AmountText(type.toLowerCase() as 'credit' | 'debit')}>
-          {type === 'Credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
+          {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
         </span>
       </td>
     </tr>

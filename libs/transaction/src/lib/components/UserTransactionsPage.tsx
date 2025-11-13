@@ -42,9 +42,8 @@ const UserTransactionsPage: React.FC = observer(() => {
           <button
             key={tab.id}
             onClick={() => handleTabChange(tab.id)}
-            className={`${styles.TabButtonBase} ${
-              store.activeTab === tab.id ? styles.TabActive : styles.TabInactive
-            }`}
+            className={`${styles.TabButtonBase} ${store.activeTab === tab.id ? styles.TabActive : styles.TabInactive
+              }`}
             aria-pressed={store.activeTab === tab.id}
           >
             {tab.label}
@@ -70,26 +69,34 @@ const UserTransactionsPage: React.FC = observer(() => {
     </div>
   );
 
-  const renderTransactionTable = () => (
-    <div className={styles.UserCard}>
-      <div className={styles.UserScrollContainer}>
-        <TransactionTable
-          transactions={store.filteredTransactions.map((tx) => ({
-            id: tx.id,
-            userId: userId,
-            description: tx.name,
-            category: tx.category || "General",
-            timestamp: tx.date,
-            amount: tx.amount * (tx.type === 'Debit' ? -1 : 1),
-          }))}
-          onDeleteSuccess={fetchAllTransactions}
-          onUpdateSuccess={fetchAllTransactions}
-          showHeader={true}
-          className="w-full"
-        />
+  const renderTransactionTable = () => {
+    // Ensure we have valid transaction data before rendering
+    if (!store.filteredTransactions || store.filteredTransactions.length === 0) {
+      return <div className={styles.UserCard}><p>No transactions found</p></div>;
+    }
+
+    return (
+      <div className={styles.UserCard}>
+        <div className={styles.UserScrollContainer}>
+          <TransactionTable
+            transactions={store.filteredTransactions.map((tx) => ({
+              id: tx.id,
+              userId: userId,
+              description: tx.name,
+              category: tx.category || "General",
+              timestamp: tx.date,
+              amount: tx.type === 'debit' ? -Math.abs(Number(tx.amount)) : Math.abs(Number(tx.amount)),
+              type: tx.type,
+            }))}
+            onDeleteSuccess={fetchAllTransactions}
+            onUpdateSuccess={fetchAllTransactions}
+            showHeader={true}
+            className="w-full"
+          />
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderContent = () => (
     <div className={styles.UserInnerContainer}>

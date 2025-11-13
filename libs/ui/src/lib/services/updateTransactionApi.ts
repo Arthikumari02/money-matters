@@ -39,7 +39,7 @@ const updateTransaction = async (
                 body: JSON.stringify({
                     id: transactionId,
                     name: data.name,
-                    type: data.type as 'Credit' | 'Debit',
+                    type: data.type as 'credit' | 'debit',
                     category: data.category,
                     amount: data.amount,
                     date: data.date,

@@ -31,9 +31,12 @@ export class UserTransactionStore {
 
   get filteredTransactions() {
     if (this.activeTab === "all") return this.transactions;
-    return this.transactions.filter(
-      (tx) => tx.type.toLowerCase() === this.activeTab
-    );
+    return this.transactions.filter((tx) => {
+      const typeMatch = this.activeTab === 'credit'
+        ? tx.type === 'credit'
+        : tx.type === 'debit';
+      return typeMatch;
+    });
   }
 
   reset() {

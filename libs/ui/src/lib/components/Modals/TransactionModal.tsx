@@ -89,7 +89,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       if (mode === 'edit' && transactionId) {
         await updateTransaction(userId, transactionId, {
           name: formData.name,
-          type: formData.type as 'Credit' | 'Debit',
+          type: formData.type as 'credit' | 'debit',
           category: formData.category,
           amount: parseFloat(formData.amount),
           date: fullDateTime,
@@ -98,7 +98,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       } else {
         await addTransactionApi(userId, {
           name: formData.name,
-          type: formData.type as 'Credit' | 'Debit',
+          type: formData.type as 'credit' | 'debit',
           category: formData.category,
           amount: parseFloat(formData.amount),
           date: fullDateTime,
@@ -152,8 +152,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         disabled={isLoading}
         options={[
           { value: '', label: t('add_transaction.placeholders.select_type') },
-          { value: 'Credit', label: t('credit') },
-          { value: 'Debit', label: t('debit') }
+          { value: 'credit', label: t('credit') },
+          { value: 'debit', label: t('debit') }
         ]}
       />
 

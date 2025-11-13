@@ -35,7 +35,7 @@ const addTransaction = async (userId: string, data: TransactionInput) => {
                 body: JSON.stringify({
                     user_id: userId,
                     name: data.name,
-                    type: data.type as 'Credit' | 'Debit',
+                    type: data.type as 'credit' | 'debit',
                     category: data.category,
                     amount: data.amount,
                     date: data.date,
