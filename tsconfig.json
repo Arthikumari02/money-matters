@@ -23,6 +23,15 @@
     },
     {
       "path": "./libs/sidebar"
+    },
+    {
+      "path": "./libs/button"
+    },
+    {
+      "path": "./libs/button/design-system"
+    },
+    {
+      "path": "./design-system"
     }
   ],
   "ts-node": {
