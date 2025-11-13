@@ -35,7 +35,6 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
   const [showConfirm, setShowConfirm] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const isDebit = amount < 0;
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
@@ -75,7 +74,6 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
 
   return (
     <>
-      {/* Transaction Name + Icon */}
       <td className={styles.CellBase}>
         <div className={styles.IconCell}>
           <div className={styles.IconContainer}>
@@ -89,23 +87,19 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
         </div>
       </td>
 
-      {/* Category */}
       <td className={`${styles.CellBase} text-center`}>
         <span className={styles.CategoryText}>{category}</span>
       </td>
 
-      {/* Date */}
       <td className={`${styles.CellBase} text-center`}>
         <span className={styles.DateText}>{formattedDate}</span>
       </td>
 
-      {/* Amount */}
       <td className={`${styles.CellBase} text-right`}>
         <span className={styles.AmountText(type.toLowerCase() as 'credit' | 'debit')}>
           {type === 'credit' ? '+' : '-'}${Math.abs(amount).toLocaleString()}
         </span>
       </td>
-      {/* Action Buttons */}
       <td className={styles.ActionCell}>
         <div className={styles.ActionsWrapper}>
           <button

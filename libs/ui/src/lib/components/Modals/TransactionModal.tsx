@@ -6,7 +6,7 @@ import addTransactionApi from '../../services/addTransactionApi';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import * as styles from './Styles';
-import { Button } from '@money-matters/button';
+import { Button } from '@money-matters/designSystem';
 import FormField from '../Form/FormField';
 import { validateTransactionForm } from '../../utils/validation';
 

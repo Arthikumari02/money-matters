@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus } from 'react-icons/fa';
 import TransactionModal from '../Modals/TransactionModal';
-import { Button } from '@money-matters/button';
+import { Button } from '@money-matters/designSystem';
 import {
   TransactionInput,
 } from '../../types/transaction';

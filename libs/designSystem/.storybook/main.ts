@@ -7,10 +7,7 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 // Create a basic Tailwind config that extends the root config
 const tailwindConfig = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-    "../../libs/**/*.{js,jsx,ts,tsx}"
-  ],
+  content: ['./src/**/*.{js,jsx,ts,tsx}', '../../libs/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {},
   },
@@ -38,10 +35,7 @@ const config: StorybookConfig = {
       plugins: [react(), nxViteTsPaths()],
       css: {
         postcss: {
-          plugins: [
-            tailwindcss(tailwindConfig),
-            autoprefixer(),
-          ],
+          plugins: [tailwindcss(tailwindConfig), autoprefixer()],
         },
       },
     });

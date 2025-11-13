@@ -2,7 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@money-matters/app/*": ["apps/money-matters/src/*"]
+      "@money-matters/app/*": ["apps/money-matters/src/*"],
+      "@money-matters/designSystem": ["libs/designSystem/src/index.ts"]
     },
     "composite": true,
     "declarationMap": true,

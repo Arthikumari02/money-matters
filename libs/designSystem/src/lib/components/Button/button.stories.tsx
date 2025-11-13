@@ -11,9 +11,17 @@ const meta: Meta<typeof Button> = {
     variant: {
       control: { type: 'select' },
       options: [
-        'primary', 'primaryOutline', 'primaryLink', 'primaryGhost',
-        'destructive', 'destructiveOutline', 'destructiveLink', 'destructiveGhost',
-        'secondaryOutline', 'secondaryLink', 'secondaryGhost',
+        'primary',
+        'primaryOutline',
+        'primaryLink',
+        'primaryGhost',
+        'destructive',
+        'destructiveOutline',
+        'destructiveLink',
+        'destructiveGhost',
+        'secondaryOutline',
+        'secondaryLink',
+        'secondaryGhost',
       ],
       description: 'Button variant',
     },
@@ -88,19 +96,28 @@ export const WithRightIcon: Story = {
   },
 };
 
-
 export const AllVariants: Story = {
   render: () => (
     <div className="grid grid-cols-3 gap-8">
-      {([
-        'primary', 'primaryOutline', 'primaryLink', 'primaryGhost',
-        'destructive', 'destructiveOutline', 'destructiveLink', 'destructiveGhost',
-        'secondaryOutline', 'secondaryLink', 'secondaryGhost',
-      ] as ButtonVariantType[]).map(
-        (variant) => (
-          <div key={variant} className="space-y-4">
-            <h3 className="text-lg font-semibold capitalize">{variant}</h3>
-            {(['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as ButtonSizeType[]).map((size) => (
+      {(
+        [
+          'primary',
+          'primaryOutline',
+          'primaryLink',
+          'primaryGhost',
+          'destructive',
+          'destructiveOutline',
+          'destructiveLink',
+          'destructiveGhost',
+          'secondaryOutline',
+          'secondaryLink',
+          'secondaryGhost',
+        ] as ButtonVariantType[]
+      ).map((variant) => (
+        <div key={variant} className="space-y-4">
+          <h3 className="text-lg font-semibold capitalize">{variant}</h3>
+          {(['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as ButtonSizeType[]).map(
+            (size) => (
               <div key={`${variant}-${size}`} className="mb-2">
                 <Button
                   variant={variant}
@@ -109,12 +126,10 @@ export const AllVariants: Story = {
                   leftIcon={<FaPlus />}
                 />
               </div>
-            ))}
-          </div>
-        )
-      )}
+            )
+          )}
+        </div>
+      ))}
     </div>
   ),
 };
-
-

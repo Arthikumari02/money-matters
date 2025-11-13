@@ -3,7 +3,7 @@ import { IoClose } from 'react-icons/io5';
 import { FiLogOut } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-modal';
-import { Button } from '@money-matters/button';
+import { Button } from '@money-matters/designSystem';
 import * as styles from './Styles';
 
 interface ConfirmationModalProps {
