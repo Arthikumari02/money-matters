@@ -3,22 +3,25 @@
     "Type": "Delete",
     "title": "Are you sure you want to",
     "description": "This transaction will be deleted immediately. You can't undo this action",
-    "yes_delete": "Yes",
+    "yes_delete": "Yes, Delete",
+    "yes_deleting": "Yes, Deleting",
     "no_leave_it": "No, Leave it"
   },
   "logout": {
     "Type": "Logout",
     "title": "Are you sure you want to?",
     "description": "The account will be logged out immediately. You can't undo this action",
-    "yes_logout": "Yes"
-  },
+    "yes_logout": "Yes, Logout",
+    "yes_logging_out": "Yes, Logging out"
+  },  
   "transaction": {
     "name": "Transaction Name",
     "type": "Transaction Type",
     "category": "Category",
     "amount": "Amount",
     "date": "Date",
-    "add_transaction_button": "Add Transaction"
+    "add_transaction_button": "Add Transaction",
+    "adding_transaction": "Adding Transaction"
   },
   "add_transaction": {
     "title": "Add Transaction",

@@ -6,7 +6,7 @@ import addTransactionApi from '../../services/addTransactionApi';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import * as styles from './Styles';
-import Button from '../Button/Button';
+import { Button } from '@money-matters/button';
 import FormField from '../Form/FormField';
 import { validateTransactionForm } from '../../utils/validation';
 
@@ -229,13 +229,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       {renderFields()}
 
       <Button
-        onClick={handleSubmit}
-        isLoading={isLoading}
         variant="primary"
-        className={`${styles.ModalSubmitButton} w-full`}
-      >
-        {mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title')}
-      </Button>
+        size="lg"
+        isLoading={isLoading}
+        text={isLoading ? t('transaction.adding_transaction') :
+          (mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title'))}
+        onClick={handleSubmit}
+        className="w-full mt-8"
+      />
     </Modal>
   );
 };

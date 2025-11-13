@@ -151,6 +151,7 @@ const TransactionItemUser: React.FC<TransactionItemUserProps> = ({
           message={t('delete.description')}
           onConfirm={handleDelete}
           onCancel={() => setShowConfirm(false)}
+          isDeleting={isLoading}
         />
       )}
     </>

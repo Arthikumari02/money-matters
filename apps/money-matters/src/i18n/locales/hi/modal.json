@@ -3,14 +3,16 @@
     "Type": "मिटाना",
     "title": "क्या आप आश्वस्त है कि आपको मिटाना है",
     "description": "यह लेन-देन तुरंत हटा दिया जाएगा। आप इस कार्रवाई को पूर्ववत नहीं कर सकते",
-    "yes_delete": "हाँ",
+    "yes_delete": "हाँ, मिटाना",
+    "yes_deleting": "हाँ, मिटाना",
     "no_leave_it": "नहीं, रहने दो"
   },
   "logout": {
     "Type": "लॉगआउट",
     "title": "क्या आप लॉगआउट करना चाहते हैं?",
     "description": "लोरेम इप्सम डोलर सिट अमेट, कंसेक्टेचर एडिपिसिंग एलीट, सेड",
-    "yes_logout": "हाँ"
+    "yes_logout": "हाँ, लॉगआउट",
+    "yes_logging_out": "हाँ, लॉगआउट"
   },
   "transaction": {
     "name": "लेन-देन का नाम",
@@ -18,7 +20,8 @@
     "category": "वर्ग",
     "amount": "राशि",
     "date": "दिनांक",
-    "add_transaction_button": "लेन-देन जोड़ें"
+    "add_transaction_button": "लेन-देन जोड़ें",
+    "adding_transaction": "लेन-देन जोड़ा जा रहा है"
   },
   "add_transaction": {
     "title": "लेन-देन जोड़ें",

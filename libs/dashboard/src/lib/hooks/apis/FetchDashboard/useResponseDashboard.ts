@@ -68,6 +68,11 @@ export const processDashboardData = async (
         (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
+    console.log(
+        'Recent Transactions:',
+        allTransactions.slice(0, 3).map((t: any) => ({ name: t.transaction_name, type: t.type }))
+    );
+
     store.setAllTransactions(allTransactions);
 
     store.setRecentTransactions(allTransactions.slice(0, 3));

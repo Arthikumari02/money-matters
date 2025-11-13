@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus } from 'react-icons/fa';
 import TransactionModal from '../Modals/TransactionModal';
-import Button from '../Button/Button';
+import { Button } from '@money-matters/button';
 import {
   TransactionInput,
 } from '../../types/transaction';
@@ -33,7 +33,7 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { t } = useTranslation('transaction');
+  const { t } = useTranslation('modal');
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -54,26 +54,16 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
     }));
   };
 
-  const handleSubmit = async () => {
-    if (!validate()) return;
-
+  const handleSubmit = async (data: TransactionInput) => {
     setIsLoading(true);
     try {
-      await addTransactionApi(userId, formData);
+      await addTransactionApi(userId, data);
       onSuccess?.();
-
       setIsOpen(false);
-      setFormData({
-        name: '',
-        type: 'Credit',
-        category: '',
-        amount: 0,
-        date: '',
-      });
-
       toast.success('Transaction added successfully!');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to add transaction');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to add transaction';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -83,27 +73,20 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
     <>
       <Button
         variant="primary"
+        size="sm"
         onClick={openModal}
         isLoading={isLoading}
-        className="rounded-xl"
-        icon={<FaPlus />}
-      >
-        {isLoading ? t('adding_transaction') : t('add_transaction_button')}
-      </Button>
+        isDisabled={isLoading}
+        leftIcon={<FaPlus />}
+        text={isLoading ? t('transaction.adding_transaction') : t('transaction.add_transaction_button')}
+      />
 
       <TransactionModal
         mode="add"
         userId={userId}
         isOpen={isOpen}
-        transactionData={{
-          ...formData,
-          amount: formData.amount.toString(),
-        }}
         onClose={closeModal}
-        onInputChange={handleInputChange}
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-        errors={errors}
+        onSuccess={onSuccess}
       />
     </>
   );

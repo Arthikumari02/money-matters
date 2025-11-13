@@ -48,8 +48,9 @@ export const formatTransaction = (tx: any) => ({
     userId: tx.user_id,
     description: tx.transaction_name || tx.name || 'No description',
     category: tx.category || 'Uncategorized',
-    timestamp: tx.date || tx.timestamp || new Date().toISOString(),
-    amount: tx.amount ? Number(tx.amount) : 0,
-    userName: tx.user_name || tx.userName || 'Unknown User',
+    timestamp: tx.date || tx.created_at,
+    amount: Number(tx.amount) || 0,
+    type: tx.type,
+    userName: tx.user_name,
     userAvatar: tx.user_avatar,
 });

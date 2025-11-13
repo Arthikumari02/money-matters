@@ -3,7 +3,7 @@ import { IoClose } from 'react-icons/io5';
 import { FiLogOut } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import Modal from 'react-modal';
-import Button from '../Button/Button';
+import { Button } from '@money-matters/button';
 import * as styles from './Styles';
 
 interface ConfirmationModalProps {
@@ -12,6 +12,7 @@ interface ConfirmationModalProps {
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
+  isDeleting?: boolean;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -20,6 +21,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   message,
   onConfirm,
   onCancel,
+  isDeleting = false,
 }) => {
   const { t } = useTranslation('modal');
 
@@ -50,18 +52,16 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       <div className={styles.ConfirmButtonWrapper}>
         <Button
           onClick={onConfirm}
-          variant="danger"
-          className="w-full sm:w-auto"
-        >
-          {t(title === 'delete' ? 'delete.yes_delete' : 'logout.yes_logout')}
-        </Button>
+          variant="destructive"
+          size="sm"
+          isLoading={isDeleting}
+          text={isDeleting ? t('delete.yes_deleting') : t('delete.yes_delete')} />
         <Button
           onClick={onCancel}
-          variant="secondary"
-          className="w-full sm:w-auto"
-        >
-          {t('delete.no_leave_it')}
-        </Button>
+          variant="secondaryOutline"
+          size="sm"
+          text={t('delete.no_leave_it')}
+        />
       </div>
     </Modal>
   );

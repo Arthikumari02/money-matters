@@ -70,13 +70,33 @@ export class DashboardStore {
 
   setRecentTransactions(data: any[]) {
     this.recentTransactions = Array.isArray(data)
-      ? data.map(t => t instanceof TransactionModel ? t : new TransactionModel(t))
+      ? data.map(t => {
+          const transaction = t instanceof TransactionModel ? t : new TransactionModel(t);
+          // Ensure type is properly set based on amount if not provided
+          if (!transaction.type) {
+            transaction.type = transaction.amount < 0 ? 'Debit' : 'Credit';
+          } else {
+            // Ensure type is properly capitalized
+            transaction.type = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase();
+          }
+          return transaction;
+        })
       : [];
   }
 
   setAllTransactions(data: any[]) {
     this.allTransactions = Array.isArray(data)
-      ? data.map(t => t instanceof TransactionModel ? t : new TransactionModel(t))
+      ? data.map(t => {
+          const transaction = t instanceof TransactionModel ? t : new TransactionModel(t);
+          // Ensure type is properly set based on amount if not provided
+          if (!transaction.type) {
+            transaction.type = transaction.amount < 0 ? 'Debit' : 'Credit';
+          } else {
+            // Ensure type is properly capitalized
+            transaction.type = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1).toLowerCase();
+          }
+          return transaction;
+        })
       : [];
   }
 

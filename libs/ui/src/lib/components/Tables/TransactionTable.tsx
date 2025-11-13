@@ -12,6 +12,7 @@ export interface Transaction {
     category: string;
     timestamp: string;
     amount: number;
+    type: 'Credit' | 'Debit';
     onDeleteSuccess?: () => void;
     onUpdateSuccess?: () => void;
     userName?: string;
@@ -90,7 +91,7 @@ export const TransactionTable: React.FC<TransactionTableProps> = ({
                                         name: transaction.description,
                                         userName: transaction.userName || '',
                                         category: transaction.category,
-                                        type: transaction.amount < 0 ? 'Debit' : 'Credit',
+                                        type: transaction.type || 'Credit',
                                         amount: transaction.amount * (transaction.amount < 0 ? -1 : 1),
                                         date: transaction.timestamp,
                                         userAvatar: transaction.userAvatar,
