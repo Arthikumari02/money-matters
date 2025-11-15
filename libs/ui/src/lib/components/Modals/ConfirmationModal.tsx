@@ -34,9 +34,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       contentLabel={title}
       shouldCloseOnOverlayClick={true}
     >
-      <button onClick={onCancel} className={styles.ModalCloseButton}>
-        <IoClose size={22} />
-      </button>
+      <div className="absolute top-4 right-4 p-2 rounded-ful bg-transparent text-[#718EBF]">
+        <Button onClick={onCancel} variant="link" intent="primary" size="sm">
+          <IoClose size={22} />
+        </Button>
+      </div>
 
       <div className={styles.ModalContentWrapper}>
         <div className={styles.ConfirmIconWrapper}>
@@ -51,19 +53,30 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
       <div className={styles.ConfirmButtonWrapper}>
         <Button
-          onClick={onConfirm}
-          variant="destructive"
+          onPress={onConfirm}
+          variant="solid"
+          intent='destructive'
           size="sm"
-          isLoading={isDeleting}
-          text={isDeleting ? t('delete.yes_deleting') : t('delete.yes_delete')} />
+        >
+          {isDeleting ? (
+            <>
+              <Button.Loader />
+              <Button.Text>Loading...</Button.Text>
+            </>
+          ) : (
+            <Button.Text>{t('delete.yes_delete')}</Button.Text>
+          )}
+        </Button>
         <Button
-          onClick={onCancel}
-          variant="secondaryOutline"
+          onPress={onCancel}
+          variant="outline"
+          intent='neutral'
           size="sm"
-          text={t('delete.no_leave_it')}
-        />
-      </div>
-    </Modal>
+        >
+          <Button.Text>{t('delete.no_leave_it')}</Button.Text>
+        </Button>
+      </div >
+    </Modal >
   );
 };
 

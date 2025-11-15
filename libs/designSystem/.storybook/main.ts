@@ -4,15 +4,10 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import path from 'path';
 
-// Create a basic Tailwind config that extends the root config
-const tailwindConfig = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}', '../../libs/**/*.{js,jsx,ts,tsx}'],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
+// Use the root Tailwind config
+const tailwindConfig = require('../../../tailwind.config.js');
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
@@ -35,7 +30,17 @@ const config: StorybookConfig = {
       plugins: [react(), nxViteTsPaths()],
       css: {
         postcss: {
-          plugins: [tailwindcss(tailwindConfig), autoprefixer()],
+          plugins: [
+            tailwindcss({
+              config: tailwindConfig,
+            }),
+            autoprefixer(),
+          ],
+        },
+      },
+      resolve: {
+        alias: {
+          '@': path.resolve(__dirname, '../src'),
         },
       },
     });

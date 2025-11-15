@@ -28,7 +28,6 @@ export const ModalFieldWrapper = `
   flex flex-col gap-5 mt-4
 `;
 
-// Base modal styles
 export const ModalLabel = `
   text-sm font-medium text-[#374151] mb-1
 `;

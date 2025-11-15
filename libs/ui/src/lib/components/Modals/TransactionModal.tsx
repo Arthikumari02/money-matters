@@ -106,7 +106,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         toast.success(t('toast.added_successfully'));
       }
 
-      // Call onSuccess before closing the modal
       onSuccess?.();
       onClose();
     } catch (err) {
@@ -209,13 +208,17 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       contentLabel={mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}
       shouldCloseOnOverlayClick={true}
     >
-      <button
-        onClick={onClose}
-        disabled={isLoading}
-        className="absolute right-4 top-4 p-1 rounded-ful bg-transparent text-[#718EBF]"
-      >
-        <IoClose size={22} />
-      </button>
+      <div className="absolute top-4 right-4 p-2 rounded-ful bg-transparent text-[#718EBF]">
+        <Button
+          variant="link"
+          intent="primary"
+          size="sm"
+          onPress={onClose}
+          isDisabled={isLoading}
+        >
+          <IoClose size={22} />
+        </Button>
+      </div>
 
       <h2 className={styles.ModalHeading}>
         {mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title')}
@@ -229,14 +232,21 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       {renderFields()}
 
       <Button
-        variant="primary"
+        variant="solid"
+        intent="primary"
         size="lg"
-        isLoading={isLoading}
-        text={isLoading ? t('transaction.adding_transaction') :
-          (mode === 'edit' ? t('update_transaction.title') : t('add_transaction.title'))}
-        onClick={handleSubmit}
+        onPress={handleSubmit}
         className="w-full mt-8"
-      />
+      >
+        {isLoading ? (
+          <>
+            <Button.Loader />
+            <Button.Text>Loading...</Button.Text>
+          </>
+        ) : (
+          <Button.Text>{t('transaction.adding_transaction')}</Button.Text>
+        )}
+      </Button>
     </Modal>
   );
 };

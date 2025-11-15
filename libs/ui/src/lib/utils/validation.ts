@@ -10,13 +10,13 @@ export const validateTransaction = (
   t: (key: string) => string
 ): ValidationResult => {
   const errors: Record<string, string> = {};
-  
+
   if (!formData.name.trim()) errors.name = t('validation.name_required');
   if (!formData.type) errors.type = t('validation.type_required');
   if (!formData.category) errors.category = t('validation.category_required');
   if (!formData.amount) errors.amount = t('validation.amount_required');
   if (!formData.date) errors.date = t('validation.date_required');
-  
+
   return {
     isValid: Object.keys(errors).length === 0,
     errors

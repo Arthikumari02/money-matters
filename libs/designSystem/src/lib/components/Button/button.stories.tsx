@@ -1,135 +1,162 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Button, ButtonVariantType, ButtonSizeType } from './button';
-import { FaPlus, FaSignOutAlt } from 'react-icons/fa';
+import { Button } from './Button';
+import { Mail, Download, Plus, Trash2, Save } from 'lucide-react';
 
-const meta: Meta<typeof Button> = {
+const meta = {
   title: 'Components/Button',
   component: Button,
+  parameters: {
+    layout: 'centered',
+  },
   tags: ['autodocs'],
   argTypes: {
-    variant: {
-      control: { type: 'select' },
-      options: [
-        'primary',
-        'primaryOutline',
-        'primaryLink',
-        'primaryGhost',
-        'destructive',
-        'destructiveOutline',
-        'destructiveLink',
-        'destructiveGhost',
-        'secondaryOutline',
-        'secondaryLink',
-        'secondaryGhost',
-      ],
-      description: 'Button variant',
-    },
     size: {
-      control: { type: 'select' },
-      options: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'],
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
       description: 'Button size',
+    },
+    variant: {
+      control: 'select',
+      options: ['solid', 'outline', 'link', 'ghost'],
+      description: 'Button variant style',
+    },
+    intent: {
+      control: 'select',
+      options: ['primary', 'destructive', 'neutral'],
+      description: 'Button intent/color scheme',
     },
     isDisabled: {
       control: 'boolean',
-      description: 'Disables the button',
+      description: 'Disabled state',
     },
-    isLoading: {
-      control: 'boolean',
-      description: 'Shows loading state',
-    },
-    onClick: { action: 'clicked' },
   },
-  args: {
-    text: 'Button',
-    variant: 'primary',
-    size: 'md',
-    isDisabled: false,
-    isLoading: false,
-    leftIcon: <FaPlus />,
-    rightIcon: <FaSignOutAlt />,
-  },
-};
+} satisfies Meta<typeof Button>;
 
 export default meta;
-type Story = StoryObj<typeof Button>;
+type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    variant: 'primary',
-    text: 'Primary Button',
+    children: 'Primary Button',
+    intent: 'primary',
+    variant: 'solid',
+    size: 'md',
   },
 };
 
 export const Destructive: Story = {
   args: {
-    variant: 'destructive',
-    text: 'Delete',
+    children: 'Delete',
+    intent: 'destructive',
+    variant: 'solid',
+    size: 'md',
   },
 };
 
-export const DisabledState: Story = {
+export const Small: Story = {
   args: {
+    children: 'Small Button',
+    size: 'sm',
+  },
+};
+
+export const Outline: Story = {
+  args: {
+    children: 'Outline Button',
+    variant: 'outline',
+  },
+};
+
+export const Ghost: Story = {
+  args: {
+    children: 'Ghost Button',
+    variant: 'ghost',
+  },
+};
+
+export const WithLeadingIcon: Story = {
+  render: (args) => (
+    <Button {...args}>
+      <Button.Icon>
+        <Mail />
+      </Button.Icon>
+      <Button.Text>Send Email</Button.Text>
+    </Button>
+  ),
+};
+
+export const WithTrailingIcon: Story = {
+  render: (args) => (
+    <Button {...args}>
+      <Button.Text>Download</Button.Text>
+      <Button.Icon>
+        <Download />
+      </Button.Icon>
+    </Button>
+  ),
+};
+
+export const Loading: Story = {
+  render: (args) => (
+    <Button {...args} isDisabled>
+      <Button.Loader />
+      <Button.Text>Loading...</Button.Text>
+    </Button>
+  ),
+};
+
+export const Disabled: Story = {
+  args: {
+    children: 'Disabled Button',
     isDisabled: true,
-    text: 'Disabled Button',
   },
 };
 
-export const LoadingState: Story = {
-  args: {
-    isLoading: true,
-    text: 'Loading...',
-  },
+export const PrimaryShortcut: Story = {
+  render: () => (
+    <Button.Primary>
+      <Button.Text>Primary Shortcut</Button.Text>
+    </Button.Primary>
+  ),
 };
 
-export const WithLeftIcon: Story = {
-  args: {
-    leftIcon: <FaPlus />,
-    text: 'Add Item',
-  },
-};
-
-export const WithRightIcon: Story = {
-  args: {
-    rightIcon: <FaSignOutAlt />,
-    text: 'Sign Out',
-  },
+export const DangerShortcut: Story = {
+  render: () => (
+    <Button.Danger>
+      <Button.Icon>
+        <Trash2 />
+      </Button.Icon>
+      <Button.Text>Delete Item</Button.Text>
+    </Button.Danger>
+  ),
 };
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="grid grid-cols-3 gap-8">
-      {(
-        [
-          'primary',
-          'primaryOutline',
-          'primaryLink',
-          'primaryGhost',
-          'destructive',
-          'destructiveOutline',
-          'destructiveLink',
-          'destructiveGhost',
-          'secondaryOutline',
-          'secondaryLink',
-          'secondaryGhost',
-        ] as ButtonVariantType[]
-      ).map((variant) => (
-        <div key={variant} className="space-y-4">
-          <h3 className="text-lg font-semibold capitalize">{variant}</h3>
-          {(['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as ButtonSizeType[]).map(
-            (size) => (
-              <div key={`${variant}-${size}`} className="mb-2">
-                <Button
-                  variant={variant}
-                  size={size}
-                  text={`${variant} ${size}`}
-                  leftIcon={<FaPlus />}
-                />
-              </div>
-            )
-          )}
+    <div className="flex flex-col gap-8">
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Solid Variants</h3>
+        <div className="flex gap-4">
+          <Button intent="primary" variant="solid">Primary</Button>
+          <Button intent="destructive" variant="solid">Destructive</Button>
         </div>
-      ))}
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Outline Variants</h3>
+        <div className="flex gap-4">
+          <Button intent="primary" variant="outline">Just Test</Button>
+          <Button intent="destructive" variant="outline">Destructive</Button>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Ghost Variants</h3>
+        <div className="flex gap-4">
+          <Button intent="primary" variant="ghost">Primary</Button>
+          <Button intent="destructive" variant="ghost">Destructive</Button>
+        </div>
+      </div>
     </div>
   ),
 };

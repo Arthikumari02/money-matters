@@ -72,14 +72,16 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
   return (
     <>
       <Button
-        variant="primary"
+        variant="solid"
+        intent="primary"
         size="sm"
-        onClick={openModal}
-        isLoading={isLoading}
-        isDisabled={isLoading}
-        leftIcon={<FaPlus />}
-        text={isLoading ? t('transaction.adding_transaction') : t('transaction.add_transaction_button')}
-      />
+        onPress={openModal}
+      >
+        <Button.Icon>
+          <FaPlus />
+        </Button.Icon>
+        <Button.Text>{t('transaction.add_transaction_button')}</Button.Text>
+      </Button>
 
       <TransactionModal
         mode="add"

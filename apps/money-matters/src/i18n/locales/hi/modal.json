@@ -38,5 +38,12 @@
     "title": "लेन-देन अपडेट करें",
     "description": "लोरेम इप्सम डोलर सिट अमेट, कंसेक्टेचर"
   },
-  "processing": "प्रसंस्करण...."
+  "processing": "प्रसंस्करण....",
+  "validation": {
+    "name_required": "नाम दर्ज करें",
+    "type_required": "लेनदेन प्रकार चुनें",
+    "category_required": "वर्ग",
+    "amount_required": "राशि दर्ज करें",
+    "date_required": "दिनांक चुनें"
+  }
 }
