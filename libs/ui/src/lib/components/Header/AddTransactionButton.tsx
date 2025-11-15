@@ -21,7 +21,6 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
   onSuccess,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<TransactionInput>({
     name: '',
     type: 'credit',
@@ -55,7 +54,6 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
   };
 
   const handleSubmit = async (data: TransactionInput) => {
-    setIsLoading(true);
     try {
       await addTransactionApi(userId, data);
       onSuccess?.();
@@ -64,8 +62,6 @@ const AddTransactionButton: React.FC<AddTransactionButtonProps> = ({
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to add transaction';
       toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
     }
   };
 

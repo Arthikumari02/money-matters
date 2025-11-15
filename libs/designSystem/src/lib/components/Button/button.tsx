@@ -1,8 +1,7 @@
 import React, { createContext, useContext } from "react";
 import { Button as AriaButton, ButtonProps } from "react-aria-components";
-import { getLoaderSize } from "../../utils/getStyles";
+import { getLoaderSize, getVariant } from "../../utils/getButtonStyles";
 import { cn } from "../../utils/helpers";
-import { getVariant } from "../../utils/getStyles";
 
 
 const ButtonSizeContext = createContext("md");
