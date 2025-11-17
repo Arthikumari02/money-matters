@@ -10,8 +10,8 @@ import clsx from "clsx";
 import { FieldContext, useFieldContext } from "../FieldContext";
 import { ValidationIcon } from "../ValidationIconProps";
 import { InputStyleBuilder } from "../InputStyleBuilder";
-import { IconDetector } from "../IconDetector";
-import { ValidationIconResolver } from "../ValidationIconResolver";
+import { IconDetector } from "../../helpers/IconDetector";
+import { ValidationIconResolver } from "../../helpers/ValidationIconResolver";
 
 import { TextInputFieldProps } from "./Types";
 import { LabelProps, IconProps, InputProps, TextProps } from "../BaseInputFieldProps";
