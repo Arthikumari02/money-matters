@@ -2,7 +2,7 @@ import React, { createContext, useContext } from "react";
 import {
     Disclosure as AriaDisclosure,
     Button,
-    DisclosurePanel
+    DisclosurePanel,
 } from "react-aria-components";
 import { ChevronRight } from "lucide-react";
 import clsx from "clsx";
@@ -29,6 +29,7 @@ import type {
 
 const DisclosureContext = createContext<DisclosureContextValue | null>(null);
 
+
 const useDisclosureContext = () => {
     const ctx = useContext(DisclosureContext);
     if (!ctx)
@@ -44,7 +45,7 @@ const Disclosure = ({
 }: DisclosureProps) => {
     return (
         <DisclosureContext.Provider value={{ size }}>
-            <AriaDisclosure {...props} className={clsx("group rounded-md", className)}>
+            <AriaDisclosure {...props} className={clsx("group gap-2 rounded-md", className)}>
                 {children}
             </AriaDisclosure>
         </DisclosureContext.Provider>
@@ -57,7 +58,7 @@ const Trigger = ({ children, className }: TriggerProps) => {
     return (
         <Button
             slot="trigger"
-            className={clsx(triggerBaseStyles, sizeStyles[size], className)}
+            className={clsx("group", triggerBaseStyles, sizeStyles[size], className)}
         >
             {children}
         </Button>

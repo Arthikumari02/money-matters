@@ -12,8 +12,8 @@ export const iconSizes: Record<Size, number> = {
     lg: 20,
 };
 
-export const contentStyles = "px-4 pb-4 pt-1 text-sm text-gray-700";
-export const triggerBaseStyles = "w-full flex items-center gap-2 transition-colors font-medium";
+export const contentStyles = "px-7 pb-4 pt-1 text-sm text-gray-700";
+export const triggerBaseStyles = "w-full flex items-center gap-1 transition-colors font-medium";
 export const leftIconStyles = "flex items-center";
 export const rightIconStyles = "flex items-center ml-auto";
 export const chevronBaseStyles = "transition-transform duration-200 group-data-[expanded]:rotate-90";
