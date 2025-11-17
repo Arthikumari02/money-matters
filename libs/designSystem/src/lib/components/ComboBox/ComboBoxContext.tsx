@@ -1,10 +1,13 @@
 import { createContext, useContext } from "react";
 
+export type Size = 'xs' | 'sm' | 'md' | 'lg';
+
 export interface ComboBoxContextType {
-    size?: "xs" | "sm" | "md";
+    size?: Size;
+    isDisabled?: boolean;
     isInvalid?: boolean;
     isRequired?: boolean;
-    isDisabled?: boolean;
+    isSelected?: boolean;
     customIcons?: {
         invalid?: React.ReactNode;
         required?: React.ReactNode;
