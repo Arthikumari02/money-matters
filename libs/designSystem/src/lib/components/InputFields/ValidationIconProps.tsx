@@ -1,5 +1,5 @@
 import React from "react";
-import { ValidationIconResolver } from "../helpers/ValidationIconResolver";
+import { ValidationIconResolver } from "../../helpers/ValidationIconResolver";
 
 interface ValidationIconProps {
     isInvalid?: boolean;

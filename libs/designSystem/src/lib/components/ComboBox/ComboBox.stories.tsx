@@ -97,8 +97,7 @@ type Story = StoryObj<typeof ComboBoxField>;
 
 export const Default: Story = {
     render: function Render(args) {
-        const [selectedKey, setSelectedKey] = useState<string | null>(null);
-
+        const [selectedKey, setSelectedKey] = useState<Key | null>(null);
         return (
             <div className="w-80">
                 <ComboBoxField
@@ -158,54 +157,6 @@ export const WithSelectedValue: Story = {
     }
 };
 
-export const WithLeftIcon: Story = {
-    args: {
-        label: 'Search Member',
-        placeholder: 'Search team member'
-    },
-    render: function Render(args) {
-        const [selectedKey, setSelectedKey] = useState<string | null>(null);
-
-        return (
-            <div className="w-80">
-                <ComboBoxField
-                    {...args}
-                    value={selectedKey || undefined}
-                    onChange={setSelectedKey}
-                    className="relative"
-                >
-                    <ComboBoxField.LeftIcon>
-                        <AiOutlineSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                    </ComboBoxField.LeftIcon>
-                    {teamMembers.map((member) => (
-                        <ComboBoxField.Option
-                            key={member.id}
-                            id={String(member.id)}
-                            textValue={member.name}
-                        >
-                            <div className="flex items-center gap-3">
-                                <img
-                                    src={member.avatar}
-                                    alt={member.name}
-                                    className="w-6 h-6 rounded-full"
-                                />
-                                <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-medium text-gray-900 truncate">
-                                        {member.name}
-                                    </div>
-                                    <div className="text-xs text-gray-500 truncate">
-                                        {member.role}
-                                    </div>
-                                </div>
-                            </div>
-                        </ComboBoxField.Option>
-                    ))}
-                </ComboBoxField>
-            </div>
-        );
-    }
-};
-
 export const ErrorState: Story = {
     args: {
         isInvalid: true,
@@ -242,7 +193,7 @@ export const CustomOptionRendering: Story = {
         placeholder: 'Select team member',
     },
     render: function Render(args) {
-        const [selectedKey, setSelectedKey] = useState<string | null>(null);
+        const [selectedKey, setSelectedKey] = useState<Key | null>(null);
 
         return (
             <div className="w-80">

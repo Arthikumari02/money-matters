@@ -1,7 +1,7 @@
 import { ListBoxItem, type ListBoxItemProps } from "react-aria-components";
 import type { Key, ReactNode } from "react";
 import clsx from "clsx";
-
+import { comboBoxOptionStyles } from "./Style";
 export interface ComboBoxOptionProps extends Omit<ListBoxItemProps, "id"> {
     id: Key;
     children: ReactNode | ((renderProps: { isSelected: boolean; isFocused: boolean; isHovered: boolean; isPressed: boolean; isDisabled: boolean }) => ReactNode);
@@ -17,10 +17,10 @@ export function ComboBoxOption({ id, children, className, ...props }: ComboBoxOp
                 const { isFocused, isSelected, isHovered } = renderProps;
 
                 const baseClass = clsx(
-                    "flex items-center justify-between px-3 py-2 text-sm cursor-pointer select-none rounded-md transition-colors",
-                    isFocused && "bg-gray-100",
-                    !isFocused && isHovered && "bg-gray-50",
-                    isSelected && "bg-blue-50 text-blue-700"
+                    comboBoxOptionStyles.base,
+                    isFocused && comboBoxOptionStyles.focused,
+                    !isFocused && isHovered && comboBoxOptionStyles.hovered,
+                    isSelected && comboBoxOptionStyles.selected
                 );
 
                 if (typeof className === 'function') {
@@ -34,20 +34,20 @@ export function ComboBoxOption({ id, children, className, ...props }: ComboBoxOp
                 <>
                     {typeof children === 'function' ? (
                         <>
-                            <div className="flex items-center gap-2 flex-1">
+                            <div className={comboBoxOptionStyles.content}>
                                 {children(renderProps)}
                             </div>
                             {renderProps.isSelected && (
-                                <span className="text-blue-600 ml-2">✓</span>
+                                <span className={comboBoxOptionStyles.checkmark}>✓</span>
                             )}
                         </>
                     ) : (
                         <>
-                            <div className="flex items-center gap-2 flex-1">
+                            <div className={comboBoxOptionStyles.content}>
                                 {children}
                             </div>
                             {renderProps.isSelected && (
-                                <span className="text-blue-600 ml-2">✓</span>
+                                <span className={comboBoxOptionStyles.checkmark}>✓</span>
                             )}
                         </>
                     )}

@@ -69,3 +69,11 @@ export const getFieldClasses = (className?: string) => {
 };
 
 export default baseStyles;
+export const comboBoxOptionStyles = {
+    base: 'flex items-center justify-between px-3 py-2 text-sm cursor-pointer select-none rounded-md transition-colors',
+    focused: 'bg-gray-100',
+    hovered: 'bg-gray-50',
+    selected: 'bg-blue-50 text-blue-700',
+    content: 'flex items-center gap-2 flex-1',
+    checkmark: 'text-blue-600 ml-2'
+};
